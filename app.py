@@ -62,8 +62,8 @@ def create_admin_user():
     admin_user = User.query.filter_by(username='admin').first()
     if not admin_user:
         new_admin = User(
-            username='admin',
-            password=generate_password_hash('adminpassword'),
+            username='AR.ad-@min',
+            password=generate_password_hash('3jnckdj2de@dadjc-AdBasE'),
             role='admin',
             email='admin@example.com',
             fullname='مدیر سیستم',
