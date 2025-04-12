@@ -8,11 +8,13 @@ from wtforms import (
 from wtforms.validators import DataRequired, Length, Optional, Email, NumberRange
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 
+
 # --------------------- Authentication & User Management ---------------------
 class LoginForm(FlaskForm):
     username = StringField('نام کاربری', validators=[DataRequired()])
     password = PasswordField('رمز عبور', validators=[DataRequired()])
     submit = SubmitField('ورود')
+
 
 class UserForm(FlaskForm):
     username = StringField('نام کاربری', validators=[DataRequired(), Length(min=3, max=50)])
@@ -25,7 +27,12 @@ class UserForm(FlaskForm):
         ('marketer', 'بازاریاب'),
         ('observer', 'ناظر')
     ])
+    # New fields for job information
+    job_title = StringField('عنوان شغلی', validators=[Optional(), Length(max=100)])
+    department = StringField('دپارتمان', validators=[Optional(), Length(max=100)])
+    parent_id = SelectField('زیرمجموعه کاربر', coerce=int, validators=[Optional()])
     submit = SubmitField('ذخیره')
+
 
 # --------------------- Route & Point Management ---------------------
 class RouteForm(FlaskForm):
@@ -33,6 +40,7 @@ class RouteForm(FlaskForm):
     description = TextAreaField('توضیحات', validators=[Optional()])
     marketer_ids = SelectMultipleField('بازاریاب‌ها', coerce=int)
     submit = SubmitField('ذخیره مسیر')
+
 
 class RoutePointForm(FlaskForm):
     name = StringField('نام نقطه', validators=[DataRequired()])
@@ -48,6 +56,7 @@ class RoutePointForm(FlaskForm):
     order = IntegerField('ترتیب', validators=[DataRequired()])
     submit = SubmitField('افزودن نقطه')
 
+
 # --------------------- Store & Evaluation ---------------------
 class StoreForm(FlaskForm):
     name = StringField('نام فروشگاه', validators=[DataRequired(), Length(max=150)])
@@ -55,10 +64,12 @@ class StoreForm(FlaskForm):
     lng = FloatField('طول جغرافیایی', validators=[Optional()])
     submit = SubmitField('ایجاد فروشگاه')
 
+
 class EvaluationParameterForm(FlaskForm):
     name = StringField('نام پارامتر', validators=[DataRequired(), Length(max=150)])
     weight = FloatField('وزن', validators=[Optional()])
     submit = SubmitField('ذخیره')
+
 
 class StoreEvaluationForm(FlaskForm):
     store_id = SelectField('فروشگاه', coerce=int, validators=[DataRequired()])
@@ -66,10 +77,12 @@ class StoreEvaluationForm(FlaskForm):
     end_date = DateField('تاریخ پایان', validators=[Optional()])
     submit = SubmitField('ایجاد ارزیابی')
 
+
 class QuotaCategoryForm(FlaskForm):
     category = StringField('دسته‌بندی', validators=[DataRequired(), Length(max=50)])
     monthly_quota = IntegerField('سهمیه ماهانه', validators=[DataRequired()])
     submit = SubmitField('ذخیره سهمیه')
+
 
 # --------------------- CSV Upload Forms ---------------------
 class CSVRouteUploadForm(FlaskForm):
@@ -79,6 +92,7 @@ class CSVRouteUploadForm(FlaskForm):
     ])
     submit = SubmitField('بارگذاری')
 
+
 class CSVCustomerUploadForm(FlaskForm):
     customer_csv = FileField('فایل CSV اطلاعات مشتریان', validators=[
         FileRequired(),
@@ -86,11 +100,13 @@ class CSVCustomerUploadForm(FlaskForm):
     ])
     submit = SubmitField('بارگذاری')
 
+
 # --------------------- New Grade Mapping Form ---------------------
 class GradeMappingForm(FlaskForm):
     grade_letter = StringField('درجه', validators=[DataRequired(), Length(max=10)])
     min_score = FloatField('حداقل نمره', validators=[DataRequired(), NumberRange(min=0)])
     submit = SubmitField('ذخیره')
+
 
 # --------------------- New Customer Evaluation Form ---------------------
 # Updated to reflect the new parameter structure.
@@ -145,12 +161,64 @@ class CustomerEvaluationForm(FlaskForm):
 
     submit = SubmitField('ذخیره ارزیابی')
 
+
 # --------------------- Target Setting Form ---------------------
 class TargetSettingForm(FlaskForm):
     liter_enabled = BooleanField('ظرفیت بر حسب لیتر')
     liter_capacity = FloatField('ظرفیت کل (لیتر)', validators=[Optional()])
-    
+
     shrink_enabled = BooleanField('ظرفیت بر حسب شرینک')
     shrink_capacity = FloatField('ظرفیت کل (شرینک)', validators=[Optional()])
-    
+
     submit = SubmitField('محاسبه و ذخیره تارگت‌ها')
+
+
+class ProductForm(FlaskForm):
+    name = StringField('نام محصول', validators=[DataRequired(), Length(max=100)])
+
+    # New fields with select/options for reusability
+    category_id = SelectField('دسته بندی', coerce=int, validators=[Optional()])
+    new_category = StringField('دسته بندی جدید', validators=[Optional(), Length(max=100)])
+
+    flavor_id = SelectField('طعم', coerce=int, validators=[Optional()])
+    new_flavor = StringField('طعم جدید', validators=[Optional(), Length(max=100)])
+
+    packaging_id = SelectField('بسته بندی', coerce=int, validators=[Optional()])
+    new_packaging = StringField('بسته بندی جدید', validators=[Optional(), Length(max=100)])
+
+    volume_id = SelectField('حجم', coerce=int, validators=[Optional()])
+    new_volume = FloatField('حجم جدید', validators=[Optional()])
+    volume_unit = StringField('واحد', validators=[Optional(), Length(max=20)], default='لیتر')
+
+    # Original fields
+    liter_capacity = FloatField('ظرفیت کل (لیتر)', validators=[Optional()])
+    shrink_capacity = FloatField('ظرفیت کل (شرینک)', validators=[Optional()])
+    submit = SubmitField('ذخیره محصول')
+
+
+
+# Add to forms.py
+class CustomerTypeForm(FlaskForm):
+    name = StringField('نوع مشتری', validators=[DataRequired(), Length(max=100)])
+    description = TextAreaField('توضیحات', validators=[Optional()])
+    submit = SubmitField('ذخیره')
+
+
+# Add this to forms.py
+
+class CustomerTypeQuotaForm(FlaskForm):
+    customer_type_id = SelectField('نوع فروشگاه', coerce=int, validators=[DataRequired()])
+    product_id = SelectField('محصول', coerce=int, validators=[Optional()])
+    province_id = SelectField('استان', coerce=int, validators=[Optional()])
+    percentage = FloatField('درصد تخصیص', validators=[
+        DataRequired(),
+        NumberRange(min=0, max=100, message='درصد باید بین 0 تا 100 باشد')
+    ])
+    is_active = BooleanField('فعال', default=True)
+    submit = SubmitField('ذخیره تخصیص')
+
+    def validate_percentage(self, field):
+        # Additional validation can be added here, for example:
+        # - Check if the sum of all active percentages doesn't exceed 100%
+        # This would require database access, which is typically done in route functions
+        pass

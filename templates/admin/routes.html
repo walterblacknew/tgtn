@@ -233,6 +233,22 @@
         </button>
     </div>
 
+
+    <!-- Add this button to the header section in routes.html -->
+<div class="header">
+    <h1 class="page-title">مدیریت مسیرها</h1>
+    <div style="display: flex; gap: 1rem;">
+        <a href="{{ url_for('admin_routes_upload') }}" class="btn btn-primary">
+            <i class="fas fa-file-upload"></i>
+            بارگذاری از فایل
+        </a>
+        <button class="btn btn-outline" onclick="window.location.href='{{ url_for('admin_index') }}'">
+            بازگشت به داشبورد
+        </button>
+    </div>
+</div>
+
+
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <div class="flash-messages">

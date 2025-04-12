@@ -18,8 +18,28 @@ class User(db.Model, UserMixin):
     last_location_update = db.Column(db.DateTime, nullable=True)
     assigned_routes = db.relationship('RouteAssignment', backref='marketer', lazy=True)
 
+    # New fields for job information
+    job_title = db.Column(db.String(100), nullable=True)
+    department = db.Column(db.String(100), nullable=True)
+    position_level = db.Column(db.Integer, default=0)  # Organizational level (0=top)
+
     def __repr__(self):
         return f'<User {self.username}, role={self.role}>'
+
+
+class UserHierarchy(db.Model):
+    __tablename__ = 'user_hierarchy'
+    id = db.Column(db.Integer, primary_key=True)
+    parent_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    child_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    level = db.Column(db.Integer, default=1)  # Depth in the hierarchy
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+
+    # Relationships
+    parent = db.relationship('User', foreign_keys=[parent_id], backref='subordinates_rel')
+    child = db.relationship('User', foreign_keys=[child_id], backref='superiors_rel')
+
+    __table_args__ = (db.UniqueConstraint('parent_id', 'child_id', name='_parent_child_uc'),)
 
 
 class Route(db.Model):
@@ -150,7 +170,8 @@ class CustomerReport(db.Model):
 
     evaluations = db.relationship('CustomerEvaluation', backref='customer', lazy=True)
     csv_evaluations = db.relationship('CSVEvaluationRecord', backref='customer', lazy=True)
-
+    customer_type_id = db.Column(db.Integer, db.ForeignKey('customer_type.id'), nullable=True)
+    customer_type = db.relationship('CustomerType', backref='customers', lazy=True)
     def __repr__(self):
         return f'<CustomerReport {self.name}>'
 
@@ -245,3 +266,175 @@ class ProvinceTarget(db.Model):
 
     def __repr__(self):
         return f'<ProvinceTarget for {self.province.name if self.province else "Unknown"}>'
+
+
+class Product(db.Model):
+    __tablename__ = 'product'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+
+    # New relationships
+    category_id = db.Column(db.Integer, db.ForeignKey('product_category.id'), nullable=True)
+    flavor_id = db.Column(db.Integer, db.ForeignKey('product_flavor.id'), nullable=True)
+    packaging_id = db.Column(db.Integer, db.ForeignKey('product_packaging.id'), nullable=True)
+    volume_id = db.Column(db.Integer, db.ForeignKey('product_volume.id'), nullable=True)
+
+    # Original fields
+    liter_capacity = db.Column(db.Float, nullable=True)
+    shrink_capacity = db.Column(db.Float, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+
+    # Relationships
+    province_targets = db.relationship('ProductProvinceTarget', backref='product', lazy=True)
+
+    def __repr__(self):
+        return f'<Product {self.name}>'
+
+
+class ProductCategory(db.Model):
+    """Product category model to store reusable categories"""
+    __tablename__ = 'product_category'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    products = db.relationship('Product', backref='category_relation', lazy=True)
+
+    def __repr__(self):
+        return f'<ProductCategory {self.name}>'
+
+
+class ProductFlavor(db.Model):
+    """Product flavor model to store reusable flavors"""
+    __tablename__ = 'product_flavor'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    products = db.relationship('Product', backref='flavor_relation', lazy=True)
+
+    def __repr__(self):
+        return f'<ProductFlavor {self.name}>'
+
+
+class ProductPackaging(db.Model):
+    """Product packaging model to store reusable packaging types"""
+    __tablename__ = 'product_packaging'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    products = db.relationship('Product', backref='packaging_relation', lazy=True)
+
+    def __repr__(self):
+        return f'<ProductPackaging {self.name}>'
+
+
+class ProductVolume(db.Model):
+    """Product volume model to store reusable volumes"""
+    __tablename__ = 'product_volume'
+    id = db.Column(db.Integer, primary_key=True)
+    value = db.Column(db.Float, nullable=False)
+    unit = db.Column(db.String(20), nullable=False, default='لیتر')
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    products = db.relationship('Product', backref='volume_relation', lazy=True)
+
+    __table_args__ = (db.UniqueConstraint('value', 'unit', name='_volume_unit_uc'),)
+
+    def __repr__(self):
+        return f'<ProductVolume {self.value} {self.unit}>'
+
+    @property
+    def display_name(self):
+        """Format volume for display"""
+        return f"{self.value} {self.unit}"
+
+
+class ProductProvinceTarget(db.Model):
+    __tablename__ = 'product_province_target'
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    province_id = db.Column(db.Integer, db.ForeignKey('province.id'), nullable=False)
+    liter_capacity = db.Column(db.Float, nullable=True)
+    shrink_capacity = db.Column(db.Float, nullable=True)
+    liter_percentage = db.Column(db.Float, nullable=True)
+    shrink_percentage = db.Column(db.Float, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+
+    __table_args__ = (db.UniqueConstraint('product_id', 'province_id', name='_product_province_uc'),)
+
+    def __repr__(self):
+        return f'<ProductProvinceTarget {self.product_id}_{self.province_id}>'
+
+
+# Add this to models.py (a new model for batch targets)
+class BatchGradeTarget(db.Model):
+    __tablename__ = 'batch_grade_target'
+    id = db.Column(db.Integer, primary_key=True)
+    batch_id = db.Column(db.String(50), nullable=False)
+    province_id = db.Column(db.Integer, db.ForeignKey('province.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    grade = db.Column(db.String(10), nullable=False)
+    liter_capacity = db.Column(db.Float, nullable=True)
+    shrink_capacity = db.Column(db.Float, nullable=True)
+    customer_count = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+
+    # Relationships
+    province = db.relationship('Province', backref='batch_grade_targets', lazy=True)
+    product = db.relationship('Product', backref='batch_grade_targets', lazy=True)
+
+    __table_args__ = (
+    db.UniqueConstraint('batch_id', 'province_id', 'product_id', 'grade', name='_batch_product_grade_uc'),)
+
+    def __repr__(self):
+        return f'<BatchGradeTarget batch={self.batch_id} product={self.product_id} grade={self.grade}>'
+
+
+# Add to models.py
+
+class CustomerType(db.Model):
+    __tablename__ = 'customer_type'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    description = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+
+
+class ProductCustomerTypeExclusion(db.Model):
+    __tablename__ = 'product_customer_type_exclusion'
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    customer_type_id = db.Column(db.Integer, db.ForeignKey('customer_type.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+
+    __table_args__ = (db.UniqueConstraint('product_id', 'customer_type_id', name='_product_customer_type_uc'),)
+
+
+# Add this new model to models.py
+
+class CustomerTypeQuota(db.Model):
+    """
+    Model to store quota percentage assignments for specific customer types.
+    This allows allocating a fixed percentage of a product's quota to specific customer types.
+    """
+    __tablename__ = 'customer_type_quota'
+    id = db.Column(db.Integer, primary_key=True)
+    customer_type_id = db.Column(db.Integer, db.ForeignKey('customer_type.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=True)  # NULL means all products
+    province_id = db.Column(db.Integer, db.ForeignKey('province.id'), nullable=True)  # NULL means all provinces
+    percentage = db.Column(db.Float, nullable=False, default=0)  # Percentage of total quota
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+
+    # Relationships
+    customer_type = db.relationship('CustomerType', backref='quota_assignments', lazy=True)
+    product = db.relationship('Product', backref='customer_type_quotas', lazy=True)
+    province = db.relationship('Province', backref='customer_type_quotas', lazy=True)
+
+    __table_args__ = (
+        db.UniqueConstraint('customer_type_id', 'product_id', 'province_id', name='_customer_type_product_province_uc'),
+    )
+
+    def __repr__(self):
+        product_name = self.product.name if self.product else "All Products"
+        province_name = self.province.name if self.province else "All Provinces"
+        return f"<CustomerTypeQuota {self.customer_type.name}: {self.percentage}% of {product_name} in {province_name}>"

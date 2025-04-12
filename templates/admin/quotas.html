@@ -143,6 +143,13 @@
     .btn-danger:hover {
       background-color: #dc2626;
     }
+    .btn-warning {
+      background-color: #f97316;
+      color: #fff;
+    }
+    .btn-warning:hover {
+      background-color: #ea580c;
+    }
     .btn-outline {
       background-color: transparent;
       color: #475569;
@@ -209,7 +216,7 @@
     .eval-link:hover {
       background-color: #4338ca;
     }
-    
+
     /* Badge with different colors */
     .grade-badge {
       padding: 0.25rem 0.5rem;
@@ -312,7 +319,7 @@
       display: flex;
       gap: 0.5rem;
     }
-    
+
     /* Tabs for evaluations */
     .tabs {
       display: flex;
@@ -337,7 +344,7 @@
     .tab-content.active {
       display: block;
     }
-    
+
     /* Flash messages */
     .flash {
       padding: 0.75rem 1rem;
@@ -365,7 +372,7 @@
       border-left: 4px solid #3b82f6;
       color: #1e40af;
     }
-    
+
     /* Section header with actions */
     .section-header {
       display: flex;
@@ -373,31 +380,84 @@
       align-items: center;
       margin-bottom: 1rem;
     }
-    
+
     /* Target Section Styles */
     .checkbox-group {
       margin-bottom: 1rem;
     }
-    
+
     .target-input {
       padding: 0.5rem;
       border: 1px solid #e2e8f0;
       border-radius: 0.375rem;
     }
-    
+
     .target-input:disabled {
       background-color: #f1f5f9;
       cursor: not-allowed;
     }
-    
+
     .target-results-table {
       overflow-x: auto;
       max-height: 400px;
       overflow-y: auto;
     }
+
+    /* Capacity Display */
+    .capacity-display {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    .capacity-badge {
+      background-color: #f1f5f9;
+      border-radius: 0.375rem;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .liter-badge {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+    .shrink-badge {
+      background-color: #fef9c3;
+      color: #854d0e;
+    }
+
+    /* Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .card {
+      background: #fff;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 1rem;
+      border: 1px solid #e2e8f0;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .card-title {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #334155;
+    }
   </style>
 </head>
 <body>
+
   <h1>مدیریت ارزیابی و درجه‌بندی مشتریان</h1>
 
   <!-- Flash messages -->
@@ -423,7 +483,7 @@
         </a>
       </div>
     </div>
-    
+
     <form method="POST" action="{{ url_for('admin_quotas') }}">
       {{ form.csrf_token }}
       <div class="form-group">
@@ -440,6 +500,74 @@
     </form>
   </div>
 
+
+  <!-- Add this section to quotas.html before the closing div of the main section -->
+
+  <!-- Section: Province Evaluation -->
+  <div class="section">
+    <div class="section-header">
+      <h2>
+        <i class="fas fa-map-marked-alt"></i>
+        ارزیابی استان‌ها
+      </h2>
+      <div>
+        <a href="{{ url_for('admin_province_evaluation') }}" class="btn btn-primary">
+          <i class="fas fa-file-excel"></i>
+          ارزیابی با CSV/Excel
+        </a>
+      </div>
+    </div>
+
+    <!-- Display province evaluation results if they exist -->
+    {% if session.get('province_evaluation_results') %}
+      {% set results = session.get('province_evaluation_results') %}
+      <div class="cards-grid">
+        {% for province, data in results.items() %}
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">{{ province }}</div>
+              <div>
+                <span class="grade-badge
+                  {% if data.grade[0] == 'A' %}grade-A
+                  {% elif data.grade[0] == 'B' %}grade-B
+                  {% elif data.grade[0] == 'C' %}grade-C
+                  {% elif data.grade[0] == 'D' %}grade-D
+                  {% else %}grade-none
+                  {% endif %}">
+                  {{ data.grade }}
+                </span>
+              </div>
+            </div>
+            <div style="font-size:1.25rem;font-weight:600;margin-bottom:0.5rem;">
+              نمره: {{ data.score }}
+            </div>
+            {% if data.parameters %}
+              <div style="color:#64748b;font-size:0.875rem;">
+                <div style="margin-bottom:0.5rem;font-weight:500;">امتیازهای جزئی:</div>
+                {% for param, score in data.parameters.items() %}
+                  <div>{{ param }}: {{ score }}</div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div style="text-align:center;margin-top:1rem;">
+        <a href="{{ url_for('admin_province_evaluation') }}" class="btn btn-primary">
+          <i class="fas fa-sync"></i>
+          ارزیابی جدید
+        </a>
+      </div>
+    {% else %}
+      <div style="text-align:center;padding:2rem;background:#f8fafc;border-radius:0.5rem;margin-bottom:1rem;">
+        <p style="margin-bottom:1rem;color:#64748b;">هنوز هیچ ارزیابی استانی انجام نشده است.</p>
+        <p style="color:#64748b;font-size:0.875rem;">
+          برای ارزیابی استان‌ها و تعیین درجه آن‌ها، از دکمه "ارزیابی با CSV/Excel" استفاده کنید.
+        </p>
+      </div>
+    {% endif %}
+  </div>
   <!-- Section: List of Defined Grade Mappings -->
   <div class="section">
     <h2>
@@ -459,7 +587,7 @@
           {% for mapping in grade_mappings %}
           <tr>
             <td>
-              <span class="grade-badge 
+              <span class="grade-badge
                 {% if mapping.grade_letter[0] == 'A' %}grade-A
                 {% elif mapping.grade_letter[0] == 'B' %}grade-B
                 {% elif mapping.grade_letter[0] == 'C' %}grade-C
@@ -489,7 +617,17 @@
       <p>هیچ درجه‌ای تعریف نشده است.</p>
     {% endif %}
   </div>
-  
+<!-- Add this to the section-header div in the "Customer List & Evaluations" section -->
+<div>
+  <a href="{{ url_for('admin_customer_types') }}" class="btn btn-primary">
+    <i class="fas fa-users-cog"></i>
+    مدیریت انواع مشتری
+  </a>
+  <a href="{{ url_for('admin_product_exclusions') }}" class="btn btn-success">
+    <i class="fas fa-ban"></i>
+    مدیریت عدم تخصیص محصول
+  </a>
+</div>
   <!-- Section: Target Setting -->
   <div class="section">
     <div class="section-header">
@@ -508,7 +646,7 @@
         </a>
       </div>
     </div>
-    
+
     <form method="POST" action="{{ url_for('admin_quotas') }}">
       <input type="hidden" name="submit_target" value="1">
       <div class="form-group">
@@ -518,7 +656,7 @@
             <label for="liter_enabled">ظرفیت بر حسب لیتر</label>
             <input type="number" step="any" id="liter_capacity" name="liter_capacity" class="target-input" style="margin-right: 1rem; width: 150px;" placeholder="مقدار کل لیتر">
           </div>
-          
+
           <div style="display: flex; align-items: center; margin-bottom: 1rem;">
             <input type="checkbox" id="shrink_enabled" name="shrink_enabled" class="target-checkbox" style="margin-left: 0.5rem;">
             <label for="shrink_enabled">ظرفیت بر حسب شرینک</label>
@@ -526,14 +664,14 @@
           </div>
         </div>
       </div>
-      
+
       <button type="submit" class="submit-btn">محاسبه و ذخیره تارگت‌ها</button>
     </form>
-    
+
     {% if provinces and provinces|length > 0 and province_targets and province_targets|length > 0 %}
     <div style="margin-top: 2rem;">
       <h3 style="font-size: 1rem; margin-bottom: 1rem;">نتایج تخصیص تارگت بر اساس جمعیت استان‌ها</h3>
-      
+
       <div class="target-results-table">
         <table>
           <thead>
@@ -579,7 +717,7 @@
           </tbody>
         </table>
       </div>
-      
+
       {% if provinces|length > 10 %}
         <div style="text-align: center; margin-top: 1rem;">
           <a href="{{ url_for('admin_province_targets') }}" class="btn btn-outline">
@@ -590,14 +728,88 @@
     </div>
     {% endif %}
   </div>
-  
+
+  <!-- Section: Product Targeting -->
+  <div class="section">
+    <div class="section-header">
+      <h2>
+        <i class="fas fa-box-open"></i>
+        تارگت زدن محصولات
+      </h2>
+      <div>
+        <a href="{{ url_for('admin_products') }}" class="btn btn-primary">
+          <i class="fas fa-plus"></i>
+          افزودن محصول جدید
+        </a>
+      </div>
+    </div>
+
+    {% if products %}
+      <div class="cards-grid">
+        {% for product in products %}
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">{{ product.name }}</div>
+            </div>
+
+            <div style="margin-bottom: 0.75rem;">
+              <div class="capacity-display">
+                {% if product.liter_capacity %}
+                  <span class="capacity-badge liter-badge">
+                    <i class="fas fa-tint"></i>
+                    {{ "{:,.0f}".format(product.liter_capacity) }} لیتر
+                  </span>
+                {% endif %}
+
+                {% if product.shrink_capacity %}
+                  <span class="capacity-badge shrink-badge">
+                    <i class="fas fa-box"></i>
+                    {{ "{:,.0f}".format(product.shrink_capacity) }} شرینک
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="actions">
+              <a href="{{ url_for('product_province_targets', product_id=product.id) }}" class="btn btn-primary">
+                <i class="fas fa-map-marker-alt"></i>
+                تارگت استانی
+              </a>
+              <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn btn-warning">
+                <i class="fas fa-edit"></i>
+                ویرایش
+              </a>
+              <form method="POST" action="{{ url_for('delete_product', product_id=product.id) }}" style="display: inline-block;">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('آیا از حذف این محصول مطمئن هستید؟ تمام تارگت‌های استانی آن نیز حذف خواهند شد.');">
+                  <i class="fas fa-trash"></i>
+                  حذف
+                </button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; text-align: center; margin-bottom: 1rem;">
+        <p>هیچ محصولی تعریف نشده است. لطفاً برای تعریف محصول جدید روی دکمه «افزودن محصول جدید» کلیک کنید.</p>
+      </div>
+    {% endif %}
+
+    <div style="margin-top: 1rem;">
+      <p style="color: #64748b; font-size: 0.875rem;">
+        <i class="fas fa-info-circle"></i>
+        با افزودن محصول، تارگت‌های استانی به صورت خودکار بر اساس جمعیت هر استان محاسبه می‌شوند. برای مشاهده و مدیریت تارگت‌های استانی هر محصول روی دکمه «تارگت استانی» کلیک کنید.
+      </p>
+    </div>
+  </div>
+
   <!-- Section: Batch Evaluations -->
   <div class="section">
     <h2>
       <i class="fas fa-layer-group"></i>
       ارزیابی‌های دسته‌ای (CSV/Excel)
     </h2>
-    
+
     {% if batch_evaluations %}
       <div class="batch-cards">
         {% for batch in batch_evaluations %}
@@ -613,7 +825,7 @@
                 {% endif %}
               </div>
             </div>
-            
+
             <div class="batch-stats">
               <div class="batch-stat">
                 <div class="stat-label">تعداد</div>
@@ -624,11 +836,11 @@
                 <div class="stat-value">{{ stats.get('avg_score', 0) }}</div>
               </div>
             </div>
-            
+
             <div class="batch-grades">
               {% for grade, count in stats.get('grades', {}).items() %}
                 <div class="batch-grade-pill">
-                  <span class="grade-badge 
+                  <span class="grade-badge
                     {% if grade[0] == 'A' %}grade-A
                     {% elif grade[0] == 'B' %}grade-B
                     {% elif grade[0] == 'C' %}grade-C
@@ -640,7 +852,7 @@
                 </div>
               {% endfor %}
             </div>
-            
+
             <div class="batch-actions">
               <a href="{{ url_for('view_batch_evaluations', batch_id=batch.batch_id) }}" class="btn btn-primary">
                 <i class="fas fa-eye"></i>
@@ -694,7 +906,7 @@
               <td>{{ customer.name }}</td>
               <td>
                 {% if customer.grade %}
-                <span class="grade-badge 
+                <span class="grade-badge
                   {% if customer.grade[0] == 'A' %}grade-A
                   {% elif customer.grade[0] == 'B' %}grade-B
                   {% elif customer.grade[0] == 'C' %}grade-C
@@ -740,7 +952,7 @@
               <td>{{ eval.customer.name }}</td>
               <td>{{ eval.total_score }}</td>
               <td>
-                <span class="grade-badge 
+                <span class="grade-badge
                   {% if eval.assigned_grade[0] == 'A' %}grade-A
                   {% elif eval.assigned_grade[0] == 'B' %}grade-B
                   {% elif eval.assigned_grade[0] == 'C' %}grade-C
@@ -772,13 +984,33 @@
       {% endif %}
     </div>
   </div>
-
+  <div class="section">
+    <div class="section-header">
+      <h2>
+        <i class="fas fa-bullseye"></i>
+        تارگت زدن
+      </h2>
+      <div>
+        <a href="{{ url_for('admin_province_targets') }}" class="btn btn-primary">
+          <i class="fas fa-map-marked-alt"></i>
+          نمایش نقشه تارگت استان‌ها
+        </a>
+        <a href="{{ url_for('admin_customer_type_quotas') }}" class="btn btn-primary">
+          <i class="fas fa-percentage"></i>
+          تخصیص درصدی به انواع فروشگاه
+        </a>
+        <a href="{{ url_for('init_provinces') }}" class="btn btn-outline">
+          <i class="fas fa-database"></i>
+          راه‌اندازی اولیه استان‌ها
+        </a>
+      </div>
+    </div>
   <script>
     // JavaScript for filtering the customer table
     const searchInput = document.getElementById('customerSearch');
     const tableBody = document.getElementById('customerTableBody');
     const rows = Array.from(tableBody?.getElementsByTagName('tr') || []);
-    
+
     if (searchInput && tableBody) {
       searchInput.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
@@ -793,26 +1025,58 @@
         });
       });
     }
-    
+
     // Tab functionality
     function showTab(tabId) {
       // Hide all tab contents
       document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
       });
-      
+
       // Show the selected tab content
       document.getElementById(tabId).classList.add('active');
-      
+
       // Update tab styling
       document.querySelectorAll('.tab').forEach(tab => {
         tab.classList.remove('active');
       });
-      
+
       // Highlight the clicked tab
       const activeTabIndex = tabId === 'customers-tab' ? 0 : 1;
       document.querySelectorAll('.tab')[activeTabIndex].classList.add('active');
     }
+
+    // Handle target checkboxes enabling/disabling input fields
+    document.addEventListener('DOMContentLoaded', function() {
+      const literEnabled = document.getElementById('liter_enabled');
+      const literCapacity = document.getElementById('liter_capacity');
+      const shrinkEnabled = document.getElementById('shrink_enabled');
+      const shrinkCapacity = document.getElementById('shrink_capacity');
+
+      if (literEnabled && literCapacity) {
+        literEnabled.addEventListener('change', function() {
+          literCapacity.disabled = !this.checked;
+          if (this.checked) {
+            literCapacity.focus();
+          }
+        });
+
+        // Initial state
+        literCapacity.disabled = !literEnabled.checked;
+      }
+
+      if (shrinkEnabled && shrinkCapacity) {
+        shrinkEnabled.addEventListener('change', function() {
+          shrinkCapacity.disabled = !this.checked;
+          if (this.checked) {
+            shrinkCapacity.focus();
+          }
+        });
+
+        // Initial state
+        shrinkCapacity.disabled = !shrinkEnabled.checked;
+      }
+    });
   </script>
 </body>
 </html>

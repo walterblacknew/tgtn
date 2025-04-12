@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>مدیریت محصولات | پنل مدیریت</title>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Vazirmatn', sans-serif;
+      padding: 2rem;
+      color: #1e293b;
+      direction: rtl;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.75rem;
+      color: #334155;
+    }
+    .section {
+      background: #fff;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .section h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #475569;
+    }
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 0.875rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.375rem;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      border-color: #4f46e5;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+    }
+    .submit-btn {
+      background-color: #4f46e5;
+      color: #fff;
+      padding: 0.75rem 1.25rem;
+      border: none;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .submit-btn:hover {
+      background-color: #4338ca;
+    }
+
+    /* Table Styles */
+    .table-container {
+      max-height: 600px;
+      overflow-y: auto;
+      margin-top: 1.5rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+    }
+    th, td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: right;
+      font-size: 0.875rem;
+    }
+    th {
+      background-color: #f8fafc;
+      font-weight: 600;
+      color: #334155;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    tr:hover td {
+      background-color: #f1f5f9;
+    }
+
+    /* Button Styles */
+    .btn {
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      text-decoration: none;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background-color: #4f46e5;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background-color: #4338ca;
+    }
+    .btn-success {
+      background-color: #22c55e;
+      color: #fff;
+    }
+    .btn-success:hover {
+      background-color: #16a34a;
+    }
+    .btn-warning {
+      background-color: #f97316;
+      color: #fff;
+    }
+    .btn-warning:hover {
+      background-color: #ea580c;
+    }
+    .btn-danger {
+      background-color: #ef4444;
+      color: #fff;
+    }
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
+    .btn-outline {
+      background-color: transparent;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+    .btn-outline:hover {
+      background-color: #f8fafc;
+    }
+
+    /* Actions Container */
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* Capacity Display */
+    .capacity-display {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    .capacity-badge {
+      background-color: #f1f5f9;
+      border-radius: 0.375rem;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .liter-badge {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+    .shrink-badge {
+      background-color: #fef9c3;
+      color: #854d0e;
+    }
+
+    /* Chart Section */
+    .chart-container {
+      width: 100%;
+      height: 400px;
+      margin-top: 1.5rem;
+    }
+
+    /* Flash messages */
+    .flash {
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+    }
+    .success {
+      background-color: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      color: #166534;
+    }
+    .danger {
+      background-color: #fef2f2;
+      border-left: 4px solid #ef4444;
+      color: #b91c1c;
+    }
+    .warning {
+      background-color: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #92400e;
+    }
+    .info {
+      background-color: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      color: #1e40af;
+    }
+
+    /* Overview Cards */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .card {
+      background: #fff;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 1rem;
+      border: 1px solid #e2e8f0;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .card-title {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #334155;
+    }
+
+    /* Badge for attribute display */
+    .attribute-badge {
+      background-color: #f1f5f9;
+      border-radius: 0.375rem;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      margin-right: 0.25rem;
+      margin-bottom: 0.25rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .category-badge {
+      background-color: #f3e8ff;
+      color: #7e22ce;
+    }
+    .flavor-badge {
+      background-color: #fce7f3;
+      color: #be185d;
+    }
+    .packaging-badge {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+    .volume-badge {
+      background-color: #e0f2fe;
+      color: #0369a1;
+    }
+
+    /* Attribute rows */
+    .attribute-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .attribute-label {
+      flex: 0 0 90px;
+      font-size: 0.875rem;
+      color: #64748b;
+    }
+    .attribute-select {
+      flex: 1;
+    }
+    .attribute-input {
+      flex: 1;
+      display: flex;
+      gap: 0.5rem;
+    }
+    .attribute-input input {
+      flex: 1;
+    }
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 1rem 0;
+      color: #94a3b8;
+      font-size: 0.875rem;
+    }
+    .divider:before, .divider:after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .divider:before {
+      margin-left: 0.5rem;
+    }
+    .divider:after {
+      margin-right: 0.5rem;
+    }
+
+    /* Search input */
+    .search-container {
+      margin-bottom: 1rem;
+    }
+    .search-input {
+      width: 100%;
+      padding: 0.625rem 0.75rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #e2e8f0;
+      margin-bottom: 1.5rem;
+    }
+    .tab {
+      padding: 0.75rem 1.25rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      font-weight: 500;
+      color: #64748b;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      color: #4f46e5;
+      border-bottom-color: #4f46e5;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Small input for units */
+    .unit-input {
+      flex: 0 0 70px;
+    }
+  </style>
+</head>
+<body>
+  <h1>مدیریت محصولات و توزیع استانی</h1>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- Tabs for Add Product and Product List --><!-- Replace the existing tabs section in products.html with this updated version -->
+<div class="tabs">
+  {% for tab in tabs %}
+    <div class="tab {% if tab.active %}active{% endif %}" onclick="showTab('{{ tab.id }}')">{{ tab.name }}</div>
+  {% endfor %}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Toggle between tabs
+    window.showTab = function(tabId) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Show the selected tab content
+      document.getElementById(tabId).classList.add('active');
+
+      // Update tab styling
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Find and activate the tab that was clicked
+      const tabs = Array.from(document.querySelectorAll('.tab'));
+      const tabElement = tabs.find(tab => tab.textContent.includes(tabId) || tab.onclick.toString().includes(tabId));
+      if (tabElement) {
+        tabElement.classList.add('active');
+      }
+    };
+  });
+</script>
+
+  <!-- Add this section to admin/products.html before the product list section -->
+{% if session.get('current_batch_id') and session.get('current_province_id') %}
+<div class="tab-content" id="province-targeting">
+  <div class="section">
+    <div class="section-header">
+      <h2>
+        <i class="fas fa-bullseye" style="color: #4f46e5;"></i>
+        تارگت محصولات برای استان: {{ current_province.name if current_province else 'نامشخص' }}
+      </h2>
+      <div>
+        <a href="{{ url_for('view_batch_evaluations', batch_id=session.get('current_batch_id')) }}" class="btn btn-outline">
+          <i class="fas fa-arrow-right"></i>
+          بازگشت به دسته ارزیابی
+        </a>
+      </div>
+    </div>
+
+    {% if current_province %}
+      <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+        <div class="info flash" style="flex: 1; padding: 1rem; margin: 0;">
+          <p>
+            <strong>استان:</strong> {{ current_province.name }} |
+            <strong>جمعیت استان:</strong> {{ "{:,}".format(current_province.population) }}
+          </p>
+        </div>
+        <div class="success flash" style="padding: 1rem; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 700;">
+          <i class="fas fa-users" style="margin-left: 0.5rem;"></i>
+          تعداد مشتری: {{ customer_count }}
+        </div>
+      </div>
+
+      <!-- Summary Table of Per-Grade Allocation -->
+      {% if grade_distribution %}
+      <div style="margin-bottom: 2rem; background-color: #f8fafc; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+        <h3 style="font-size: 1.125rem; margin-bottom: 1rem; color: #334155;">خلاصه تخصیص بر اساس درجه‌بندی مشتریان</h3>
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+            <thead>
+              <tr>
+                <th style="padding: 0.75rem; background-color: #f1f5f9; border: 1px solid #e2e8f0; text-align: center;">درجه</th>
+                <th style="padding: 0.75rem; background-color: #f1f5f9; border: 1px solid #e2e8f0; text-align: center;">تعداد مشتری</th>
+                <th style="padding: 0.75rem; background-color: #f1f5f9; border: 1px solid #e2e8f0; text-align: center;">درصد از کل</th>
+                <th style="padding: 0.75rem; background-color: #f1f5f9; border: 1px solid #e2e8f0; text-align: center;">ضریب وزنی</th>
+                <th style="padding: 0.75rem; background-color: #f1f5f9; border: 1px solid #e2e8f0; text-align: center;">تخصیص لیتر (میانگین)</th>
+                <th style="padding: 0.75rem; background-color: #f1f5f9; border: 1px solid #e2e8f0; text-align: center;">تخصیص شرینک (میانگین)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for grade, count in grade_distribution.items() %}
+                <tr>
+                  <td style="padding: 0.75rem; border: 1px solid #e2e8f0; text-align: center; font-weight: 600;
+                  {% if grade.startswith('A') %}background-color: #dcfce7;{%
+                  elif grade.startswith('B') %}background-color: #dbeafe;{%
+                  elif grade.startswith('C') %}background-color: #fef9c3;{%
+                  elif grade.startswith('D') %}background-color: #fee2e2;{%
+                  else %}background-color: #f1f5f9;{% endif %}">
+                    {{ grade }}
+                  </td>
+                  <td style="padding: 0.75rem; border: 1px solid #e2e8f0; text-align: center;">{{ count }}</td>
+                  <td style="padding: 0.75rem; border: 1px solid #e2e8f0; text-align: center;">
+                    {{ "{:.2f}%".format(count / customer_count * 100) if customer_count > 0 else '0%' }}
+                  </td>
+                  <td style="padding: 0.75rem; border: 1px solid #e2e8f0; text-align: center;">
+                    {% if grade.startswith('A+') %}2.0
+                    {% elif grade.startswith('A') %}1.75
+                    {% elif grade.startswith('B+') %}1.5
+                    {% elif grade.startswith('B') %}1.25
+                    {% elif grade.startswith('C') %}1.0
+                    {% elif grade.startswith('D') %}0.75
+                    {% else %}0.5
+                    {% endif %}
+                  </td>
+                  <td style="padding: 0.75rem; border: 1px solid #e2e8f0; text-align: center; background-color: #f0fff4; font-weight: 600;">
+                    <!-- Sample calculation for average liter allocation per customer in this grade -->
+                    {% if products|length > 0 and customer_count > 0 %}
+                      {% set total_liter_capacity = 0 %}
+                      {% set product_count = 0 %}
+                      {% for product in products %}
+                        {% set target = product_targets.get((product.id, current_province.id)) %}
+                        {% if target and target.liter_capacity %}
+                          {% set total_liter_capacity = total_liter_capacity + target.liter_capacity %}
+                          {% set product_count = product_count + 1 %}
+                        {% endif %}
+                      {% endfor %}
+
+                      {% if product_count > 0 %}
+                        {% set avg_liter = total_liter_capacity / customer_count %}
+                        {% set weight = 2.0 if grade.startswith('A+') else
+                                       1.75 if grade.startswith('A') else
+                                       1.5 if grade.startswith('B+') else
+                                       1.25 if grade.startswith('B') else
+                                       1.0 if grade.startswith('C') else
+                                       0.75 if grade.startswith('D') else 0.5 %}
+                        {{ "{:,.2f}".format(avg_liter * weight) }}
+                      {% else %}
+                        -
+                      {% endif %}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td style="padding: 0.75rem; border: 1px solid #e2e8f0; text-align: center; background-color: #fff0f0; font-weight: 600;">
+                    <!-- Sample calculation for average shrink allocation per customer in this grade -->
+                    {% if products|length > 0 and customer_count > 0 %}
+                      {% set total_shrink_capacity = 0 %}
+                      {% set product_count = 0 %}
+                      {% for product in products %}
+                        {% set target = product_targets.get((product.id, current_province.id)) %}
+                        {% if target and target.shrink_capacity %}
+                          {% set total_shrink_capacity = total_shrink_capacity + target.shrink_capacity %}
+                          {% set product_count = product_count + 1 %}
+                        {% endif %}
+                      {% endfor %}
+
+                      {% if product_count > 0 %}
+                        {% set avg_shrink = total_shrink_capacity / customer_count %}
+                        {% set weight = 2.0 if grade.startswith('A+') else
+                                       1.75 if grade.startswith('A') else
+                                       1.5 if grade.startswith('B+') else
+                                       1.25 if grade.startswith('B') else
+                                       1.0 if grade.startswith('C') else
+                                       0.75 if grade.startswith('D') else 0.5 %}
+                        {{ "{:,.2f}".format(avg_shrink * weight) }}
+                      {% else %}
+                        -
+                      {% endif %}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top: 0.75rem; font-size: 0.75rem; color: #64748b;">
+          <i class="fas fa-info-circle"></i>
+          مقادیر تخصیص بر اساس میانگین کل و ضریب وزنی درجه محاسبه شده است. ضرایب وزنی: A+ (2.0)، A (1.75)، B+ (1.5)، B (1.25)، C (1.0)، D (0.75)، سایر (0.5)
+        </p>
+      </div>
+      {% endif %}
+
+      <form method="POST" action="{{ url_for('update_province_product_targets') }}">
+        <input type="hidden" name="province_id" value="{{ current_province.id }}">
+        <input type="hidden" name="batch_id" value="{{ session.get('current_batch_id') }}">
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>محصول</th>
+                <th>ظرفیت لیتر</th>
+                <th>ظرفیت شرینک</th>
+                <th>درصد تخصیص به استان</th>
+                <th>مقدار تخصیص لیتر</th>
+                <th>مقدار تخصیص شرینک</th>
+                <th>لیتر به ازای هر مشتری</th>
+                <th>شرینک به ازای هر مشتری</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for product in products %}
+                {% set target = product_targets.get((product.id, current_province.id)) %}
+                <tr>
+                  <td>{{ product.name }}</td>
+                  <td>{{ "{:,.0f}".format(product.liter_capacity) if product.liter_capacity else '-' }}</td>
+                  <td>{{ "{:,.0f}".format(product.shrink_capacity) if product.shrink_capacity else '-' }}</td>
+                  <td>
+                    <input
+                      type="number"
+                      name="percentage_{{ product.id }}"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      style="width: 80px;"
+                      value="{{ '{:.2f}'.format(target.liter_percentage) if target and target.liter_percentage else '' }}"
+                    >%
+                  </td>
+                  <td>
+                    {% if product.liter_capacity %}
+                      <input
+                        type="number"
+                        name="liter_{{ product.id }}"
+                        min="0"
+                        step="0.01"
+                        style="width: 120px;"
+                        value="{{ '{:.2f}'.format(target.liter_capacity) if target and target.liter_capacity else '' }}"
+                      >
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if product.shrink_capacity %}
+                      <input
+                        type="number"
+                        name="shrink_{{ product.id }}"
+                        min="0"
+                        step="0.01"
+                        style="width: 120px;"
+                        value="{{ '{:.2f}'.format(target.shrink_capacity) if target and target.shrink_capacity else '' }}"
+                      >
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td style="background-color: #f0fff4; font-weight: 600;">
+                    {% if customer_count > 0 and target and target.liter_capacity %}
+                      {{ "{:,.2f}".format(target.liter_capacity / customer_count) }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td style="background-color: #fff0f0; font-weight: 600;">
+                    {% if customer_count > 0 and target and target.shrink_capacity %}
+                      {{ "{:,.2f}".format(target.shrink_capacity / customer_count) }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+          <i class="fas fa-save"></i>
+          ذخیره تارگت‌های استانی
+        </button>
+      </form>
+
+      <!-- Province Grade Distribution Chart -->
+      <div style="margin-top: 2rem;">
+        <h3 style="font-size: 1.125rem; margin-bottom: 1rem;">توزیع درجه‌بندی مشتریان استان {{ current_province.name }}</h3>
+        <div style="height: 300px;">
+          <canvas id="provinceGradeChart"></canvas>
+        </div>
+      </div>
+
+      <!-- JavaScript for the chart -->
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const ctx = document.getElementById('provinceGradeChart').getContext('2d');
+
+          // Grade distribution data
+          const gradeLabels = {{ grade_labels|tojson }};
+          const gradeCounts = {{ grade_counts|tojson }};
+
+          // Colors for each grade
+          const gradeColors = gradeCounts.map(count => {
+            const label = gradeLabels[gradeCounts.indexOf(count)];
+            if (label.startsWith('A')) return '#dcfce7';
+            if (label.startsWith('B')) return '#dbeafe';
+            if (label.startsWith('C')) return '#fef9c3';
+            if (label.startsWith('D')) return '#fee2e2';
+            return '#f1f5f9';
+          });
+
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: gradeLabels,
+              datasets: [{
+                label: 'تعداد مشتری',
+                data: gradeCounts,
+                backgroundColor: gradeColors,
+                borderColor: gradeColors.map(color => color.replace(')', ', 0.8)').replace('rgb', 'rgba')),
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      return `تعداد: ${context.raw} مشتری`;
+                    }
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    font: {
+                      family: 'Vazirmatn'
+                    }
+                  }
+                },
+                x: {
+                  ticks: {
+                    font: {
+                      family: 'Vazirmatn'
+                    }
+                  }
+                }
+              }
+            }
+          });
+        });
+      </script>
+    {% else %}
+      <div class="warning flash">
+        هیچ استانی برای این دسته ارزیابی انتخاب نشده است. لطفاً ابتدا یک استان را به دسته ارزیابی تخصیص دهید.
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+  <!-- Add this section to admin/products.html before the product list section -->
+{% if session.get('current_batch_id') and session.get('current_province_id') %}
+<div class="tab-content" id="province-targeting">
+  <div class="section">
+    <div class="section-header">
+      <h2>
+        <i class="fas fa-bullseye" style="color: #4f46e5;"></i>
+        تارگت محصولات برای استان: {{ current_province.name if current_province else 'نامشخص' }}
+      </h2>
+      <div>
+        <a href="{{ url_for('view_batch_evaluations', batch_id=session.get('current_batch_id')) }}" class="btn btn-outline">
+          <i class="fas fa-arrow-right"></i>
+          بازگشت به دسته ارزیابی
+        </a>
+      </div>
+    </div>
+
+    {% if current_province %}
+      <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+        <div class="info flash" style="flex: 1; padding: 1rem; margin: 0;">
+          <p>
+            <strong>استان:</strong> {{ current_province.name }} |
+            <strong>جمعیت استان:</strong> {{ "{:,}".format(current_province.population) }}
+          </p>
+        </div>
+        <div class="success flash" style="padding: 1rem; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 700;">
+          <i class="fas fa-users" style="margin-left: 0.5rem;"></i>
+          تعداد مشتری: {{ customer_count }}
+        </div>
+      </div>
+
+      <!-- Summary Table of Per-Grade Allocation -->
+      {% if grade_distribution %}
+      <div style="margin-bottom: 2rem; background-color: #f8fafc; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+        <h3 style="font-size: 1.125rem; margin-bottom: 1rem; color: #334155;">خلاصه تخصیص بر اساس درجه‌بندی مشتریان</h3>
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+            <thead>
+              <tr>
+                <th style="padding: 0.75rem; background-color: #f1f5f9; border: 1px solid #e2e8f0; text-align: center;">درجه</th>
+                <th style="padding: 0.75rem; background-color: #f1f5f9; border: 1px solid #e2e8f0; text-align: center;">تعداد مشتری</th>
+                <th style="padding: 0.75rem; background-color: #f1f5f9; border: 1px solid #e2e8f0; text-align: center;">درصد از کل</th>
+                <th style="padding: 0.75rem; background-color: #f1f5f9; border: 1px solid #e2e8f0; text-align: center;">ضریب وزنی</th>
+                <th style="padding: 0.75rem; background-color: #f1f5f9; border: 1px solid #e2e8f0; text-align: center;">تخصیص لیتر (میانگین)</th>
+                <th style="padding: 0.75rem; background-color: #f1f5f9; border: 1px solid #e2e8f0; text-align: center;">تخصیص شرینک (میانگین)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for grade, count in grade_distribution.items() %}
+                <tr>
+                  <td style="padding: 0.75rem; border: 1px solid #e2e8f0; text-align: center; font-weight: 600;
+                  {% if grade.startswith('A') %}background-color: #dcfce7;{%
+                  elif grade.startswith('B') %}background-color: #dbeafe;{%
+                  elif grade.startswith('C') %}background-color: #fef9c3;{%
+                  elif grade.startswith('D') %}background-color: #fee2e2;{%
+                  else %}background-color: #f1f5f9;{% endif %}">
+                    {{ grade }}
+                  </td>
+                  <td style="padding: 0.75rem; border: 1px solid #e2e8f0; text-align: center;">{{ count }}</td>
+                  <td style="padding: 0.75rem; border: 1px solid #e2e8f0; text-align: center;">
+                    {{ "{:.2f}%".format(count / customer_count * 100) if customer_count > 0 else '0%' }}
+                  </td>
+                  <td style="padding: 0.75rem; border: 1px solid #e2e8f0; text-align: center;">
+                    {% if grade.startswith('A+') %}2.0
+                    {% elif grade.startswith('A') %}1.75
+                    {% elif grade.startswith('B+') %}1.5
+                    {% elif grade.startswith('B') %}1.25
+                    {% elif grade.startswith('C') %}1.0
+                    {% elif grade.startswith('D') %}0.75
+                    {% else %}0.5
+                    {% endif %}
+                  </td>
+                  <td style="padding: 0.75rem; border: 1px solid #e2e8f0; text-align: center; background-color: #f0fff4; font-weight: 600;">
+                    <!-- Sample calculation for average liter allocation per customer in this grade -->
+                    {% if products|length > 0 and customer_count > 0 %}
+                      {% set total_liter_capacity = 0 %}
+                      {% set product_count = 0 %}
+                      {% for product in products %}
+                        {% set target = product_targets.get((product.id, current_province.id)) %}
+                        {% if target and target.liter_capacity %}
+                          {% set total_liter_capacity = total_liter_capacity + target.liter_capacity %}
+                          {% set product_count = product_count + 1 %}
+                        {% endif %}
+                      {% endfor %}
+
+                      {% if product_count > 0 %}
+                        {% set avg_liter = total_liter_capacity / customer_count %}
+                        {% set weight = 2.0 if grade.startswith('A+') else
+                                       1.75 if grade.startswith('A') else
+                                       1.5 if grade.startswith('B+') else
+                                       1.25 if grade.startswith('B') else
+                                       1.0 if grade.startswith('C') else
+                                       0.75 if grade.startswith('D') else 0.5 %}
+                        {{ "{:,.2f}".format(avg_liter * weight) }}
+                      {% else %}
+                        -
+                      {% endif %}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td style="padding: 0.75rem; border: 1px solid #e2e8f0; text-align: center; background-color: #fff0f0; font-weight: 600;">
+                    <!-- Sample calculation for average shrink allocation per customer in this grade -->
+                    {% if products|length > 0 and customer_count > 0 %}
+                      {% set total_shrink_capacity = 0 %}
+                      {% set product_count = 0 %}
+                      {% for product in products %}
+                        {% set target = product_targets.get((product.id, current_province.id)) %}
+                        {% if target and target.shrink_capacity %}
+                          {% set total_shrink_capacity = total_shrink_capacity + target.shrink_capacity %}
+                          {% set product_count = product_count + 1 %}
+                        {% endif %}
+                      {% endfor %}
+
+                      {% if product_count > 0 %}
+                        {% set avg_shrink = total_shrink_capacity / customer_count %}
+                        {% set weight = 2.0 if grade.startswith('A+') else
+                                       1.75 if grade.startswith('A') else
+                                       1.5 if grade.startswith('B+') else
+                                       1.25 if grade.startswith('B') else
+                                       1.0 if grade.startswith('C') else
+                                       0.75 if grade.startswith('D') else 0.5 %}
+                        {{ "{:,.2f}".format(avg_shrink * weight) }}
+                      {% else %}
+                        -
+                      {% endif %}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top: 0.75rem; font-size: 0.75rem; color: #64748b;">
+          <i class="fas fa-info-circle"></i>
+          مقادیر تخصیص بر اساس میانگین کل و ضریب وزنی درجه محاسبه شده است. ضرایب وزنی: A+ (2.0)، A (1.75)، B+ (1.5)، B (1.25)، C (1.0)، D (0.75)، سایر (0.5)
+        </p>
+      </div>
+      {% endif %}
+
+      <form method="POST" action="{{ url_for('update_province_product_targets') }}">
+        <input type="hidden" name="province_id" value="{{ current_province.id }}">
+        <input type="hidden" name="batch_id" value="{{ session.get('current_batch_id') }}">
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>محصول</th>
+                <th>ظرفیت لیتر</th>
+                <th>ظرفیت شرینک</th>
+                <th>درصد تخصیص به استان</th>
+                <th>مقدار تخصیص لیتر</th>
+                <th>مقدار تخصیص شرینک</th>
+                <th>لیتر به ازای هر مشتری</th>
+                <th>شرینک به ازای هر مشتری</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for product in products %}
+                {% set target = product_targets.get((product.id, current_province.id)) %}
+                <tr>
+                  <td>{{ product.name }}</td>
+                  <td>{{ "{:,.0f}".format(product.liter_capacity) if product.liter_capacity else '-' }}</td>
+                  <td>{{ "{:,.0f}".format(product.shrink_capacity) if product.shrink_capacity else '-' }}</td>
+                  <td>
+                    <input
+                      type="number"
+                      name="percentage_{{ product.id }}"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      style="width: 80px;"
+                      value="{{ '{:.2f}'.format(target.liter_percentage) if target and target.liter_percentage else '' }}"
+                    >%
+                  </td>
+                  <td>
+                    {% if product.liter_capacity %}
+                      <input
+                        type="number"
+                        name="liter_{{ product.id }}"
+                        min="0"
+                        step="0.01"
+                        style="width: 120px;"
+                        value="{{ '{:.2f}'.format(target.liter_capacity) if target and target.liter_capacity else '' }}"
+                      >
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if product.shrink_capacity %}
+                      <input
+                        type="number"
+                        name="shrink_{{ product.id }}"
+                        min="0"
+                        step="0.01"
+                        style="width: 120px;"
+                        value="{{ '{:.2f}'.format(target.shrink_capacity) if target and target.shrink_capacity else '' }}"
+                      >
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td style="background-color: #f0fff4; font-weight: 600;">
+                    {% if customer_count > 0 and target and target.liter_capacity %}
+                      {{ "{:,.2f}".format(target.liter_capacity / customer_count) }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td style="background-color: #fff0f0; font-weight: 600;">
+                    {% if customer_count > 0 and target and target.shrink_capacity %}
+                      {{ "{:,.2f}".format(target.shrink_capacity / customer_count) }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+          <i class="fas fa-save"></i>
+          ذخیره تارگت‌های استانی
+        </button>
+      </form>
+
+      <!-- Province Grade Distribution Chart -->
+      <div style="margin-top: 2rem;">
+        <h3 style="font-size: 1.125rem; margin-bottom: 1rem;">توزیع درجه‌بندی مشتریان استان {{ current_province.name }}</h3>
+        <div style="height: 300px;">
+          <canvas id="provinceGradeChart"></canvas>
+        </div>
+      </div>
+
+      <!-- JavaScript for the chart -->
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const ctx = document.getElementById('provinceGradeChart').getContext('2d');
+
+          // Grade distribution data
+          const gradeLabels = {{ grade_labels|tojson }};
+          const gradeCounts = {{ grade_counts|tojson }};
+
+          // Colors for each grade
+          const gradeColors = gradeCounts.map(count => {
+            const label = gradeLabels[gradeCounts.indexOf(count)];
+            if (label.startsWith('A')) return '#dcfce7';
+            if (label.startsWith('B')) return '#dbeafe';
+            if (label.startsWith('C')) return '#fef9c3';
+            if (label.startsWith('D')) return '#fee2e2';
+            return '#f1f5f9';
+          });
+
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: gradeLabels,
+              datasets: [{
+                label: 'تعداد مشتری',
+                data: gradeCounts,
+                backgroundColor: gradeColors,
+                borderColor: gradeColors.map(color => color.replace(')', ', 0.8)').replace('rgb', 'rgba')),
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      return `تعداد: ${context.raw} مشتری`;
+                    }
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    font: {
+                      family: 'Vazirmatn'
+                    }
+                  }
+                },
+                x: {
+                  ticks: {
+                    font: {
+                      family: 'Vazirmatn'
+                    }
+                  }
+                }
+              }
+            }
+          });
+        });
+      </script>
+    {% else %}
+      <div class="warning flash">
+        هیچ استانی برای این دسته ارزیابی انتخاب نشده است. لطفاً ابتدا یک استان را به دسته ارزیابی تخصیص دهید.
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+  <!-- Add Product Section -->
+  <div class="tab-content active" id="add-product">
+    <div class="section">
+      <div class="section-header">
+        <h2>
+          <i class="fas fa-plus" style="color: #4f46e5;"></i>
+          افزودن محصول جدید
+        </h2>
+        <div>
+          <a href="{{ url_for('admin_quotas') }}" class="btn btn-outline">
+            <i class="fas fa-arrow-right"></i>
+            بازگشت به صفحه سهمیه‌ها
+          </a>
+        </div>
+      </div>
+
+      <form method="POST" action="{{ url_for('admin_products') }}">
+        {{ form.csrf_token }}
+
+        <div class="form-group">
+          <label for="name">{{ form.name.label }}</label>
+          {{ form.name(id="name", placeholder="مثلاً: آب معدنی طعم دار پرتقالی 1.5 لیتری") }}
+        </div>
+
+        <!-- Category Attribute -->
+        <div class="attribute-row">
+          <div class="attribute-label">{{ form.category_id.label }}</div>
+          <div class="attribute-select">
+            {{ form.category_id(id="category_id") }}
+          </div>
+        </div>
+
+        <div class="attribute-row">
+          <div class="attribute-label">جدید</div>
+          <div class="attribute-input">
+            {{ form.new_category(id="new_category", placeholder="دسته بندی جدید") }}
+          </div>
+        </div>
+
+        <!-- Flavor Attribute -->
+        <div class="attribute-row">
+          <div class="attribute-label">{{ form.flavor_id.label }}</div>
+          <div class="attribute-select">
+            {{ form.flavor_id(id="flavor_id") }}
+          </div>
+        </div>
+
+        <div class="attribute-row">
+          <div class="attribute-label">جدید</div>
+          <div class="attribute-input">
+            {{ form.new_flavor(id="new_flavor", placeholder="طعم جدید") }}
+          </div>
+        </div>
+
+        <!-- Packaging Attribute -->
+        <div class="attribute-row">
+          <div class="attribute-label">{{ form.packaging_id.label }}</div>
+          <div class="attribute-select">
+            {{ form.packaging_id(id="packaging_id") }}
+          </div>
+        </div>
+
+        <div class="attribute-row">
+          <div class="attribute-label">جدید</div>
+          <div class="attribute-input">
+            {{ form.new_packaging(id="new_packaging", placeholder="بسته بندی جدید") }}
+          </div>
+        </div>
+
+        <!-- Volume Attribute -->
+        <div class="attribute-row">
+          <div class="attribute-label">{{ form.volume_id.label }}</div>
+          <div class="attribute-select">
+            {{ form.volume_id(id="volume_id") }}
+          </div>
+        </div>
+
+        <div class="attribute-row">
+          <div class="attribute-label">جدید</div>
+          <div class="attribute-input">
+            {{ form.new_volume(id="new_volume", placeholder="حجم جدید") }}
+            {{ form.volume_unit(id="volume_unit", class="unit-input", placeholder="واحد") }}
+          </div>
+        </div>
+
+        <div class="divider">تارگت محصول</div>
+
+        <div class="form-group">
+          <label for="liter_capacity">{{ form.liter_capacity.label }}</label>
+          {{ form.liter_capacity(id="liter_capacity", placeholder="مثلاً: 100000") }}
+        </div>
+        <div class="form-group">
+          <label for="shrink_capacity">{{ form.shrink_capacity.label }}</label>
+          {{ form.shrink_capacity(id="shrink_capacity", placeholder="مثلاً: 10000") }}
+        </div>
+        {{ form.submit(class_="submit-btn") }}
+      </form>
+    </div>
+  </div>
+
+  <!-- Add this section to admin/products.html before the product list section -->
+{% if session.get('current_batch_id') and session.get('current_province_id') %}
+<div class="tab-content" id="province-targeting">
+  <div class="section">
+    <div class="section-header">
+      <h2>
+        <i class="fas fa-bullseye" style="color: #4f46e5;"></i>
+        تارگت محصولات برای استان: {{ current_province.name if current_province else 'نامشخص' }}
+      </h2>
+      <div>
+        <a href="{{ url_for('view_batch_evaluations', batch_id=session.get('current_batch_id')) }}" class="btn btn-outline">
+          <i class="fas fa-arrow-right"></i>
+          بازگشت به دسته ارزیابی
+        </a>
+      </div>
+    </div>
+
+    {% if current_province %}
+      <div class="info flash" style="margin-bottom: 1.5rem;">
+        <p>
+          <strong>استان:</strong> {{ current_province.name }} |
+          <strong>تعداد مشتری:</strong> {{ customer_count }} |
+          <strong>جمعیت استان:</strong> {{ "{:,}".format(current_province.population) }}
+        </p>
+      </div>
+
+      <form method="POST" action="{{ url_for('update_province_product_targets') }}">
+        <input type="hidden" name="province_id" value="{{ current_province.id }}">
+        <input type="hidden" name="batch_id" value="{{ session.get('current_batch_id') }}">
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>محصول</th>
+                <th>ظرفیت لیتر</th>
+                <th>ظرفیت شرینک</th>
+                <th>درصد تخصیص به استان</th>
+                <th>مقدار تخصیص لیتر</th>
+                <th>مقدار تخصیص شرینک</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for product in products %}
+                {% set target = product_targets.get((product.id, current_province.id)) %}
+                <tr>
+                  <td>{{ product.name }}</td>
+                  <td>{{ "{:,.0f}".format(product.liter_capacity) if product.liter_capacity else '-' }}</td>
+                  <td>{{ "{:,.0f}".format(product.shrink_capacity) if product.shrink_capacity else '-' }}</td>
+                  <td>
+                    <input
+                      type="number"
+                      name="percentage_{{ product.id }}"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      style="width: 80px;"
+                      value="{{ '{:.2f}'.format(target.liter_percentage) if target and target.liter_percentage else '' }}"
+                    >%
+                  </td>
+                  <td>
+                    {% if product.liter_capacity %}
+                      <input
+                        type="number"
+                        name="liter_{{ product.id }}"
+                        min="0"
+                        step="0.01"
+                        style="width: 120px;"
+                        value="{{ '{:.2f}'.format(target.liter_capacity) if target and target.liter_capacity else '' }}"
+                      >
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if product.shrink_capacity %}
+                      <input
+                        type="number"
+                        name="shrink_{{ product.id }}"
+                        min="0"
+                        step="0.01"
+                        style="width: 120px;"
+                        value="{{ '{:.2f}'.format(target.shrink_capacity) if target and target.shrink_capacity else '' }}"
+                      >
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+          <i class="fas fa-save"></i>
+          ذخیره تارگت‌های استانی
+        </button>
+      </form>
+
+      <!-- Province Grade Distribution Chart -->
+      <div style="margin-top: 2rem;">
+        <h3 style="font-size: 1.125rem; margin-bottom: 1rem;">توزیع درجه‌بندی مشتریان استان {{ current_province.name }}</h3>
+        <div style="height: 300px;">
+          <canvas id="provinceGradeChart"></canvas>
+        </div>
+      </div>
+
+      <!-- JavaScript for the chart -->
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const ctx = document.getElementById('provinceGradeChart').getContext('2d');
+
+          // Grade distribution data
+          const gradeLabels = {{ grade_labels|tojson }};
+          const gradeCounts = {{ grade_counts|tojson }};
+
+          // Colors for each grade
+          const gradeColors = gradeCounts.map(count => {
+            const label = gradeLabels[gradeCounts.indexOf(count)];
+            if (label.startsWith('A')) return '#dcfce7';
+            if (label.startsWith('B')) return '#dbeafe';
+            if (label.startsWith('C')) return '#fef9c3';
+            if (label.startsWith('D')) return '#fee2e2';
+            return '#f1f5f9';
+          });
+
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: gradeLabels,
+              datasets: [{
+                label: 'تعداد مشتری',
+                data: gradeCounts,
+                backgroundColor: gradeColors,
+                borderColor: gradeColors.map(color => color.replace(')', ', 0.8)').replace('rgb', 'rgba')),
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      return `تعداد: ${context.raw} مشتری`;
+                    }
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    font: {
+                      family: 'Vazirmatn'
+                    }
+                  }
+                },
+                x: {
+                  ticks: {
+                    font: {
+                      family: 'Vazirmatn'
+                    }
+                  }
+                }
+              }
+            }
+          });
+        });
+      </script>
+    {% else %}
+      <div class="warning flash">
+        هیچ استانی برای این دسته ارزیابی انتخاب نشده است. لطفاً ابتدا یک استان را به دسته ارزیابی تخصیص دهید.
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+  <!-- Product List Section -->
+  <div class="tab-content" id="product-list">
+    <div class="section">
+      <h2>
+        <i class="fas fa-list" style="color: #4f46e5;"></i>
+        لیست محصولات
+      </h2>
+
+      <div class="search-container">
+        <input type="text" id="productSearch" class="search-input" placeholder="جستجو در محصولات...">
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>نام محصول</th>
+              <th>مشخصات</th>
+              <th>ظرفیت‌ها</th>
+              <th>تاریخ ایجاد</th>
+              <th>عملیات</th>
+            </tr>
+          </thead>
+          <tbody id="productsTableBody">
+            {% if products %}
+              {% for product in products %}
+                <tr>
+                  <td>{{ product.name }}</td>
+                  <td>
+                    <div>
+                      {% if product.category_relation %}
+                        <span class="attribute-badge category-badge">
+                          <i class="fas fa-tag"></i>
+                          {{ product.category_relation.name }}
+                        </span>
+                      {% endif %}
+
+                      {% if product.flavor_relation %}
+                        <span class="attribute-badge flavor-badge">
+                          <i class="fas fa-lemon"></i>
+                          {{ product.flavor_relation.name }}
+                        </span>
+                      {% endif %}
+
+                      {% if product.packaging_relation %}
+                        <span class="attribute-badge packaging-badge">
+                          <i class="fas fa-box"></i>
+                          {{ product.packaging_relation.name }}
+                        </span>
+                      {% endif %}
+
+                      {% if product.volume_relation %}
+                        <span class="attribute-badge volume-badge">
+                          <i class="fas fa-tachometer-alt"></i>
+                          {{ product.volume_relation.display_name }}
+                        </span>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td>
+                    <div class="capacity-display">
+                      {% if product.liter_capacity %}
+                        <span class="capacity-badge liter-badge">
+                          <i class="fas fa-tint"></i>
+                          {{ "{:,.0f}".format(product.liter_capacity) }} لیتر
+                        </span>
+                      {% endif %}
+
+                      {% if product.shrink_capacity %}
+                        <span class="capacity-badge shrink-badge">
+                          <i class="fas fa-box"></i>
+                          {{ "{:,.0f}".format(product.shrink_capacity) }} شرینک
+                        </span>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td>{{ product.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                  <td>
+                    <div class="actions">
+                      <a href="{{ url_for('product_province_targets', product_id=product.id) }}" class="btn btn-primary">
+                        <i class="fas fa-map-marker-alt"></i>
+                        تارگت استانی
+                      </a>
+                      <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i>
+                        ویرایش
+                      </a>
+                      <form method="POST" action="{{ url_for('delete_product', product_id=product.id) }}" style="display: inline-block;">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('آیا از حذف این محصول مطمئن هستید؟ تمام تارگت‌های استانی آن نیز حذف خواهند شد.');">
+                          <i class="fas fa-trash"></i>
+                          حذف
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="5" style="text-align: center;">هیچ محصولی یافت نشد. لطفاً یک محصول جدید ایجاد کنید.</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="tab-content" id="product-charts">
+    <div class="section">
+      <h2>
+        <i class="fas fa-chart-pie" style="color: #4f46e5;"></i>
+        نمودار توزیع محصولات
+      </h2>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+        <div style="background: #fff; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">توزیع ظرفیت بر حسب لیتر</h3>
+          <div class="chart-container">
+            <canvas id="literChart"></canvas>
+          </div>
+        </div>
+
+        <div style="background: #fff; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">توزیع ظرفیت بر حسب شرینک</h3>
+          <div class="chart-container">
+            <canvas id="shrinkChart"></canvas>
+          </div>
+        </div>
+
+        <div style="background: #fff; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">توزیع محصولات بر اساس دسته‌بندی</h3>
+          <div class="chart-container">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+
+        <div style="background: #fff; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">توزیع محصولات بر اساس بسته‌بندی</h3>
+          <div class="chart-container">
+            <canvas id="packagingChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Toggle between tabs
+      window.showTab = function(tabId) {
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(tab => {
+          tab.classList.remove('active');
+        });
+
+        // Show the selected tab content
+        document.getElementById(tabId).classList.add('active');
+
+        // Update tab styling
+        document.querySelectorAll('.tab').forEach(tab => {
+          tab.classList.remove('active');
+        });
+
+        // Find and activate the tab that was clicked
+        const tabs = Array.from(document.querySelectorAll('.tab'));
+        const tabIndex = ['add-product', 'product-list', 'product-charts'].indexOf(tabId);
+        if (tabIndex >= 0 && tabIndex < tabs.length) {
+          tabs[tabIndex].classList.add('active');
+        }
+      };
+
+      // Product search functionality
+      const searchInput = document.getElementById('productSearch');
+      const tableBody = document.getElementById('productsTableBody');
+      if (searchInput && tableBody) {
+        const rows = Array.from(tableBody.querySelectorAll('tr'));
+
+        searchInput.addEventListener('input', function() {
+          const query = this.value.toLowerCase().trim();
+
+          rows.forEach(row => {
+            const productName = row.cells[0].textContent.toLowerCase();
+            const attributes = row.cells[1].textContent.toLowerCase();
+
+            if (productName.includes(query) || attributes.includes(query)) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+          });
+        });
+      }
+
+      // Initialize all charts if products exist
+      if (document.getElementById('literChart') && document.getElementById('shrinkChart') &&
+          document.getElementById('categoryChart') && document.getElementById('packagingChart')) {
+
+        // Prepare data for charts
+        const products = [
+          {% for product in products %}
+            {
+              name: "{{ product.name }}",
+              liter_capacity: {{ product.liter_capacity or 0 }},
+              shrink_capacity: {{ product.shrink_capacity or 0 }},
+              category: "{{ product.category_relation.name if product.category_relation else 'بدون دسته‌بندی' }}",
+              packaging: "{{ product.packaging_relation.name if product.packaging_relation else 'نامشخص' }}"
+            },
+          {% endfor %}
+        ];
+
+        if (products.length > 0) {
+          // Liter capacity pie chart
+          const literCtx = document.getElementById('literChart').getContext('2d');
+          new Chart(literCtx, {
+            type: 'pie',
+            data: {
+              labels: products.map(p => p.name),
+              datasets: [{
+                data: products.map(p => p.liter_capacity),
+                backgroundColor: [
+                  '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe', '#dbeafe',
+                  '#1d4ed8', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd'
+                ]
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: 'right',
+                  labels: {
+                    font: { family: 'Vazirmatn' }
+                  }
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      return `${context.label}: ${context.parsed.toLocaleString()} لیتر`;
+                    }
+                  }
+                }
+              }
+            }
+          });
+
+          // Shrink capacity pie chart
+          const shrinkCtx = document.getElementById('shrinkChart').getContext('2d');
+          new Chart(shrinkCtx, {
+            type: 'pie',
+            data: {
+              labels: products.map(p => p.name),
+              datasets: [{
+                data: products.map(p => p.shrink_capacity),
+                backgroundColor: [
+                  '#f59e0b', '#fbbf24', '#fcd34d', '#fde68a', '#fef3c7',
+                  '#d97706', '#b45309', '#92400e', '#78350f', '#92400e'
+                ]
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: 'right',
+                  labels: {
+                    font: { family: 'Vazirmatn' }
+                  }
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      return `${context.label}: ${context.parsed.toLocaleString()} شرینک`;
+                    }
+                  }
+                }
+              }
+            }
+          });
+
+          // Category distribution
+          const categoryCount = {};
+          products.forEach(p => {
+            if (!categoryCount[p.category]) categoryCount[p.category] = 0;
+            categoryCount[p.category]++;
+          });
+
+          const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+          new Chart(categoryCtx, {
+            type: 'pie',
+            data: {
+              labels: Object.keys(categoryCount),
+              datasets: [{
+                data: Object.values(categoryCount),
+                backgroundColor: [
+                  '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#ede9fe',
+                  '#7c3aed', '#6d28d9', '#5b21b6', '#4c1d95', '#6d28d9'
+                ]
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: 'right',
+                  labels: {
+                    font: { family: 'Vazirmatn' }
+                  }
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      return `${context.label}: ${context.parsed} محصول`;
+                    }
+                  }
+                }
+              }
+            }
+          });
+
+          // Packaging distribution
+          const packagingCount = {};
+          products.forEach(p => {
+            if (!packagingCount[p.packaging]) packagingCount[p.packaging] = 0;
+            packagingCount[p.packaging]++;
+          });
+
+          const packagingCtx = document.getElementById('packagingChart').getContext('2d');
+          new Chart(packagingCtx, {
+            type: 'pie',
+            data: {
+              labels: Object.keys(packagingCount),
+              datasets: [{
+                data: Object.values(packagingCount),
+                backgroundColor: [
+                  '#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5',
+                  '#059669', '#047857', '#065f46', '#064e3b', '#047857'
+                ]
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: 'right',
+                  labels: {
+                    font: { family: 'Vazirmatn' }
+                  }
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      return `${context.label}: ${context.parsed} محصول`;
+                    }
+                  }
+                }
+              }
+            }
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>توزیع استانی محصول | پنل مدیریت</title>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Vazirmatn', sans-serif;
+      padding: 2rem;
+      color: #1e293b;
+      direction: rtl;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.75rem;
+      color: #334155;
+    }
+    .section {
+      background: #fff;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .section h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0;
+    }
+
+    /* Button Styles */
+    .btn {
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      text-decoration: none;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background-color: #4f46e5;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background-color: #4338ca;
+    }
+    .btn-outline {
+      background-color: transparent;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+    .btn-outline:hover {
+      background-color: #f8fafc;
+    }
+
+    /* Capacity Display */
+    .capacity-display {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .capacity-badge {
+      background-color: #f1f5f9;
+      border-radius: 0.375rem;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .liter-badge {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+    .shrink-badge {
+      background-color: #fef9c3;
+      color: #854d0e;
+    }
+
+    /* Product Info Box */
+    .product-info {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .product-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #334155;
+    }
+    .product-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Map Styles */
+    #iran-map-container {
+      width: 100%;
+      height: 500px;
+      margin-bottom: 2rem;
+      position: relative;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+
+    /* Color legend for map */
+    .color-legend {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      padding: 0.75rem;
+      background: #f8fafc;
+      border-radius: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin: 0 1rem;
+    }
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      margin-left: 0.5rem;
+      border-radius: 3px;
+    }
+
+    /* Table Styles */
+    .table-container {
+      max-height: 600px;
+      overflow-y: auto;
+      margin-top: 1.5rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+    }
+    th, td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: right;
+      font-size: 0.875rem;
+    }
+    th {
+      background-color: #f8fafc;
+      font-weight: 600;
+      color: #334155;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    tr:hover td {
+      background-color: #f1f5f9;
+    }
+
+    /* Flash messages */
+    .flash {
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+    }
+    .success {
+      background-color: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      color: #166534;
+    }
+    .danger {
+      background-color: #fef2f2;
+      border-left: 4px solid #ef4444;
+      color: #b91c1c;
+    }
+    .warning {
+      background-color: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #92400e;
+    }
+    .info {
+      background-color: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      color: #1e40af;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #e2e8f0;
+      margin-bottom: 1rem;
+    }
+    .tab {
+      padding: 0.75rem 1.25rem;
+      font-weight: 500;
+      color: #64748b;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      color: #4f46e5;
+      border-bottom-color: #4f46e5;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Chart container */
+    .chart-container {
+      width: 100%;
+      height: 400px;
+      margin-top: 1rem;
+    }
+
+    /* Province tooltip */
+    .province-tooltip {
+      position: absolute;
+      background-color: rgba(255, 255, 255, 0.9);
+      border: 1px solid #cbd5e1;
+      border-radius: 0.375rem;
+      padding: 0.75rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      z-index: 100;
+      font-size: 0.875rem;
+      direction: rtl;
+    }
+  </style>
+</head>
+<body>
+  <h1>توزیع استانی محصول</h1>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- Product Info Section -->
+  <div class="section">
+    <div class="section-header">
+      <h2>
+        <i class="fas fa-box" style="color: #4f46e5;"></i>
+        اطلاعات محصول
+      </h2>
+      <div>
+        <a href="{{ url_for('admin_products') }}" class="btn btn-outline">
+          <i class="fas fa-arrow-right"></i>
+          بازگشت به لیست محصولات
+        </a>
+      </div>
+    </div>
+
+    <div class="product-info">
+      <div class="product-title">{{ product.name }}</div>
+      <div class="product-stats">
+        {% if product.liter_capacity %}
+          <span class="capacity-badge liter-badge">
+            <i class="fas fa-tint"></i>
+            ظرفیت کل لیتر: {{ "{:,.0f}".format(product.liter_capacity) }}
+          </span>
+        {% endif %}
+
+        {% if product.shrink_capacity %}
+          <span class="capacity-badge shrink-badge">
+            <i class="fas fa-box"></i>
+            ظرفیت کل شرینک: {{ "{:,.0f}".format(product.shrink_capacity) }}
+          </span>
+        {% endif %}
+      </div>
+      <div>
+        <small style="color: #64748b;">ایجاد شده در: {{ product.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs Section -->
+  <div class="section">
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('map-tab')">نقشه توزیع</div>
+      <div class="tab" onclick="showTab('chart-tab')">نمودار توزیع</div>
+      <div class="tab" onclick="showTab('table-tab')">جدول توزیع</div>
+    </div>
+
+    <!-- Tab 1: Map View -->
+    <div class="tab-content active" id="map-tab">
+      <h3 style="font-size: 1rem; margin-bottom: 1rem;">
+        <i class="fas fa-map-marked-alt" style="color: #4f46e5;"></i>
+        نقشه تارگت استان‌ها برای محصول: {{ product.name }}
+      </h3>
+
+      <!-- Color legend -->
+      <div class="color-legend">
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #dbeafe;"></div>
+          <span>کمترین درصد</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #93c5fd;"></div>
+          <span>درصد متوسط</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #3b82f6;"></div>
+          <span>درصد بالا</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #1e40af;"></div>
+          <span>بیشترین درصد</span>
+        </div>
+      </div>
+
+      <!-- Map container -->
+      <div id="iran-map-container">
+        <!-- SVG map will be rendered here via JavaScript -->
+      </div>
+    </div>
+
+    <!-- Tab 2: Chart View -->
+    <div class="tab-content" id="chart-tab">
+      <h3 style="font-size: 1rem; margin-bottom: 1rem;">
+        <i class="fas fa-chart-bar" style="color: #4f46e5;"></i>
+        نمودار توزیع استانی برای محصول: {{ product.name }}
+      </h3>
+
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 300px;">
+          <div style="background: #fff; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <h4 style="font-size: 0.875rem; margin-bottom: 0.5rem;">ظرفیت لیتر بر اساس استان</h4>
+            <div class="chart-container">
+              <canvas id="literProvinceChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex: 1; min-width: 300px;">
+          <div style="background: #fff; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <h4 style="font-size: 0.875rem; margin-bottom: 0.5rem;">ظرفیت شرینک بر اساس استان</h4>
+            <div class="chart-container">
+              <canvas id="shrinkProvinceChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Table View -->
+    <div class="tab-content" id="table-tab">
+      <h3 style="font-size: 1rem; margin-bottom: 1rem;">
+        <i class="fas fa-table" style="color: #4f46e5;"></i>
+        جدول توزیع استانی برای محصول: {{ product.name }}
+      </h3>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ردیف</th>
+              <th>استان</th>
+              <th>جمعیت</th>
+              <th>تعداد مشتری</th>
+              <th>درصد جمعیت</th>
+              {% if product.liter_capacity is not none %}
+                <th>ظرفیت لیتر</th>
+                <th>تخصیص به هر مشتری (لیتر)</th>
+              {% endif %}
+              {% if product.shrink_capacity is not none %}
+                <th>ظرفیت شرینک</th>
+                <th>تخصیص به هر مشتری (شرینک)</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% set total_population = provinces|sum(attribute='population') %}
+            {% for province in provinces %}
+              <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ province.name }}</td>
+                <td>{{ "{:,}".format(province.population) }}</td>
+                <td>{{ customers_by_province.get(province.id, 0) }}</td>
+                <td>
+                  {% set percentage = (province.population / total_population * 100)|round(2) %}
+                  {{ percentage }}%
+                </td>
+
+                {% if product.liter_capacity is not none %}
+                  {% set target = targets.get(province.id) %}
+                  <td>{{ "{:,.2f}".format(target.liter_capacity) if target and target.liter_capacity else "-" }}</td>
+                  <td>
+                    {% if target and target.liter_capacity and customers_by_province.get(province.id, 0) > 0 %}
+                      {{ "{:,.2f}".format(target.liter_capacity / customers_by_province.get(province.id)) }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                {% endif %}
+
+                {% if product.shrink_capacity is not none %}
+                  {% set target = targets.get(province.id) %}
+                  <td>{{ "{:,.2f}".format(target.shrink_capacity) if target and target.shrink_capacity else "-" }}</td>
+                  <td>
+                    {% if target and target.shrink_capacity and customers_by_province.get(province.id, 0) > 0 %}
+                      {{ "{:,.2f}".format(target.shrink_capacity / customers_by_province.get(province.id)) }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Tab functionality
+    function showTab(tabId) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Show the selected tab content
+      document.getElementById(tabId).classList.add('active');
+
+      // Update tab styling
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Find and activate the tab that was clicked
+      const tabs = Array.from(document.querySelectorAll('.tab'));
+      const tabIndex = ['map-tab', 'chart-tab', 'table-tab'].indexOf(tabId);
+      if (tabIndex >= 0 && tabIndex < tabs.length) {
+        tabs[tabIndex].classList.add('active');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // SVG map of Iran with provinces
+      const iranMapSvg = `
+        <svg id="iran-map" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+          <path id="tehran" d="M400 200 L420 180 L440 190 L430 210 L410 215 Z" />
+          <path id="isfahan" d="M380 250 L420 230 L450 260 L420 290 L370 270 Z" />
+          <path id="khorasan-razavi" d="M550 150 L580 130 L620 170 L590 200 L540 190 Z" />
+          <path id="fars" d="M400 320 L430 300 L470 320 L450 350 L410 360 Z" />
+          <path id="khuzestan" d="M300 300 L340 280 L370 310 L350 340 L310 330 Z" />
+          <path id="east-azerbaijan" d="M250 100 L290 80 L310 110 L280 130 L240 120 Z" />
+          <path id="mazandaran" d="M420 120 L450 100 L480 120 L460 140 L430 135 Z" />
+          <path id="west-azerbaijan" d="M180 120 L220 100 L240 130 L210 150 L170 140 Z" />
+          <path id="kerman" d="M500 300 L540 280 L570 310 L550 340 L510 350 Z" />
+          <path id="sistan-baluchistan" d="M600 300 L640 280 L680 310 L650 350 L610 350 Z" />
+          <path id="alborz" d="M380 170 L400 150 L420 170 L410 190 L370 185 Z" />
+          <path id="gilan" d="M320 130 L350 110 L370 140 L350 160 L320 155 Z" />
+          <path id="kermanshah" d="M220 220 L250 200 L270 230 L250 250 L220 245 Z" />
+          <path id="lorestan" d="M270 250 L300 230 L320 260 L300 280 L270 275 Z" />
+          <path id="hamadan" d="M270 200 L300 180 L320 210 L300 230 L270 225 Z" />
+          <path id="golestan" d="M480 140 L510 120 L530 150 L510 170 L480 165 Z" />
+          <path id="kurdistan" d="M220 180 L250 160 L270 190 L250 210 L220 205 Z" />
+          <path id="hormozgan" d="M450 380 L490 360 L520 390 L500 410 L460 405 Z" />
+          <path id="markazi" d="M320 210 L350 190 L370 220 L350 240 L320 235 Z" />
+          <path id="ardabil" d="M280 70 L310 50 L330 80 L310 100 L280 95 Z" />
+          <path id="qazvin" d="M350 160 L380 140 L400 170 L380 190 L350 185 Z" />
+          <path id="qom" d="M370 210 L400 190 L420 220 L400 240 L370 235 Z" />
+          <path id="yazd" d="M450 280 L480 260 L500 290 L480 310 L450 305 Z" />
+          <path id="zanjan" d="M300 140 L330 120 L350 150 L330 170 L300 165 Z" />
+          <path id="bushehr" d="M330 350 L360 330 L380 360 L360 380 L330 375 Z" />
+          <path id="chaharmahal" d="M350 270 L380 250 L400 280 L380 300 L350 295 Z" />
+          <path id="north-khorasan" d="M500 100 L530 80 L550 110 L530 130 L500 125 Z" />
+          <path id="kohgiluyeh" d="M360 320 L390 300 L410 330 L390 350 L360 345 Z" />
+          <path id="south-khorasan" d="M540 220 L570 200 L590 230 L570 250 L540 245 Z" />
+          <path id="semnan" d="M460 180 L490 160 L510 190 L490 210 L460 205 Z" />
+          <path id="ilam" d="M240 270 L270 250 L290 280 L270 300 L240 295 Z" />
+          <!-- Add province names -->
+          <text x="405" y="200" font-size="8">تهران</text>
+          <text x="410" y="260" font-size="8">اصفهان</text>
+          <text x="570" y="170" font-size="8">خراسان رضوی</text>
+          <text x="430" y="330" font-size="8">فارس</text>
+          <text x="330" y="310" font-size="8">خوزستان</text>
+          <text x="270" y="110" font-size="8">آذربایجان شرقی</text>
+          <text x="445" y="125" font-size="8">مازندران</text>
+          <text x="200" y="130" font-size="8">آذربایجان غربی</text>
+          <text x="530" y="310" font-size="8">کرمان</text>
+          <text x="640" y="310" font-size="8">سیستان و بلوچستان</text>
+          <text x="385" y="170" font-size="8">البرز</text>
+          <text x="335" y="140" font-size="8">گیلان</text>
+          <text x="235" y="230" font-size="8">کرمانشاه</text>
+          <text x="285" y="260" font-size="8">لرستان</text>
+          <text x="285" y="210" font-size="8">همدان</text>
+          <text x="495" y="150" font-size="8">گلستان</text>
+          <text x="235" y="190" font-size="8">کردستان</text>
+          <text x="480" y="390" font-size="8">هرمزگان</text>
+          <text x="335" y="220" font-size="8">مرکزی</text>
+          <text x="295" y="80" font-size="8">اردبیل</text>
+          <text x="365" y="170" font-size="8">قزوین</text>
+          <text x="385" y="220" font-size="8">قم</text>
+          <text x="475" y="290" font-size="8">یزد</text>
+          <text x="315" y="150" font-size="8">زنجان</text>
+          <text x="345" y="360" font-size="8">بوشهر</text>
+          <text x="375" y="280" font-size="8">چهارمحال</text>
+          <text x="515" y="115" font-size="8">خراسان شمالی</text>
+          <text x="375" y="330" font-size="8">کهگیلویه</text>
+          <text x="555" y="230" font-size="8">خراسان جنوبی</text>
+          <text x="475" y="195" font-size="8">سمنان</text>
+          <text x="255" y="280" font-size="8">ایلام</text>
+        </svg>
+      `;
+
+      // Insert the SVG into the container
+      const mapContainer = document.getElementById('iran-map-container');
+      if (mapContainer) {
+        mapContainer.innerHTML = iranMapSvg;
+
+        // Get all provinces in the SVG
+        const provincePaths = document.querySelectorAll('#iran-map path');
+
+        // Set default styling
+        provincePaths.forEach(path => {
+          path.setAttribute('fill', '#e2e8f0');
+          path.setAttribute('stroke', '#1e293b');
+          path.setAttribute('stroke-width', '1');
+        });
+
+        // Prepare province data mapping
+        const provinceMap = {
+          'tehran': 'تهران',
+          'isfahan': 'اصفهان',
+          'khorasan-razavi': 'خراسان رضوی',
+          'fars': 'فارس',
+          'khuzestan': 'خوزستان',
+          'east-azerbaijan': 'آذربایجان شرقی',
+          'mazandaran': 'مازندران',
+          'west-azerbaijan': 'آذربایجان غربی',
+          'kerman': 'کرمان',
+          'sistan-baluchistan': 'سیستان و بلوچستان',
+          'alborz': 'البرز',
+          'gilan': 'گیلان',
+          'kermanshah': 'کرمانشاه',
+          'lorestan': 'لرستان',
+          'hamadan': 'همدان',
+          'golestan': 'گلستان',
+          'kurdistan': 'کردستان',
+          'hormozgan': 'هرمزگان',
+          'markazi': 'مرکزی',
+          'ardabil': 'اردبیل',
+          'qazvin': 'قزوین',
+          'qom': 'قم',
+          'yazd': 'یزد',
+          'zanjan': 'زنجان',
+          'bushehr': 'بوشهر',
+          'chaharmahal': 'چهارمحال و بختیاری',
+          'north-khorasan': 'خراسان شمالی',
+          'kohgiluyeh': 'کهگیلویه و بویراحمد',
+          'south-khorasan': 'خراسان جنوبی',
+          'semnan': 'سمنان',
+          'ilam': 'ایلام'
+        };
+
+        // Function to map percentages to colors (blue gradient)
+        function getColor(percentage) {
+          if (!percentage) return '#e2e8f0'; // Default gray for no data
+
+          // Scale from light blue (#dbeafe) to dark blue (#1e40af) based on percentage
+          const value = percentage / 100;
+
+          // Color components
+          const r = Math.round(219 - (value * (219 - 30)));
+          const g = Math.round(234 - (value * (234 - 64)));
+          const b = Math.round(254 - (value * (254 - 175)));
+
+          return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        // Prepare province targets data from template variables
+        const provinceTargets = {};
+        let liter_type = false;
+        let shrink_type = false;
+
+        {% if product.liter_capacity is not none %}
+          liter_type = true;
+        {% endif %}
+
+        {% if product.shrink_capacity is not none %}
+          shrink_type = true;
+        {% endif %}
+
+        // Get total population
+        const totalPopulation = {{ provinces|sum(attribute='population') }};
+
+        // Process each province
+        {% for province in provinces %}
+          const population{{ province.id }} = {{ province.population }};
+          const percentage{{ province.id }} = (population{{ province.id }} / totalPopulation * 100).toFixed(2);
+          const customerCount{{ province.id }} = {{ customers_by_province.get(province.id, 0) }};
+
+          {% if province.id in targets %}
+            const literCapacity{{ province.id }} = {{ targets[province.id].liter_capacity or 'null' }};
+            const shrinkCapacity{{ province.id }} = {{ targets[province.id].shrink_capacity or 'null' }};
+
+            provinceTargets['{{ province.name }}'] = {
+              population: population{{ province.id }},
+              percentage: percentage{{ province.id }},
+              customers: customerCount{{ province.id }},
+              liter_capacity: literCapacity{{ province.id }},
+              shrink_capacity: shrinkCapacity{{ province.id }}
+            };
+          {% else %}
+            provinceTargets['{{ province.name }}'] = {
+              population: population{{ province.id }},
+              percentage: percentage{{ province.id }},
+              customers: customerCount{{ province.id }},
+              liter_capacity: null,
+              shrink_capacity: null
+            };
+          {% endif %}
+        {% endfor %}
+
+        // Apply coloring based on percentage and set up tooltips
+        provincePaths.forEach(path => {
+          const provinceId = path.id;
+          const provinceName = provinceMap[provinceId];
+
+          if (provinceName && provinceTargets[provinceName]) {
+            const data = provinceTargets[provinceName];
+            // Apply color based on population percentage
+            path.setAttribute('fill', getColor(data.percentage));
+
+            // Set tooltip data attributes
+            path.setAttribute('data-name', provinceName);
+            path.setAttribute('data-population', data.population.toLocaleString());
+            path.setAttribute('data-percentage', data.percentage + '%');
+            path.setAttribute('data-customers', data.customers);
+
+            if (liter_type && data.liter_capacity) {
+              path.setAttribute('data-liter', data.liter_capacity.toFixed(2));
+
+              if (data.customers > 0) {
+                const perCustomer = (data.liter_capacity / data.customers).toFixed(2);
+                path.setAttribute('data-liter-per-customer', perCustomer);
+              }
+            }
+
+            if (shrink_type && data.shrink_capacity) {
+              path.setAttribute('data-shrink', data.shrink_capacity.toFixed(2));
+
+              if (data.customers > 0) {
+                const perCustomer = (data.shrink_capacity / data.customers).toFixed(2);
+                path.setAttribute('data-shrink-per-customer', perCustomer);
+              }
+            }
+
+            // Add hover effects and tooltip
+            path.addEventListener('mouseover', function(e) {
+              this.setAttribute('stroke-width', '2');
+              this.setAttribute('stroke', '#1e40af');
+
+              // Show tooltip
+              const tooltip = document.createElement('div');
+              tooltip.className = 'province-tooltip';
+              tooltip.style.position = 'absolute';
+              tooltip.style.left = (e.pageX + 10) + 'px';
+              tooltip.style.top = (e.pageY + 10) + 'px';
+              tooltip.style.zIndex = '100';
+
+              let tooltipContent = `
+                <div><strong>${this.getAttribute('data-name')}</strong></div>
+                <div>جمعیت: ${this.getAttribute('data-population')}</div>
+                <div>درصد: ${this.getAttribute('data-percentage')}</div>
+                <div>مشتریان: ${this.getAttribute('data-customers') || 0}</div>
+              `;
+
+              if (liter_type && this.hasAttribute('data-liter')) {
+                tooltipContent += `<div>ظرفیت لیتر: ${this.getAttribute('data-liter')}</div>`;
+
+                if (this.hasAttribute('data-liter-per-customer')) {
+                  tooltipContent += `<div>لیتر به ازای هر مشتری: ${this.getAttribute('data-liter-per-customer')}</div>`;
+                }
+              }
+
+              if (shrink_type && this.hasAttribute('data-shrink')) {
+                tooltipContent += `<div>ظرفیت شرینک: ${this.getAttribute('data-shrink')}</div>`;
+
+                if (this.hasAttribute('data-shrink-per-customer')) {
+                  tooltipContent += `<div>شرینک به ازای هر مشتری: ${this.getAttribute('data-shrink-per-customer')}</div>`;
+                }
+              }
+
+              tooltip.innerHTML = tooltipContent;
+              document.body.appendChild(tooltip);
+              this.tooltip = tooltip;
+            });
+
+            path.addEventListener('mousemove', function(e) {
+              if (this.tooltip) {
+                this.tooltip.style.left = (e.pageX + 10) + 'px';
+                this.tooltip.style.top = (e.pageY + 10) + 'px';
+              }
+            });
+
+            path.addEventListener('mouseout', function() {
+              this.setAttribute('stroke-width', '1');
+              this.setAttribute('stroke', '#1e293b');
+
+              // Remove tooltip
+              if (this.tooltip) {
+                document.body.removeChild(this.tooltip);
+                this.tooltip = null;
+              }
+            });
+          }
+        });
+      }
+
+      // Chart.js Visualizations
+      // Prepare data for province charts
+      const provinceNames = [];
+      const literCapacities = [];
+      const shrinkCapacities = [];
+
+      {% for province in provinces %}
+        {% if province.id in targets %}
+          provinceNames.push('{{ province.name }}');
+          {% if product.liter_capacity is not none %}
+            literCapacities.push({{ targets[province.id].liter_capacity or 0 }});
+          {% endif %}
+          {% if product.shrink_capacity is not none %}
+            shrinkCapacities.push({{ targets[province.id].shrink_capacity or 0 }});
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+
+      // Liter capacity bar chart
+      const literCtx = document.getElementById('literProvinceChart')?.getContext('2d');
+      if (literCtx && literCapacities.length > 0) {
+        new Chart(literCtx, {
+          type: 'bar',
+          data: {
+            labels: provinceNames,
+            datasets: [{
+              label: 'ظرفیت لیتر',
+              data: literCapacities,
+              backgroundColor: '#3b82f6',
+              borderColor: '#2563eb',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    let value = context.parsed.x;
+                    return `${value.toLocaleString()} لیتر`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(value) {
+                    return value.toLocaleString();
+                  },
+                  font: { family: 'Vazirmatn' }
+                }
+              },
+              y: {
+                ticks: {
+                  font: { family: 'Vazirmatn' }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Shrink capacity bar chart
+      const shrinkCtx = document.getElementById('shrinkProvinceChart')?.getContext('2d');
+      if (shrinkCtx && shrinkCapacities.length > 0) {
+        new Chart(shrinkCtx, {
+          type: 'bar',
+          data: {
+            labels: provinceNames,
+            datasets: [{
+              label: 'ظرفیت شرینک',
+              data: shrinkCapacities,
+              backgroundColor: '#f59e0b',
+              borderColor: '#d97706',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    let value = context.parsed.x;
+                    return `${value.toLocaleString()} شرینک`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(value) {
+                    return value.toLocaleString();
+                  },
+                  font: { family: 'Vazirmatn' }
+                }
+              },
+              y: {
+                ticks: {
+                  font: { family: 'Vazirmatn' }
+                }
+              }
+            }
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

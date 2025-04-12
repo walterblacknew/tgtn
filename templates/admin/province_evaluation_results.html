@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>نتایج ارزیابی استان‌ها</title>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f0f4f8, #e9ecef);
+      font-family: 'Vazirmatn', sans-serif;
+      direction: rtl;
+      padding: 2rem;
+      margin: 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #102a43;
+    }
+    h2 {
+      margin-top: 2rem;
+      font-size: 1.5rem;
+    }
+    .summary {
+      background: #f1f5f9;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 2rem;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .summary-row:last-child {
+      border-bottom: none;
+    }
+    .summary-label {
+      font-weight: 500;
+      color: #475569;
+    }
+    .summary-value {
+      font-weight: 600;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+    th, td {
+      padding: 0.75rem;
+      border: 1px solid #cbd5e1;
+      text-align: center;
+    }
+    th {
+      background-color: #f0f4f8;
+      color: #243b53;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .section {
+      margin-bottom: 2rem;
+    }
+    .table-container {
+      overflow-x: auto;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    .score-column {
+      background-color: #eff6ff;
+      font-weight: 500;
+    }
+    td.score-column {
+      background-color: #f8fafc;
+    }
+    .total-score-column {
+      background-color: #ecfdf5;
+      font-weight: 700;
+    }
+    td.total-score-column {
+      background-color: #f0fdf4;
+    }
+    .grade-cell {
+      font-weight: bold;
+      text-align: center;
+    }
+    .grade-A {
+      color: #166534;
+      background-color: #dcfce7;
+    }
+    .grade-B {
+      color: #1e40af;
+      background-color: #dbeafe;
+    }
+    .grade-C {
+      color: #854d0e;
+      background-color: #fef9c3;
+    }
+    .grade-D {
+      color: #b91c1c;
+      background-color: #fee2e2;
+    }
+    .grade-none {
+      color: #475569;
+      background-color: #f1f5f9;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #334e68;
+      color: #fff;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      margin-top: 1rem;
+      text-align: center;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+    }
+    .btn:hover {
+      background-color: #243b53;
+    }
+    .btn-secondary {
+      background-color: #64748b;
+    }
+    .btn-secondary:hover {
+      background-color: #475569;
+    }
+    .back-link {
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .legend {
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      padding: 0.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.25rem;
+      background: #f8fafc;
+    }
+    .legend-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.25rem;
+    }
+    .legend-color {
+      width: 1rem;
+      height: 1rem;
+      margin-left: 0.5rem;
+      border-radius: 0.125rem;
+    }
+    .no-data {
+      text-align: center;
+      padding: 2rem;
+      color: #64748b;
+      font-style: italic;
+    }
+    .grade-mappings {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #f1f5f9;
+      border-radius: 0.5rem;
+      border: 1px solid #e2e8f0;
+    }
+    .grade-mappings-title {
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .grade-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .grade-item {
+      background: #fff;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.375rem;
+      border: 1px solid #cbd5e1;
+      font-size: 0.875rem;
+    }
+    .grade-letter {
+      font-weight: 700;
+    }
+
+    /* Step indicator */
+    .steps {
+      display: flex;
+      justify-content: space-between;
+      margin: 2rem 0;
+      position: relative;
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 14px;
+      right: 0;
+      left: 0;
+      height: 2px;
+      background-color: #e2e8f0;
+      z-index: 1;
+    }
+    .step {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+    .step-number {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: #e2e8f0;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.5rem;
+      font-weight: 600;
+      border: 2px solid #fff;
+    }
+    .step.active .step-number {
+      background-color: #4f46e5;
+      color: #fff;
+    }
+    .step.completed .step-number {
+      background-color: #22c55e;
+      color: #fff;
+    }
+    .step-label {
+      font-size: 0.875rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+    .step.active .step-label {
+      color: #4f46e5;
+    }
+    .step.completed .step-label {
+      color: #22c55e;
+    }
+
+    /* Map visualization */
+    .map-container {
+      width: 100%;
+      height: 500px;
+      margin: 2rem 0;
+      position: relative;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+
+    /* Charts */
+    .charts-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    .chart-card {
+      background: #fff;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 1rem;
+      border: 1px solid #e2e8f0;
+    }
+    .chart-title {
+      font-weight: 600;
+      margin-bottom: 1rem;
+      text-align: center;
+      color: #334155;
+    }
+    .chart-container {
+      height: 400px;
+    }
+
+    /* Cards for grade distribution */
+    .grade-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .grade-card {
+      background: #fff;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 1rem;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .province-name {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #334155;
+      font-size: 1.125rem;
+    }
+    .province-grade {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0.5rem 0;
+      width: 5rem;
+      height: 5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    .province-score {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .province-params {
+      font-size: 0.875rem;
+      color: #64748b;
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>نتایج ارزیابی استان‌ها</h1>
+
+    <!-- Step indicator -->
+    <div class="steps">
+      <div class="step completed">
+        <div class="step-number">1</div>
+        <div class="step-label">بارگذاری فایل</div>
+      </div>
+      <div class="step completed">
+        <div class="step-number">2</div>
+        <div class="step-label">تنظیم پارامترها</div>
+      </div>
+      <div class="step active">
+        <div class="step-number">3</div>
+        <div class="step-label">نتایج ارزیابی</div>
+      </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="summary">
+      <div class="summary-row">
+        <span class="summary-label">تعداد کل استان‌ها:</span>
+        <span class="summary-value">{{ provinces|length }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">تعداد استان‌های ارزیابی شده:</span>
+        <span class="summary-value">{{ valid_rows|length }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">پارامترهای ارزیابی:</span>
+        <span class="summary-value">{{ config|length }} پارامتر</span>
+      </div>
+    </div>
+
+    <!-- Grade Mappings -->
+    <div class="grade-mappings">
+      <div class="grade-mappings-title">درجه‌بندی مورد استفاده:</div>
+      <div class="grade-list">
+        {% if grade_mappings %}
+          {% for mapping in grade_mappings %}
+            <div class="grade-item">
+              <span class="grade-letter" style="color:
+                {% if mapping.grade_letter[0] == 'A' %}#166534
+                {% elif mapping.grade_letter[0] == 'B' %}#1e40af
+                {% elif mapping.grade_letter[0] == 'C' %}#854d0e
+                {% elif mapping.grade_letter[0] == 'D' %}#b91c1c
+                {% endif %}">{{ mapping.grade_letter }}:</span>
+              حداقل امتیاز {{ mapping.min_score }}
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="grade-item">هیچ درجه‌بندی تعریف نشده است.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Province Grade Cards -->
+    <h2>درجه‌بندی استان‌ها</h2>
+    <div class="grade-cards">
+      {% for row in valid_rows %}
+        <div class="grade-card">
+          <div class="province-name">{{ row[province_column] }}</div>
+          <div class="province-grade grade-{{ row.درجه[0] if row.درجه else 'none' }}" style="background-color:
+            {% if row.درجه[0] == 'A' %}#dcfce7
+            {% elif row.درجه[0] == 'B' %}#dbeafe
+            {% elif row.درجه[0] == 'C' %}#fef9c3
+            {% elif row.درجه[0] == 'D' %}#fee2e2
+            {% else %}#f1f5f9
+            {% endif %}">
+            {{ row.درجه }}
+          </div>
+          <div class="province-score">نمره: {{ row['نمره کل'] }}</div>
+          <div class="province-params">
+            {% for key, value in row.items() %}
+              {% if key.startswith('نمره ') and key != 'نمره کل' %}
+                {{ key.replace('نمره ', '') }}: {{ value }}<br>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Map Visualization -->
+    <h2>نقشه درجه‌بندی استان‌ها</h2>
+    <div class="map-container" id="iran-map-container">
+      <!-- SVG map will be rendered here via JavaScript -->
+    </div>
+
+    <!-- Bar Chart for Comparison -->
+    <div class="charts-container">
+      <div class="chart-card">
+        <div class="chart-title">مقایسه نمرات استان‌ها</div>
+        <div class="chart-container">
+          <canvas id="scoresChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">توزیع درجه‌بندی استان‌ها</div>
+        <div class="chart-container">
+          <canvas id="gradesChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend for color coding -->
+    <div class="legend">
+      <div class="legend-title">راهنمای رنگ‌ها:</div>
+      <div class="legend-item">
+        <div class="legend-color" style="background-color: #f8fafc;"></div>
+        <span>نمره پارامتر</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background-color: #f0fdf4;"></div>
+        <span>نمره کل و درجه نهایی</span>
+      </div>
+    </div>
+    <div class="section">
+  <h2>توانایی پوشش استان‌ها</h2>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>استان</th>
+          <th>نمره کل</th>
+          <th>توانایی پوشش بر اساس جمعیت</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in valid_rows %}
+        <tr>
+          <td>{{ row['استان'] }}</td>
+          <td>{{ row['total_score'] }}</td>
+          <td>{{ row['توانایی پوشش بر اساس جمعیت'] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+    <!-- Section: Valid Evaluated Data -->
+    <div class="section">
+      <h2>جزئیات نتایج ارزیابی</h2>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>{{ province_column }}</th>
+              {% for key in valid_rows[0].keys() %}
+                {% if key != province_column %}
+                  {% if key.startswith('نمره ') and key != 'نمره کل' %}
+                    <th class="score-column">{{ key }}</th>
+                  {% elif key == 'نمره کل' %}
+                    <th class="total-score-column">{{ key }}</th>
+                  {% elif key == 'درجه' %}
+                    <th class="total-score-column">{{ key }}</th>
+                  {% else %}
+                    <th>{{ key }}</th>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in valid_rows %}
+            <tr>
+              <td>{{ row[province_column] }}</td>
+              {% for key, value in row.items() %}
+                {% if key != province_column %}
+                  {% if key.startswith('نمره ') and key != 'نمره کل' %}
+                    <td class="score-column">{{ value }}</td>
+                  {% elif key == 'نمره کل' %}
+                    <td class="total-score-column">{{ value }}</td>
+                  {% elif key == 'درجه' %}
+                    <td class="grade-cell grade-{{ value[0] if value else 'none' }}">{{ value }}</td>
+                  {% else %}
+                    <td>{{ value }}</td>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="back-link">
+      <a href="{{ url_for('admin_quotas') }}" class="btn">بازگشت به صفحه سهمیه‌ها</a>
+      <button onclick="window.print()" class="btn">چاپ نتایج</button>
+      <a href="{{ url_for('admin_province_evaluation') }}" class="btn btn-secondary">ارزیابی جدید</a>
+    </div>
+  </div>
+
+  <!-- Chart.js for visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Prepare data for charts
+      const provinces = {{ province_names|tojson }};
+      const scores = {{ province_scores|tojson }};
+      const grades = {{ province_grades|tojson }};
+
+      // Scores chart (bar chart)
+      const scoresCtx = document.getElementById('scoresChart').getContext('2d');
+      new Chart(scoresCtx, {
+        type: 'bar',
+        data: {
+          labels: provinces,
+          datasets: [{
+            label: 'نمره استان',
+            data: scores,
+            backgroundColor: provinces.map(p => {
+              // Match grade to color
+              const index = provinces.indexOf(p);
+              const grade = grades[index][0]; // First letter of grade
+
+              if (grade === 'A') return '#86efac';
+              if (grade === 'B') return '#93c5fd';
+              if (grade === 'C') return '#fde047';
+              if (grade === 'D') return '#fca5a5';
+              return '#d1d5db'; // Default/none
+            }),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'نمره',
+                font: {
+                  family: 'Vazirmatn'
+                }
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'استان',
+                font: {
+                  family: 'Vazirmatn'
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // Grades distribution chart (pie chart)
+      const countGrades = {};
+      grades.forEach(grade => {
+        countGrades[grade] = (countGrades[grade] || 0) + 1;
+      });
+
+      const gradesCtx = document.getElementById('gradesChart').getContext('2d');
+      new Chart(gradesCtx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(countGrades),
+          datasets: [{
+            data: Object.values(countGrades),
+            backgroundColor: Object.keys(countGrades).map(grade => {
+              if (grade[0] === 'A') return '#86efac';
+              if (grade[0] === 'B') return '#93c5fd';
+              if (grade[0] === 'C') return '#fde047';
+              if (grade[0] === 'D') return '#fca5a5';
+              return '#d1d5db'; // Default/none
+            })
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                font: {
+                  family: 'Vazirmatn'
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // SVG map of Iran with provinces
+      const iranMapSvg = `
+        <svg id="iran-map" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+          <path id="tehran" d="M400 200 L420 180 L440 190 L430 210 L410 215 Z" />
+          <path id="isfahan" d="M380 250 L420 230 L450 260 L420 290 L370 270 Z" />
+          <path id="khorasan-razavi" d="M550 150 L580 130 L620 170 L590 200 L540 190 Z" />
+          <path id="fars" d="M400 320 L430 300 L470 320 L450 350 L410 360 Z" />
+          <path id="khuzestan" d="M300 300 L340 280 L370 310 L350 340 L310 330 Z" />
+          <path id="east-azerbaijan" d="M250 100 L290 80 L310 110 L280 130 L240 120 Z" />
+          <path id="mazandaran" d="M420 120 L450 100 L480 120 L460 140 L430 135 Z" />
+          <path id="west-azerbaijan" d="M180 120 L220 100 L240 130 L210 150 L170 140 Z" />
+          <path id="kerman" d="M500 300 L540 280 L570 310 L550 340 L510 350 Z" />
+          <path id="sistan-baluchistan" d="M600 300 L640 280 L680 310 L650 350 L610 350 Z" />
+          <path id="alborz" d="M380 170 L400 150 L420 170 L410 190 L370 185 Z" />
+          <path id="gilan" d="M320 130 L350 110 L370 140 L350 160 L320 155 Z" />
+          <path id="kermanshah" d="M220 220 L250 200 L270 230 L250 250 L220 245 Z" />
+          <path id="lorestan" d="M270 250 L300 230 L320 260 L300 280 L270 275 Z" />
+          <path id="hamadan" d="M270 200 L300 180 L320 210 L300 230 L270 225 Z" />
+          <path id="golestan" d="M480 140 L510 120 L530 150 L510 170 L480 165 Z" />
+          <path id="kurdistan" d="M220 180 L250 160 L270 190 L250 210 L220 205 Z" />
+          <path id="hormozgan" d="M450 380 L490 360 L520 390 L500 410 L460 405 Z" />
+          <path id="markazi" d="M320 210 L350 190 L370 220 L350 240 L320 235 Z" />
+          <path id="ardabil" d="M280 70 L310 50 L330 80 L310 100 L280 95 Z" />
+          <path id="qazvin" d="M350 160 L380 140 L400 170 L380 190 L350 185 Z" />
+          <path id="qom" d="M370 210 L400 190 L420 220 L400 240 L370 235 Z" />
+          <path id="yazd" d="M450 280 L480 260 L500 290 L480 310 L450 305 Z" />
+          <path id="zanjan" d="M300 140 L330 120 L350 150 L330 170 L300 165 Z" />
+          <path id="bushehr" d="M330 350 L360 330 L380 360 L360 380 L330 375 Z" />
+          <path id="chaharmahal" d="M350 270 L380 250 L400 280 L380 300 L350 295 Z" />
+          <path id="north-khorasan" d="M500 100 L530 80 L550 110 L530 130 L500 125 Z" />
+          <path id="kohgiluyeh" d="M360 320 L390 300 L410 330 L390 350 L360 345 Z" />
+          <path id="south-khorasan" d="M540 220 L570 200 L590 230 L570 250 L540 245 Z" />
+          <path id="semnan" d="M460 180 L490 160 L510 190 L490 210 L460 205 Z" />
+          <path id="ilam" d="M240 270 L270 250 L290 280 L270 300 L240 295 Z" />
+          <!-- Add province names -->
+          <text x="405" y="200" font-size="8">تهران</text>
+          <text x="410" y="260" font-size="8">اصفهان</text>
+          <text x="570" y="170" font-size="8">خراسان رضوی</text>
+          <text x="430" y="330" font-size="8">فارس</text>
+          <text x="330" y="310" font-size="8">خوزستان</text>
+          <text x="270" y="110" font-size="8">آذربایجان شرقی</text>
+          <text x="445" y="125" font-size="8">مازندران</text>
+          <text x="200" y="130" font-size="8">آذربایجان غربی</text>
+          <text x="530" y="310" font-size="8">کرمان</text>
+          <text x="640" y="310" font-size="8">سیستان و بلوچستان</text>
+          <text x="385" y="170" font-size="8">البرز</text>
+          <text x="335" y="140" font-size="8">گیلان</text>
+          <text x="235" y="230" font-size="8">کرمانشاه</text>
+          <text x="285" y="260" font-size="8">لرستان</text>
+          <text x="285" y="210" font-size="8">همدان</text>
+          <text x="495" y="150" font-size="8">گلستان</text>
+          <text x="235" y="190" font-size="8">کردستان</text>
+          <text x="480" y="390" font-size="8">هرمزگان</text>
+          <text x="335" y="220" font-size="8">مرکزی</text>
+          <text x="295" y="80" font-size="8">اردبیل</text>
+          <text x="365" y="170" font-size="8">قزوین</text>
+          <text x="385" y="220" font-size="8">قم</text>
+          <text x="475" y="290" font-size="8">یزد</text>
+          <text x="315" y="150" font-size="8">زنجان</text>
+          <text x="345" y="360" font-size="8">بوشهر</text>
+          <text x="375" y="280" font-size="8">چهارمحال</text>
+          <text x="515" y="115" font-size="8">خراسان شمالی</text>
+          <text x="375" y="330" font-size="8">کهگیلویه</text>
+          <text x="555" y="230" font-size="8">خراسان جنوبی</text>
+          <text x="475" y="195" font-size="8">سمنان</text>
+          <text x="255" y="280" font-size="8">ایلام</text>
+        </svg>
+      `;
+
+      // Insert the SVG into the container
+      const mapContainer = document.getElementById('iran-map-container');
+      mapContainer.innerHTML = iranMapSvg;
+
+      // Map province IDs in SVG to their Persian names
+      const provinceMap = {
+        'tehran': 'تهران',
+        'isfahan': 'اصفهان',
+        'khorasan-razavi': 'خراسان رضوی',
+        'fars': 'فارس',
+        'khuzestan': 'خوزستان',
+        'east-azerbaijan': 'آذربایجان شرقی',
+        'mazandaran': 'مازندران',
+        'west-azerbaijan': 'آذربایجان غربی',
+        'kerman': 'کرمان',
+        'sistan-baluchistan': 'سیستان و بلوچستان',
+        'alborz': 'البرز',
+        'gilan': 'گیلان',
+        'kermanshah': 'کرمانشاه',
+        'lorestan': 'لرستان',
+        'hamadan': 'همدان',
+        'golestan': 'گلستان',
+        'kurdistan': 'کردستان',
+        'hormozgan': 'هرمزگان',
+        'markazi': 'مرکزی',
+        'ardabil': 'اردبیل',
+        'qazvin': 'قزوین',
+        'qom': 'قم',
+        'yazd': 'یزد',
+        'zanjan': 'زنجان',
+        'bushehr': 'بوشهر',
+        'chaharmahal': 'چهارمحال و بختیاری',
+        'north-khorasan': 'خراسان شمالی',
+        'kohgiluyeh': 'کهگیلویه و بویراحمد',
+        'south-khorasan': 'خراسان جنوبی',
+        'semnan': 'سمنان',
+        'ilam': 'ایلام'
+      };
+
+      // Create lookup of province to grade and score
+      const provinceResults = {};
+
+      {% for row in valid_rows %}
+        provinceResults['{{ row[province_column] }}'] = {
+          grade: '{{ row["درجه"] }}',
+          score: {{ row["نمره کل"]|float }}
+        };
+      {% endfor %}
+
+      // Get all province paths
+      const provincePaths = document.querySelectorAll('#iran-map path');
+
+      // Color provinces based on their grades
+      provincePaths.forEach(path => {
+        const provinceId = path.id;
+        const persianName = provinceMap[provinceId];
+
+        if (persianName && provinceResults[persianName]) {
+          const grade = provinceResults[persianName].grade;
+          const score = provinceResults[persianName].score;
+
+          // Set color based on grade
+          let fillColor = '#f1f5f9'; // Default for no grade
+          if (grade.startsWith('A')) fillColor = '#dcfce7';
+          else if (grade.startsWith('B')) fillColor = '#dbeafe';
+          else if (grade.startsWith('C')) fillColor = '#fef9c3';
+          else if (grade.startsWith('D')) fillColor = '#fee2e2';
+
+          path.setAttribute('fill', fillColor);
+          path.setAttribute('stroke', '#1e293b');
+          path.setAttribute('stroke-width', '1');
+
+          // Add data attributes for tooltip
+          path.setAttribute('data-province', persianName);
+          path.setAttribute('data-grade', grade);
+          path.setAttribute('data-score', score);
+
+          // Add hover effects and tooltip
+          path.addEventListener('mouseover', function(e) {
+            this.setAttribute('stroke-width', '2');
+            this.setAttribute('stroke', '#1e40af');
+
+            // Show tooltip
+            const tooltip = document.createElement('div');
+            tooltip.style.position = 'absolute';
+            tooltip.style.backgroundColor = '#fff';
+            tooltip.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+            tooltip.style.padding = '8px 12px';
+            tooltip.style.borderRadius = '4px';
+            tooltip.style.fontSize = '14px';
+            tooltip.style.zIndex = '1000';
+            tooltip.style.left = (e.pageX + 10) + 'px';
+            tooltip.style.top = (e.pageY + 10) + 'px';
+
+            tooltip.innerHTML = `
+              <div style="font-weight:bold">${this.getAttribute('data-province')}</div>
+              <div>درجه: ${this.getAttribute('data-grade')}</div>
+              <div>نمره: ${this.getAttribute('data-score')}</div>
+            `;
+
+            document.body.appendChild(tooltip);
+            this.tooltip = tooltip;
+          });
+
+          path.addEventListener('mousemove', function(e) {
+            if (this.tooltip) {
+              this.tooltip.style.left = (e.pageX + 10) + 'px';
+              this.tooltip.style.top = (e.pageY + 10) + 'px';
+            }
+          });
+
+          path.addEventListener('mouseout', function() {
+            this.setAttribute('stroke-width', '1');
+            this.setAttribute('stroke', '#1e293b');
+            if (this.tooltip) {
+              document.body.removeChild(this.tooltip);
+              this.tooltip = null;
+            }
+          });
+        } else {
+          // Province not in results
+          path.setAttribute('fill', '#e2e8f0');
+          path.setAttribute('stroke', '#94a3b8');
+          path.setAttribute('stroke-width', '1');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

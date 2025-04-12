@@ -5,6 +5,8 @@
   <title>جزئیات دسته ارزیابی | پنل مدیریت</title>
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
   <style>
     /* Global Styles */
     body {
@@ -36,7 +38,7 @@
       border-radius: 0.75rem;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-    
+
     .btn {
       padding: 0.375rem 0.75rem;
       border-radius: 0.375rem;
@@ -79,7 +81,7 @@
     .btn-outline:hover {
       background-color: #f8fafc;
     }
-    
+
     /* Batch info section */
     .batch-info {
       display: flex;
@@ -126,7 +128,7 @@
       align-items: center;
       gap: 0.25rem;
     }
-    
+
     /* Table */
     .table-container {
       max-height: 600px;
@@ -157,7 +159,7 @@
     tr:hover td {
       background-color: #f1f5f9;
     }
-    
+
     /* Actions */
     .actions {
       display: flex;
@@ -172,7 +174,7 @@
       align-items: center;
       margin-bottom: 1.5rem;
     }
-    
+
     /* Badge with different colors */
     .grade-badge {
       padding: 0.25rem 0.5rem;
@@ -198,7 +200,7 @@
       background-color: #fee2e2;
       color: #b91c1c;
     }
-    
+
     /* Customer info pill */
     .customer-info {
       font-size: 0.875rem;
@@ -210,7 +212,7 @@
       color: #64748b;
       font-size: 0.75rem;
     }
-    
+
     /* Flash messages */
     .flash {
       padding: 0.75rem 1rem;
@@ -238,7 +240,7 @@
       border-left: 4px solid #3b82f6;
       color: #1e40af;
     }
-    
+
     /* Row data display */
     .row-data-container {
       background-color: #f8fafc;
@@ -264,6 +266,404 @@
     .row-data-value {
       color: #334155;
     }
+
+    /* Targeting section styles */
+    .targeting-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #e2e8f0;
+    }
+
+    .product-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .capacity-display {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .capacity-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+    }
+
+    .liter-capacity {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+
+    .shrink-capacity {
+      background-color: #fef9c3;
+      color: #854d0e;
+    }
+
+    .grade-distribution-summary {
+      margin-bottom: 2rem;
+    }
+
+    #grade-distribution-chart-container {
+      height: 300px;
+      margin-top: 1rem;
+    }
+
+    .allocation-container {
+      background-color: #fff;
+      border-radius: 0.5rem;
+      border: 1px solid #e2e8f0;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .allocation-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+
+    .allocation-table th,
+    .allocation-table td {
+      padding: 0.75rem;
+      border: 1px solid #e2e8f0;
+      text-align: center;
+    }
+
+    .allocation-table th {
+      background-color: #f8fafc;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .helper-text {
+      color: #64748b;
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+
+    .weight-adjustment {
+      margin-top: 2rem;
+      background-color: #f8fafc;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid #e2e8f0;
+    }
+
+    #weights-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .weight-slider-item {
+      background-color: #fff;
+      padding: 0.75rem;
+      border-radius: 0.375rem;
+      border: 1px solid #e2e8f0;
+    }
+
+    .weight-slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .weight-grade {
+      font-weight: 600;
+      display: inline-flex;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+    }
+
+    .weight-value {
+      font-weight: 500;
+      color: #64748b;
+    }
+
+    .weight-slider {
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      color: #64748b;
+      font-size: 1.25rem;
+      gap: 0.75rem;
+    }
+
+    .highlight-row {
+      background-color: #f0fdf4;
+      font-weight: 600;
+    }
+
+    /* Enhanced grade badge styles */
+    .grade-A-plus {
+      background-color: #86efac;
+      color: #14532d;
+    }
+
+    .grade-A {
+      background-color: #bbf7d0;
+      color: #166534;
+    }
+
+    .grade-B-plus {
+      background-color: #93c5fd;
+      color: #1e3a8a;
+    }
+
+    .grade-B {
+      background-color: #bfdbfe;
+      color: #1e40af;
+    }
+
+    .grade-C {
+      background-color: #fef08a;
+      color: #854d0e;
+    }
+
+    .grade-D {
+      background-color: #fecaca;
+      color: #b91c1c;
+    }
+
+    .grade-none {
+      background-color: #e2e8f0;
+      color: #475569;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.625rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      transition: border-color 0.2s;
+    }
+    .form-control:focus {
+      border-color: #4f46e5;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+    }
+
+    /* NEW STYLES FOR BULK TARGETING AND EXPORT */
+    .bulk-actions-panel {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .bulk-actions-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .bulk-form-group {
+      margin-bottom: 1rem;
+    }
+
+    .bulk-form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #334155;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 0.375rem;
+      background-color: #fff;
+      border: 1px solid #e2e8f0;
+      transition: background-color 0.2s;
+    }
+
+    .checkbox-item:hover {
+      background-color: #f1f5f9;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      accent-color: #4f46e5;
+      width: 1rem;
+      height: 1rem;
+    }
+
+    .export-options {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .export-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1rem;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      background-color: #f8fafc;
+      color: #334155;
+      border: 1px solid #e2e8f0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .export-btn:hover {
+      background-color: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .export-excel {
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+
+    .export-excel:hover {
+      background-color: #f0fdf4;
+    }
+
+    .export-csv {
+      color: #1e40af;
+      border-color: #bfdbfe;
+    }
+
+    .export-csv:hover {
+      background-color: #eff6ff;
+    }
+
+    .export-pdf {
+      color: #b91c1c;
+      border-color: #fecaca;
+    }
+
+    .export-pdf:hover {
+      background-color: #fef2f2;
+    }
+
+    .select-all-container {
+      margin-bottom: 1rem;
+      background-color: #fff;
+      border-radius: 0.375rem;
+      padding: 0.75rem;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .select-all-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .percentage-inputs {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .percentage-input-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      border: 1px solid #e2e8f0;
+    }
+
+    .percentage-input {
+      width: 80px;
+      padding: 0.375rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.25rem;
+      text-align: center;
+    }
+
+    .bulk-submit-container {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #e2e8f0;
+      margin-bottom: 1.5rem;
+    }
+
+    .tab {
+      padding: 0.75rem 1.25rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      font-weight: 500;
+      color: #64748b;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      color: #4f46e5;
+      border-bottom-color: #4f46e5;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .export-results-preview {
+      background-color: #fff;
+      border-radius: 0.5rem;
+      border: 1px solid #e2e8f0;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+
+    .export-preview-header {
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
   </style>
 </head>
 <body>
@@ -282,141 +682,2485 @@
       </form>
     </div>
   </div>
-  
-  <!-- Flash messages -->
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="flash {{ category }}">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
-  
-  <div class="section">
+
+  <!-- Tabs for the page -->
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('batch-info')">اطلاعات دسته</div>
+    <div class="tab" onclick="showTab('bulk-targeting')">تارگت دسته‌ای</div>
+    <div class="tab" onclick="showTab('export-reports')">خروجی گزارش</div>
+  </div>
+
+  <!-- Tab 1: Batch Info (Original Content) -->
+  <div class="tab-content active" id="batch-info">
+    <!-- Add this section to batch_evaluations.html after the batch header section -->
+    <div class="section">
+      <h2>
+        <i class="fas fa-map-marker-alt" style="color: #4f46e5;"></i>
+        تعیین استان برای ارزیابی‌های دسته‌ای
+      </h2>
+
+      <form method="POST" action="{{ url_for('assign_batch_province', batch_id=batch_id) }}">
+        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+          <div style="flex: 1;">
+            <label for="province_id" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #64748b;">انتخاب استان:</label>
+            <select id="province_id" name="province_id" class="form-control" style="width: 100%; padding: 0.625rem; border: 1px solid #e2e8f0; border-radius: 0.375rem;">
+              <option value="">-- انتخاب استان --</option>
+              {% for province in provinces %}
+                <option value="{{ province.id }}" {% if current_province and current_province.id == province.id %}selected{% endif %}>
+                  {{ province.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div style="display: flex; align-items: flex-end;">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i>
+              تخصیص استان به دسته ارزیابی
+            </button>
+          </div>
+        </div>
+      </form>
+
+      {% if current_province %}
+        <div class="flash info">
+          <i class="fas fa-info-circle"></i>
+          استان فعلی برای این دسته ارزیابی: <strong>{{ current_province.name }}</strong>
+        </div>
+
+        <div style="margin-top: 1rem;">
+          <a href="{{ url_for('admin_province_targets') }}" class="btn btn-primary">
+            <i class="fas fa-map-marked-alt"></i>
+            مشاهده تارگت‌های استانی
+          </a>
+
+          <a href="{{ url_for('admin_products') }}" class="btn btn-success">
+            <i class="fas fa-box"></i>
+            تعیین تارگت محصولات برای این استان
+          </a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Product Distribution Section -->
+    <div class="section">
+      <h2>
+        <i class="fas fa-bullseye" style="color: #4f46e5;"></i>
+        توزیع محصولات براساس درجه‌بندی مشتریان
+      </h2>
+
+      <div id="product-distribution-container">
+        <!-- Products will be loaded here -->
+        <div class="loading-spinner">
+          <i class="fas fa-spinner fa-spin"></i>
+          در حال بارگذاری اطلاعات محصولات...
+        </div>
+      </div>
+
+      <div id="product-targeting-container" style="display: none;">
+        <div class="targeting-header">
+          <div class="product-selector">
+            <label for="product-select">انتخاب محصول:</label>
+            <select id="product-select" class="form-control">
+              <option value="">-- انتخاب محصول --</option>
+            </select>
+          </div>
+          <div class="capacity-display">
+            <div class="capacity-item liter-capacity">
+              <i class="fas fa-tint"></i>
+              <span>ظرفیت لیتر: </span>
+              <strong id="liter-capacity-value">0</strong>
+            </div>
+            <div class="capacity-item shrink-capacity">
+              <i class="fas fa-box"></i>
+              <span>ظرفیت شرینک: </span>
+              <strong id="shrink-capacity-value">0</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="grade-distribution-summary">
+          <h3>توزیع مشتریان براساس درجه</h3>
+          <div id="grade-distribution-chart-container">
+            <canvas id="grade-distribution-chart"></canvas>
+          </div>
+        </div>
+
+        <div class="allocation-container">
+          <h3>تخصیص بر اساس درجه مشتریان</h3>
+          <p class="helper-text">توزیع ظرفیت محصول براساس درجه‌بندی مشتریان استان مورد نظر</p>
+
+          <table class="allocation-table">
+            <thead>
+              <tr>
+                <th>درجه</th>
+                <th>تعداد مشتری</th>
+                <th>وزن تخصیص</th>
+                <th>ضریب</th>
+                <th>ظرفیت لیتر (کل)</th>
+                <th>سهم هر مشتری (لیتر)</th>
+                <th>ظرفیت شرینک (کل)</th>
+                <th>سهم هر مشتری (شرینک)</th>
+              </tr>
+            </thead>
+            <tbody id="allocation-table-body">
+              <!-- Allocation data will be inserted here -->
+            </tbody>
+          </table>
+
+          <div class="weight-adjustment">
+            <h3>تنظیم وزن‌های درجه‌بندی</h3>
+            <p>با تغییر وزن‌ها، توزیع مقادیر به صورت خودکار به‌روزرسانی می‌شود</p>
+            <div id="weights-container">
+              <!-- Weight sliders will be added here -->
+            </div>
+            <button id="apply-weights" class="btn btn-primary">
+              <i class="fas fa-check"></i>
+              اعمال وزن‌ها
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="section">
+      <h2>
+        <i class="fas fa-info-circle" style="color: #4f46e5;"></i>
+        اطلاعات دسته ارزیابی
+      </h2>
+
+      <div class="batch-info">
+        <div class="info-card">
+          <div class="info-card-title">تعداد کل ارزیابی‌ها</div>
+          <div class="info-card-value">{{ evaluations|length }}</div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-title">میانگین نمره</div>
+          <div class="info-card-value">{{ avg_score }}</div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-title">تاریخ ارزیابی</div>
+          <div class="info-card-value" style="font-size: 1rem;">{{ date.strftime('%Y-%m-%d %H:%M:%S') if date else 'نامشخص' }}</div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-title">توزیع درجه‌ها</div>
+          <div class="grade-distribution">
+            {% for grade, count in grade_counts.items() %}
+              <div class="grade-pill">
+                <span>{{ grade }}:</span>
+                <strong>{{ count }}</strong>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Add this HTML code to the appropriate section in batch_evaluations.html -->
+
+<div class="section">
+  <div class="section-header">
     <h2>
-      <i class="fas fa-info-circle" style="color: #4f46e5;"></i>
-      اطلاعات دسته ارزیابی
+      <i class="fas fa-download" style="color: #4f46e5;"></i>
+      دانلود اطلاعات دسته ارزیابی
     </h2>
-    
-    <div class="batch-info">
-      <div class="info-card">
-        <div class="info-card-title">تعداد کل ارزیابی‌ها</div>
-        <div class="info-card-value">{{ evaluations|length }}</div>
-      </div>
-      
-      <div class="info-card">
-        <div class="info-card-title">میانگین نمره</div>
-        <div class="info-card-value">{{ avg_score }}</div>
-      </div>
-      
-      <div class="info-card">
-        <div class="info-card-title">تاریخ ارزیابی</div>
-        <div class="info-card-value" style="font-size: 1rem;">{{ date.strftime('%Y-%m-%d %H:%M:%S') if date else 'نامشخص' }}</div>
-      </div>
-      
-      <div class="info-card">
-        <div class="info-card-title">توزیع درجه‌ها</div>
-        <div class="grade-distribution">
-          {% for grade, count in grade_counts.items() %}
-            <div class="grade-pill">
-              <span>{{ grade }}:</span>
-              <strong>{{ count }}</strong>
+  </div>
+
+  <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+    <button type="button" class="btn btn-primary" onclick="downloadAllCustomerData('{{ batch_id }}')">
+      <i class="fas fa-download"></i>
+      دانلود اطلاعات تمامی مشتریان به همراه سهمیه‌ها
+    </button>
+  </div>
+
+  <div class="flash info">
+    <i class="fas fa-info-circle"></i>
+    با استفاده از این دکمه می‌توانید اطلاعات تمامی مشتریان این دسته ارزیابی را به همراه سهمیه محصولات آن‌ها در یک فایل CSV دریافت کنید.
+  </div>
+</div>
+    <div class="section">
+      <h2>
+        <i class="fas fa-list" style="color: #4f46e5;"></i>
+        لیست ارزیابی‌ها
+      </h2>
+
+      <div class="table-container">
+        <table>
+         <thead>
+  <tr>
+    <th>ردیف</th>
+    {% if is_csv_record %}
+      <th>اطلاعات ردیف</th>
+    {% else %}
+      <th>اطلاعات مشتری</th>
+    {% endif %}
+    <th>نمره کل</th>
+    <th>درجه</th>
+    <th>نوع مشتری</th>
+    <th>تاریخ ارزیابی</th>
+    <th>سهمیه محصولات</th> <!-- New column header -->
+    <th>عملیات</th>
+  </tr>
+</thead>
+<!-- Update the evaluations table section in batch_evaluations.html -->
+<!-- Update the evaluations table section in batch_evaluations.html -->
+<tbody>
+  {% for eval in evaluations %}
+  <tr>
+    <td>{{ loop.index }}</td>
+    <td>
+      {% if is_csv_record %}
+        <!-- Display CSV row data -->
+        <button onclick="toggleRowData('rowData{{ loop.index }}')" class="btn btn-outline">
+          نمایش اطلاعات
+        </button>
+        <div id="rowData{{ loop.index }}" class="row-data-container" style="display: none;">
+          {% for key, value in eval.row_data.items() %}
+            <div class="row-data-item">
+              <span class="row-data-key">{{ key }}:</span>
+              <span class="row-data-value">{{ value }}</span>
             </div>
           {% endfor %}
+        </div>
+      {% else %}
+        <!-- Display customer info -->
+        <div class="customer-info">
+          {{ eval.customer.name or 'نامشخص' }}
+          {% if eval.customer.number %}
+          <span class="customer-number">({{ eval.customer.number }})</span>
+          {% endif %}
+        </div>
+      {% endif %}
+    </td>
+    <td>{{ eval.total_score }}</td>
+  <td>
+      {% if is_csv_record and eval.customer_id %}
+        {% set customer = eval.customer %}
+      {% elif not is_csv_record %}
+        {% set customer = eval.customer %}
+      {% else %}
+        {% set customer = None %}
+      {% endif %}
+
+      <form method="POST" style="display: inline;">
+        <input type="hidden" name="update_customer_type" value="1">
+        <input type="hidden" name="customer_id" value="{{ customer.id if customer else '' }}">
+        <select name="customer_type_id" onchange="this.form.submit()" style="width: 100%; padding: 0.375rem; border-radius: 0.25rem; border: 1px solid #e2e8f0;" {% if not customer %}disabled{% endif %}>
+          <option value="">-- انتخاب نوع مشتری --</option>
+          {% for type in customer_types %}
+            <option value="{{ type.id }}" {% if customer and customer.customer_type_id == type.id %}selected{% endif %}>
+              {{ type.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </form>
+    </td>
+    <td>
+      {% set grade_class = 'grade-' + eval.assigned_grade[0] if eval.assigned_grade and eval.assigned_grade[0] in ['A', 'B', 'C', 'D'] else 'grade-none' %}
+      <span class="grade-badge {{ grade_class }}">{{ eval.assigned_grade }}</span>
+    </td>
+     <td>
+      <!-- Add the customer type dropdown here -->
+      <form method="POST" class="d-inline" style="display: inline-block;">
+        <input type="hidden" name="update_customer_type" value="1">
+        <input type="hidden" name="customer_id" value="{{ eval.customer_id if is_csv_record else eval.customer.id }}">
+        <select name="customer_type_id" onchange="this.form.submit()" style="padding: 0.25rem; border-radius: 0.25rem; border: 1px solid #e2e8f0;">
+          <option value="">-- انتخاب نوع --</option>
+          {% for type in customer_types %}
+            <option value="{{ type.id }}"
+              {% if is_csv_record and eval.customer_id and eval.customer.customer_type_id == type.id %}selected{% endif %}
+              {% if not is_csv_record and eval.customer.customer_type_id == type.id %}selected{% endif %}>
+              {{ type.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </form>
+    </td>
+    <td>{{ eval.evaluated_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+
+    <!-- Updated column with button to show product quotas -->
+    <td>
+  <button type="button" class="btn btn-outline"
+          {% if is_csv_record and eval.customer_id %}
+            onclick="showCustomerDetails({{ eval.customer_id }}, '{{ eval.assigned_grade }}')"
+          {% elif not is_csv_record %}
+            onclick="showCustomerDetails({{ eval.customer.id }}, '{{ eval.assigned_grade }}')"
+          {% else %}
+            onclick="showProductQuotas('{{ eval.assigned_grade }}', {{ eval.id }})"
+          {% endif %}
+  >
+    <i class="fas fa-box"></i>
+    {% if is_csv_record and eval.customer_id or not is_csv_record %}
+      مشاهده اطلاعات و سهمیه‌ها
+    {% else %}
+      نمایش سهمیه‌ها
+    {% endif %}
+  </button>
+</td>
+
+    <td class="actions">
+  <a href="{{ url_for('edit_evaluation', eval_id=eval.id) }}" class="btn btn-primary">
+    <i class="fas fa-edit"></i>
+    ویرایش
+  </a>
+  <form method="POST" action="{{ url_for('delete_evaluation', eval_id=eval.id) }}" style="display: inline-block;" onsubmit="return confirm('آیا از حذف این ارزیابی مطمئن هستید؟');">
+    <button type="submit" class="btn btn-danger">
+      <i class="fas fa-trash"></i>
+      حذف
+    </button>
+  </form>
+  <!-- New download button for exporting customer details and quotas -->
+  <button type="button" class="btn btn-success" onclick="downloadCustomerData({{ eval.id }}, '{{ eval.assigned_grade }}')">
+    <i class="fas fa-download"></i>
+    دانلود اطلاعات
+  </button>
+</td>
+  </tr>
+  {% endfor %}
+</tbody>
+        </table>
+      <!-- Add this section to batch_evaluations.html where you want to display the grade-based targets -->
+<div class="allocation-container">
+  <h3>تخصیص بر اساس درجه مشتریان</h3>
+  <p class="helper-text">توزیع ظرفیت محصول براساس درجه‌بندی مشتریان استان مورد نظر</p>
+
+  {% if current_province %}
+    {% if batch_targets %}
+      <div class="table-container">
+        <table class="allocation-table">
+          <thead>
+            <tr>
+              <th>درجه</th>
+              <th>محصول</th>
+              <th>تعداد مشتری</th>
+              <th>سهم هر مشتری (لیتر)</th>
+              <th>سهم هر مشتری (شرینک)</th>
+              <th>عملیات</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for target in batch_targets %}
+              <tr id="target-row-{{ target.id }}">
+                <td>
+                  <span class="grade-badge
+                    {% if target.grade[0] == 'A' %}grade-A
+                    {% elif target.grade[0] == 'B' %}grade-B
+                    {% elif target.grade[0] == 'C' %}grade-C
+                    {% elif target.grade[0] == 'D' %}grade-D
+                    {% else %}grade-none
+                    {% endif %}">
+                    {{ target.grade }}
+                  </span>
+                </td>
+                <td>{{ target.product.name }}</td>
+                <td>{{ target.customer_count }}</td>
+                <td>
+                  <span id="liter-display-{{ target.id }}">
+                    {{ "{:,.2f}".format(target.liter_capacity) if target.liter_capacity else '-' }}
+                  </span>
+                  <input type="number" id="liter-input-{{ target.id }}"
+                         class="edit-input" style="display: none; width: 80px;"
+                         step="0.01" min="0" value="{{ target.liter_capacity or '' }}">
+                </td>
+                <td>
+                  <span id="shrink-display-{{ target.id }}">
+                    {{ "{:,.2f}".format(target.shrink_capacity) if target.shrink_capacity else '-' }}
+                  </span>
+                  <input type="number" id="shrink-input-{{ target.id }}"
+                         class="edit-input" style="display: none; width: 80px;"
+                         step="0.01" min="0" value="{{ target.shrink_capacity or '' }}">
+                </td>
+                <td>
+                  <div class="actions">
+                    <button type="button" class="btn btn-primary btn-edit"
+                            onclick="editTarget({{ target.id }})">
+                      <i class="fas fa-edit"></i>
+                      ویرایش
+                    </button>
+                    <button type="button" class="btn btn-success btn-save"
+                            onclick="saveTarget({{ target.id }})" style="display: none;">
+                      <i class="fas fa-save"></i>
+                      ذخیره
+                    </button>
+                    <button type="button" class="btn btn-outline btn-cancel"
+                            onclick="cancelEdit({{ target.id }})" style="display: none;">
+                      <i class="fas fa-times"></i>
+                      انصراف
+                    </button>
+                    <form method="POST" action="{{ url_for('delete_batch_target', target_id=target.id) }}"
+                          style="display: inline-block;"
+                          onsubmit="return confirm('آیا از حذف این تارگت مطمئن هستید؟');">
+                      <button type="submit" class="btn btn-danger btn-delete">
+                        <i class="fas fa-trash"></i>
+                        حذف
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 2rem; color: #64748b;">
+        <p>هنوز هیچ تارگتی محاسبه نشده است.</p>
+      </div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('calculate_batch_targets', batch_id=batch_id) }}">
+      <input type="hidden" name="province_id" value="{{ current_province.id }}">
+      <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+        <i class="fas fa-calculator"></i>
+        محاسبه تارگت‌های مبتنی بر درجه
+      </button>
+    </form>
+  {% else %}
+    <div class="flash warning">
+      <i class="fas fa-exclamation-triangle"></i>
+      لطفاً ابتدا یک استان را به این دسته ارزیابی تخصیص دهید.
+    </div>
+  {% endif %}
+</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add this somewhere at the end of the body but before closing </body> tag -->
+<div id="quotaModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+  <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; border-radius: 0.5rem; max-width: 700px;">
+    <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px;">
+      <h3 id="quotaModalTitle" style="margin: 0;">سهمیه محصولات براساس درجه</h3>
+      <span class="close" onclick="closeQuotaModal()" style="color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+    </div>
+    <div id="quotaModalContent">
+      <!-- Content will be loaded dynamically -->
+      <div class="loading-spinner">
+        <i class="fas fa-spinner fa-spin"></i>
+        در حال بارگذاری اطلاعات...
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Tab 2: Bulk Targeting -->
+  <div class="tab-content" id="bulk-targeting">
+    <div class="section">
+      <h2>
+        <i class="fas fa-cubes" style="color: #4f46e5;"></i>
+        تارگت دسته‌ای برای تمامی محصولات
+      </h2>
+
+      {% if current_province %}
+        <div class="flash info">
+          <i class="fas fa-info-circle"></i>
+          استان تخصیص داده شده: <strong>{{ current_province.name }}</strong> |
+          تعداد مشتری: <strong id="customer-count-display">0</strong> |
+          توزیع درجه:
+          {% for grade, count in grade_counts.items() %}
+            <span class="grade-badge {% if grade[0] == 'A' %}grade-A{% elif grade[0] == 'B' %}grade-B{% elif grade[0] == 'C' %}grade-C{% elif grade[0] == 'D' %}grade-D{% endif %}" style="margin: 0 2px;">{{ grade }}</span>: {{ count }}
+          {% endfor %}
+        </div>
+
+        <div class="bulk-actions-panel">
+          <div class="bulk-actions-header">
+            <h3 style="margin: 0;">تخصیص یکجا برای تمامی محصولات</h3>
+            <div>
+              <button id="refresh-products-btn" class="btn btn-outline">
+                <i class="fas fa-sync-alt"></i>
+                بروزرسانی لیست
+              </button>
+            </div>
+          </div>
+
+          <form id="bulk-targeting-form" method="POST" action="/admin/update-bulk-province-product-targets">
+            <input type="hidden" name="province_id" value="{{ current_province.id }}">
+            <input type="hidden" name="batch_id" value="{{ batch_id }}">
+
+            <div class="select-all-container">
+              <div class="select-all-checkbox">
+                <input type="checkbox" id="select-all-products" checked>
+                <label for="select-all-products" style="font-weight: 600;">انتخاب همه محصولات</label>
+              </div>
+              <div>
+                <span>تعداد محصولات انتخاب شده: <strong id="selected-products-count">0</strong></span>
+              </div>
+            </div>
+
+            <div class="bulk-form-group">
+              <label class="bulk-form-label">انتخاب محصولات:</label>
+              <div class="checkbox-group" id="products-checkbox-group">
+                <!-- محصولات به صورت پویا اینجا قرار می‌گیرند -->
+                <div class="loading-spinner">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  در حال بارگذاری لیست محصولات...
+                </div>
+              </div>
+            </div>
+
+            <div class="bulk-form-group">
+              <label class="bulk-form-label">تنظیم درصد یکسان برای تمامی محصولات:</label>
+
+              <div class="percentage-inputs">
+                <div class="percentage-input-group">
+                  <span>درصد تخصیص به استان:</span>
+                  <input type="number" id="bulk-percentage" name="bulk_percentage" class="percentage-input" min="0" max="100" step="0.01" value="">
+                  <span>%</span>
+                </div>
+
+                <div>
+                  <button type="button" id="apply-bulk-percentage" class="btn btn-primary">
+                    <i class="fas fa-check"></i>
+                    اعمال درصد برای همه محصولات
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="bulk-form-group">
+              <label class="bulk-form-label">محاسبه بر اساس:</label>
+              <div style="display: flex; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <input type="radio" id="calc-by-population" name="calculation_basis" value="population" checked>
+                  <label for="calc-by-population">جمعیت استان</label>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <input type="radio" id="calc-by-customer" name="calculation_basis" value="customer">
+                  <label for="calc-by-customer">تعداد مشتری</label>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <input type="radio" id="calc-by-grade" name="calculation_basis" value="grade">
+                  <label for="calc-by-grade">درجه‌بندی مشتریان</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="bulk-submit-container">
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-save"></i>
+                ذخیره تارگت‌های دسته‌ای
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="results-container" id="bulk-targeting-results" style="display: none;">
+          <h3>پیش‌نمایش نتایج تخصیص:</h3>
+          <div class="table-container">
+            <table id="bulk-results-table">
+              <thead>
+                <tr>
+                  <th>محصول</th>
+                  <th>ظرفیت لیتر</th>
+                  <th>ظرفیت شرینک</th>
+                  <th>درصد تخصیص</th>
+                  <th>تخصیص لیتر استان</th>
+                  <th>تخصیص شرینک استان</th>
+                  <th>تقسیم بندی درجه</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- نتایج پیش‌نمایش اینجا قرار می‌گیرند -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      {% else %}
+        <div class="flash warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          لطفاً ابتدا یک استان را به این دسته ارزیابی تخصیص دهید.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Tab 3: Export Reports -->
+  <div class="tab-content" id="export-reports">
+    <div class="section">
+      <h2>
+        <i class="fas fa-file-export" style="color: #4f46e5;"></i>
+        خروجی گزارش‌ها
+      </h2>
+
+      <div class="tabs">
+        <div class="tab active" onclick="showReportTab('customer-report')">گزارش مشتریان</div>
+        <div class="tab" onclick="showReportTab('product-report')">گزارش محصولات</div>
+        <div class="tab" onclick="showReportTab('province-report')">گزارش استان</div>
+      </div>
+
+      <!-- Customer Report Tab -->
+      <div class="tab-content active" id="customer-report">
+        <form id="customer-export-form">
+          <div class="bulk-form-group">
+            <label class="bulk-form-label">انتخاب فیلدهای گزارش:</label>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-customer-number" name="customer_fields" value="number" checked>
+                <label for="field-customer-number">شماره مشتری</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-customer-name" name="customer_fields" value="name" checked>
+                <label for="field-customer-name">نام مشتری</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-customer-grade" name="customer_fields" value="grade" checked>
+                <label for="field-customer-grade">درجه</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-customer-score" name="customer_fields" value="score" checked>
+                <label for="field-customer-score">نمره</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-customer-location" name="customer_fields" value="location" checked>
+                <label for="field-customer-location">موقعیت جغرافیایی</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-customer-province" name="customer_fields" value="province" checked>
+                <label for="field-customer-province">استان</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-customer-eval-date" name="customer_fields" value="eval_date" checked>
+                <label for="field-customer-eval-date">تاریخ ارزیابی</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-customer-products" name="customer_fields" value="products" checked>
+                <label for="field-customer-products">تخصیص محصولات</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="export-options">
+            <button type="button" class="export-btn export-excel" onclick="exportReport('customer', 'excel')">
+              <i class="fas fa-file-excel"></i>
+              خروجی Excel
+            </button>
+            <button type="button" class="export-btn export-csv" onclick="exportReport('customer', 'csv')">
+              <i class="fas fa-file-csv"></i>
+              خروجی CSV
+            </button>
+            <button type="button" class="export-btn export-pdf" onclick="exportReport('customer', 'pdf')">
+              <i class="fas fa-file-pdf"></i>
+              خروجی PDF
+            </button>
+          </div>
+        </form>
+
+        <div id="customer-export-preview" class="export-results-preview" style="display: none;">
+          <div class="export-preview-header">
+            <span>پیش‌نمایش گزارش مشتریان</span>
+            <button class="btn btn-outline" onclick="document.getElementById('customer-export-preview').style.display='none'">
+              <i class="fas fa-times"></i>
+              بستن
+            </button>
+          </div>
+          <div class="table-container">
+            <table id="customer-preview-table">
+              <thead>
+                <tr>
+                  <!-- ستون‌های جدول اینجا قرار می‌گیرند -->
+                </tr>
+              </thead>
+              <tbody>
+                <!-- داده‌ها اینجا قرار می‌گیرند -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Report Tab -->
+      <div class="tab-content" id="product-report">
+        <form id="product-export-form">
+          <div class="bulk-form-group">
+            <label class="bulk-form-label">انتخاب فیلدهای گزارش:</label>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-product-name" name="product_fields" value="name" checked>
+                <label for="field-product-name">نام محصول</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-product-category" name="product_fields" value="category" checked>
+                <label for="field-product-category">دسته‌بندی</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-product-liter" name="product_fields" value="liter" checked>
+                <label for="field-product-liter">ظرفیت لیتر</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-product-shrink" name="product_fields" value="shrink" checked>
+                <label for="field-product-shrink">ظرفیت شرینک</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-product-province" name="product_fields" value="province" checked>
+                <label for="field-product-province">تخصیص استانی</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-product-grade" name="product_fields" value="grade" checked>
+                <label for="field-product-grade">تخصیص بر اساس درجه</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="bulk-form-group">
+            <label class="bulk-form-label">انتخاب محصولات:</label>
+            <div class="select-all-container">
+              <div class="select-all-checkbox">
+                <input type="checkbox" id="select-all-report-products" checked>
+                <label for="select-all-report-products">همه محصولات</label>
+              </div>
+            </div>
+            <div class="checkbox-group" id="report-products-checkbox-group">
+              <!-- محصولات به صورت پویا اینجا قرار می‌گیرند -->
+              <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+                در حال بارگذاری لیست محصولات...
+              </div>
+            </div>
+          </div>
+
+          <div class="export-options">
+            <button type="button" class="export-btn export-excel" onclick="exportReport('product', 'excel')">
+              <i class="fas fa-file-excel"></i>
+              خروجی Excel
+            </button>
+            <button type="button" class="export-btn export-csv" onclick="exportReport('product', 'csv')">
+              <i class="fas fa-file-csv"></i>
+              خروجی CSV
+            </button>
+            <button type="button" class="export-btn export-pdf" onclick="exportReport('product', 'pdf')">
+              <i class="fas fa-file-pdf"></i>
+              خروجی PDF
+            </button>
+          </div>
+        </form>
+
+        <div id="product-export-preview" class="export-results-preview" style="display: none;">
+          <div class="export-preview-header">
+            <span>پیش‌نمایش گزارش محصولات</span>
+            <button class="btn btn-outline" onclick="document.getElementById('product-export-preview').style.display='none'">
+              <i class="fas fa-times"></i>
+              بستن
+            </button>
+          </div>
+          <div class="table-container">
+            <table id="product-preview-table">
+              <thead>
+                <tr>
+                  <!-- ستون‌های جدول اینجا قرار می‌گیرند -->
+                </tr>
+              </thead>
+              <tbody>
+                <!-- داده‌ها اینجا قرار می‌گیرند -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Province Report Tab -->
+      <div class="tab-content" id="province-report">
+        <form id="province-export-form">
+          <div class="bulk-form-group">
+            <label class="bulk-form-label">انتخاب فیلدهای گزارش:</label>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-province-name" name="province_fields" value="name" checked>
+                <label for="field-province-name">نام استان</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-province-population" name="province_fields" value="population" checked>
+                <label for="field-province-population">جمعیت</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-province-customers" name="province_fields" value="customers" checked>
+                <label for="field-province-customers">تعداد مشتریان</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-province-grades" name="province_fields" value="grades" checked>
+                <label for="field-province-grades">توزیع درجه‌ها</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-province-liter" name="province_fields" value="liter" checked>
+                <label for="field-province-liter">تخصیص لیتر</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-province-shrink" name="province_fields" value="shrink" checked>
+                <label for="field-province-shrink">تخصیص شرینک</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="field-province-products" name="province_fields" value="products" checked>
+                <label for="field-province-products">جزئیات محصولات</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="export-options">
+            <button type="button" class="export-btn export-excel" onclick="exportReport('province', 'excel')">
+              <i class="fas fa-file-excel"></i>
+              خروجی Excel
+            </button>
+            <button type="button" class="export-btn export-csv" onclick="exportReport('province', 'csv')">
+              <i class="fas fa-file-csv"></i>
+              خروجی CSV
+            </button>
+            <button type="button" class="export-btn export-pdf" onclick="exportReport('province', 'pdf')">
+              <i class="fas fa-file-pdf"></i>
+              خروجی PDF
+            </button>
+          </div>
+        </form>
+
+        <div id="province-export-preview" class="export-results-preview" style="display: none;">
+          <div class="export-preview-header">
+            <span>پیش‌نمایش گزارش استان</span>
+            <button class="btn btn-outline" onclick="document.getElementById('province-export-preview').style.display='none'">
+              <i class="fas fa-times"></i>
+              بستن
+            </button>
+          </div>
+          <div class="table-container">
+            <table id="province-preview-table">
+              <thead>
+                <tr>
+                  <!-- ستون‌های جدول اینجا قرار می‌گیرند -->
+                </tr>
+              </thead>
+              <tbody>
+                <!-- داده‌ها اینجا قرار می‌گیرند -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  
-  <div class="section">
-    <h2>
-      <i class="fas fa-list" style="color: #4f46e5;"></i>
-      لیست ارزیابی‌ها
-    </h2>
-    
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>ردیف</th>
-            {% if is_csv_record %}
-              <th>اطلاعات ردیف</th>
-              {% else %}
-              <th>اطلاعات مشتری</th>
-            {% endif %}
-            <th>نمره کل</th>
-            <th>درجه</th>
-            <th>تاریخ ارزیابی</th>
-            <th>عملیات</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for eval in evaluations %}
-          <tr>
-            <td>{{ loop.index }}</td>
-            <td>
-              {% if is_csv_record %}
-                <!-- Display CSV row data -->
-                <button onclick="toggleRowData('rowData{{ loop.index }}')" class="btn btn-outline">
-                  نمایش اطلاعات
-                </button>
-                <div id="rowData{{ loop.index }}" class="row-data-container" style="display: none;">
-                  {% for key, value in eval.row_data.items() %}
-                    <div class="row-data-item">
-                      <span class="row-data-key">{{ key }}:</span>
-                      <span class="row-data-value">{{ value }}</span>
-                    </div>
-                  {% endfor %}
-                </div>
-              {% else %}
-                <!-- Display customer info -->
-                <div class="customer-info">
-                  {{ eval.customer.name or 'نامشخص' }}
-                  {% if eval.customer.number %}
-                  <span class="customer-number">({{ eval.customer.number }})</span>
-                  {% endif %}
-                </div>
-              {% endif %}
-            </td>
-            <td>{{ eval.total_score }}</td>
-            <td>
-              {% set grade_class = 'grade-' + eval.assigned_grade[0] if eval.assigned_grade and eval.assigned_grade[0] in ['A', 'B', 'C', 'D'] else '' %}
-              <span class="grade-badge {{ grade_class }}">{{ eval.assigned_grade }}</span>
-            </td>
-            <td>{{ eval.evaluated_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-            <td class="actions">
-              <a href="{{ url_for('edit_evaluation', eval_id=eval.id) }}" class="btn btn-primary">
-                <i class="fas fa-edit"></i>
-                ویرایش
-              </a>
-              <form method="POST" action="{{ url_for('delete_evaluation', eval_id=eval.id) }}" style="display: inline-block;" onsubmit="return confirm('آیا از حذف این ارزیابی مطمئن هستید؟');">
-                <button type="submit" class="btn btn-danger">
-                  <i class="fas fa-trash"></i>
-                  حذف
-                </button>
-              </form>
-            </td>
-          </tr>
-          {% else %}
-          <tr>
-            <td colspan="6" style="text-align: center;">هیچ ارزیابی‌ای یافت نشد.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+
+
+  <!-- Add this somewhere at the end of the body but before closing </body> tag -->
+<div id="quotaModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+  <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; border-radius: 0.5rem; max-width: 700px;">
+    <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px;">
+      <h3 id="quotaModalTitle" style="margin: 0;">سهمیه محصولات براساس درجه</h3>
+      <span class="close" onclick="closeQuotaModal()" style="color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+    </div>
+    <div id="quotaModalContent">
+      <!-- Content will be loaded dynamically -->
+      <div class="loading-spinner">
+        <i class="fas fa-spinner fa-spin"></i>
+        در حال بارگذاری اطلاعات...
+      </div>
     </div>
   </div>
-  
+</div>
+
+<!-- Add this somewhere at the end of the body but before closing </body> tag -->
+<div id="customerModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+  <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 800px; border-radius: 0.5rem; max-height: 80vh; overflow-y: auto;">
+    <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px;">
+      <h3 id="customerModalTitle" style="margin: 0;">اطلاعات مشتری و سهمیه محصولات</h3>
+      <span class="close" onclick="closeCustomerModal()" style="color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+    </div>
+    <div id="customerModalContent">
+      <!-- Content will be loaded dynamically -->
+      <div class="loading-spinner">
+        <i class="fas fa-spinner fa-spin"></i>
+        در حال بارگذاری اطلاعات...
+      </div>
+    </div>
+  </div>
+</div>
+    <!-- Add this somewhere at the end of the body but before closing </body> tag -->
+<div id="customerModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+  <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 800px; border-radius: 0.5rem; max-height: 80vh; overflow-y: auto;">
+    <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px;">
+      <h3 id="customerModalTitle" style="margin: 0;">اطلاعات مشتری و سهمیه محصولات</h3>
+      <span class="close" onclick="closeCustomerModal()" style="color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+    </div>
+    <div id="customerModalContent">
+      <!-- Content will be loaded dynamically -->
+      <div class="loading-spinner">
+        <i class="fas fa-spinner fa-spin"></i>
+        در حال بارگذاری اطلاعات...
+      </div>
+    </div>
+  </div>
+</div>
   <script>
-    // Function to toggle row data visibility
-    function toggleRowData(id) {
-      const element = document.getElementById(id);
-      if (element.style.display === 'none') {
-        element.style.display = 'block';
-      } else {
-        element.style.display = 'none';
+   // Function to toggle row data visibility
+// Function to toggle row data visibility
+function toggleRowData(id) {
+  const element = document.getElementById(id);
+  if (element.style.display === 'none') {
+    element.style.display = 'block';
+  } else {
+    element.style.display = 'none';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Tab functionality
+  window.showTab = function(tabId) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(tab => {
+      tab.classList.remove('active');
+    });
+
+    // Show the selected tab content
+    document.getElementById(tabId).classList.add('active');
+
+    // Update tab styling
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.classList.remove('active');
+    });
+
+    // Find and activate the tab that was clicked
+    const tabs = Array.from(document.querySelectorAll('.tab'));
+    const tabIndex = ['batch-info', 'bulk-targeting', 'export-reports'].indexOf(tabId);
+    if (tabIndex >= 0 && tabIndex < tabs.length) {
+      tabs[tabIndex].classList.add('active');
+    }
+  };
+
+  // Check if we're on the batch evaluations page
+  const productDistributionContainer = document.getElementById('product-distribution-container');
+  if (!productDistributionContainer) return;
+
+  // Fetch product distribution data
+  fetchProductDistribution();
+
+  // Set up event listeners
+  const productSelect = document.getElementById('product-select');
+  if (productSelect) {
+    productSelect.addEventListener('change', function() {
+      updateProductDisplay(this.value);
+    });
+  }
+
+  const applyWeightsButton = document.getElementById('apply-weights');
+  if (applyWeightsButton) {
+    applyWeightsButton.addEventListener('click', function() {
+      applyGradeWeights();
+    });
+  }
+
+  // Bulk targeting select all functionality
+  const selectAllProducts = document.getElementById('select-all-products');
+  if (selectAllProducts) {
+    selectAllProducts.addEventListener('change', function() {
+      const checkboxes = document.querySelectorAll('#products-checkbox-group input[type="checkbox"]');
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+      });
+      updateSelectedProductsCount();
+    });
+  }
+
+  // Refresh products button
+  const refreshProductsBtn = document.getElementById('refresh-products-btn');
+  if (refreshProductsBtn) {
+    refreshProductsBtn.addEventListener('click', function() {
+      fetchProductDistribution();
+      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال بارگذاری...';
+      setTimeout(() => {
+        this.innerHTML = '<i class="fas fa-sync-alt"></i> بروزرسانی لیست';
+      }, 2000);
+    });
+  }
+
+  // Bulk percentage application
+  const applyBulkPercentage = document.getElementById('apply-bulk-percentage');
+  if (applyBulkPercentage) {
+    applyBulkPercentage.addEventListener('click', function() {
+      const percentage = document.getElementById('bulk-percentage').value;
+      if (!percentage) {
+        alert('لطفاً درصد تخصیص را وارد کنید.');
+        return;
+      }
+
+      const checkboxes = document.querySelectorAll('#products-checkbox-group input[type="checkbox"]:checked');
+      checkboxes.forEach(checkbox => {
+        const productId = checkbox.value;
+        const percentageInput = document.getElementById(`percentage_${productId}`);
+        if (percentageInput) {
+          percentageInput.value = percentage;
+        }
+      });
+
+      // Update preview
+      previewBulkTargeting();
+
+      // Show bulk targeting results
+      document.getElementById('bulk-targeting-results').style.display = 'block';
+    });
+  }
+
+  // Form submission event
+  const bulkTargetingForm = document.getElementById('bulk-targeting-form');
+  if (bulkTargetingForm) {
+    bulkTargetingForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      // Check if at least one product is selected
+      const selectedProducts = document.querySelectorAll('#products-checkbox-group input[type="checkbox"]:checked');
+      if (selectedProducts.length === 0) {
+        alert('لطفاً حداقل یک محصول را انتخاب کنید.');
+        return;
+      }
+
+      // Continue with form submission
+      const formData = new FormData(this);
+
+      // Add product IDs and percentages to form data
+      selectedProducts.forEach(checkbox => {
+        const productId = checkbox.value;
+        const percentageInput = document.getElementById(`percentage_${productId}`);
+        if (percentageInput) {
+          formData.append(`percentage_${productId}`, percentageInput.value);
+        }
+      });
+
+      // Show loading
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const originalBtnText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال پردازش...';
+      submitBtn.disabled = true;
+
+      // Make POST request
+      fetch('/admin/update-bulk-province-product-targets', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Server responded with an error');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          alert('تارگت‌های محصولات با موفقیت به‌روزرسانی شدند.');
+          // Refresh the product distribution data
+          fetchProductDistribution();
+        } else {
+          alert(`خطا در به‌روزرسانی تارگت‌ها: ${data.message || 'خطای نامشخص'}`);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('خطا در برقراری ارتباط با سرور. لطفاً مجدداً تلاش کنید.');
+      })
+      .finally(() => {
+        // Restore button state
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.disabled = false;
+      });
+    });
+  }
+
+  // Report tab functionality
+  window.showReportTab = function(tabId) {
+    document.querySelectorAll('#export-reports .tab-content').forEach(tab => {
+      tab.classList.remove('active');
+    });
+    document.getElementById(tabId).classList.add('active');
+
+    document.querySelectorAll('#export-reports .tabs .tab').forEach(tab => {
+      tab.classList.remove('active');
+    });
+
+    const tabIndex = ['customer-report', 'product-report', 'province-report'].indexOf(tabId);
+    if (tabIndex >= 0) {
+      document.querySelectorAll('#export-reports .tabs .tab')[tabIndex].classList.add('active');
+    }
+  };
+
+  // Load products for report
+  loadProductsForReport();
+
+  // Select all report products
+  const selectAllReportProducts = document.getElementById('select-all-report-products');
+  if (selectAllReportProducts) {
+    selectAllReportProducts.addEventListener('change', function() {
+      const checkboxes = document.querySelectorAll('#report-products-checkbox-group input[type="checkbox"]');
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+      });
+    });
+  }
+});
+
+// Fetch product distribution data from API
+async function fetchProductDistribution() {
+  try {
+    const response = await fetch('/api/product_distribution');
+    if (!response.ok) {
+      throw new Error('Failed to fetch product distribution data');
+    }
+
+    const data = await response.json();
+    console.log('Products data:', data);
+
+    // Process data and set up UI
+    processProductData(data);
+
+    // Also populate products for bulk targeting
+    populateProductsForBulkTargeting(data);
+
+    // And for report
+    loadProductsForReport(data);
+  } catch (error) {
+    console.error('Error fetching product distribution:', error);
+    document.getElementById('product-distribution-container').innerHTML = `
+      <div class="flash danger">
+        <i class="fas fa-exclamation-circle"></i>
+        خطا در بارگذاری اطلاعات محصولات: ${error.message}
+      </div>
+    `;
+  }
+}
+
+// Process product data and set up UI components
+function processProductData(products) {
+  // Hide loading spinner
+  const loadingSpinner = document.querySelector('#product-distribution-container .loading-spinner');
+  if (loadingSpinner) {
+    loadingSpinner.style.display = 'none';
+  }
+
+  // Show product targeting container
+  const productTargetingContainer = document.getElementById('product-targeting-container');
+  if (productTargetingContainer) {
+    productTargetingContainer.style.display = 'block';
+  }
+
+  // Populate product dropdown
+  const productSelect = document.getElementById('product-select');
+  if (productSelect) {
+    productSelect.innerHTML = '<option value="">-- انتخاب محصول --</option>';
+
+    products.forEach(product => {
+      const option = document.createElement('option');
+      option.value = product.id;
+      option.textContent = product.name;
+      option.dataset.liter = product.liter_capacity || 0;
+      option.dataset.shrink = product.shrink_capacity || 0;
+      option.dataset.targets = JSON.stringify(product.province_targets || []);
+      productSelect.appendChild(option);
+    });
+  }
+
+  // Store products data globally for later use
+  window.productsData = products;
+
+  // Initialize grade distribution chart
+  initGradeDistributionChart();
+
+  // Analyze batch evaluations and get grade distribution
+  analyzeGradeDistribution();
+}
+
+// Initialize the grade distribution chart
+function initGradeDistributionChart() {
+  const ctx = document.getElementById('grade-distribution-chart');
+  if (!ctx) return;
+
+  const context = ctx.getContext('2d');
+
+  window.gradeDistributionChart = new Chart(context, {
+    type: 'bar',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'تعداد مشتری',
+        data: [],
+        backgroundColor: [],
+        borderColor: [],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return `تعداد: ${context.raw} مشتری`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            font: {
+              family: 'Vazirmatn'
+            }
+          }
+        },
+        x: {
+          ticks: {
+            font: {
+              family: 'Vazirmatn'
+            }
+          }
+        }
       }
     }
+  });
+}
+
+// Analyze batch evaluations to get grade distribution
+function analyzeGradeDistribution() {
+  // Get grade distribution from the page
+  const gradeCounts = {};
+  const gradePills = document.querySelectorAll('.grade-pill');
+
+  gradePills.forEach(pill => {
+    const text = pill.textContent.trim();
+    const match = text.match(/([A-Z+]+):\s*(\d+)/);
+    if (match) {
+      const grade = match[1];
+      const count = parseInt(match[2]);
+      gradeCounts[grade] = count;
+    }
+  });
+
+  // If no grade pills found, try to find another way
+  if (Object.keys(gradeCounts).length === 0) {
+    // Try to find grade distribution from batch statistics
+    const statElement = document.querySelector('.info-card:nth-child(4)');
+    if (statElement) {
+      const gradePills = statElement.querySelectorAll('.grade-pill');
+      gradePills.forEach(pill => {
+        const [grade, count] = pill.textContent.trim().split(':');
+        if (grade && count) {
+          gradeCounts[grade.trim()] = parseInt(count.trim());
+        }
+      });
+    }
+  }
+
+  // Set default grades if nothing was found
+  if (Object.keys(gradeCounts).length === 0) {
+    gradeCounts['A+'] = 10;
+    gradeCounts['A'] = 25;
+    gradeCounts['B+'] = 35;
+    gradeCounts['B'] = 45;
+    gradeCounts['C'] = 30;
+    gradeCounts['D'] = 15;
+    gradeCounts['بدون درجه'] = 5;
+  }
+
+  // Store grade counts globally
+  window.gradeDistribution = gradeCounts;
+
+  // Set up grade weights
+  setupGradeWeights(gradeCounts);
+
+  // Update the grade distribution chart
+  updateGradeDistributionChart(gradeCounts);
+}
+
+// Update the grade distribution chart with data
+function updateGradeDistributionChart(gradeCounts) {
+  if (!window.gradeDistributionChart) return;
+
+  const labels = Object.keys(gradeCounts);
+  const data = Object.values(gradeCounts);
+
+  // Create colors based on grades
+  const backgroundColor = labels.map(grade => {
+    if (grade === 'A+') return '#86efac';
+    if (grade === 'A') return '#bbf7d0';
+    if (grade === 'B+') return '#93c5fd';
+    if (grade === 'B') return '#bfdbfe';
+    if (grade === 'C') return '#fef08a';
+    if (grade === 'D') return '#fecaca';
+    return '#e2e8f0'; // default for 'بدون درجه'
+  });
+
+  const borderColor = backgroundColor.map(color => {
+    // Slightly darker border color
+    return color.replace(')', ', 0.8)').replace('rgb', 'rgba');
+  });
+
+  // Update chart data
+  window.gradeDistributionChart.data.labels = labels;
+  window.gradeDistributionChart.data.datasets[0].data = data;
+  window.gradeDistributionChart.data.datasets[0].backgroundColor = backgroundColor;
+  window.gradeDistributionChart.data.datasets[0].borderColor = borderColor;
+  window.gradeDistributionChart.update();
+}
+
+// Set up grade weights UI
+function setupGradeWeights(gradeCounts) {
+  const weightsContainer = document.getElementById('weights-container');
+  if (!weightsContainer) return;
+
+  weightsContainer.innerHTML = '';
+
+  // Default weights
+  const defaultWeights = {
+    'A+': 2.0,
+    'A': 1.75,
+    'B+': 1.5,
+    'B': 1.25,
+    'C': 1.0,
+    'D': 0.75,
+    'بدون درجه': 0.5
+  };
+
+  // Store weights globally
+  window.gradeWeights = Object.assign({}, defaultWeights);
+
+  // Create weight sliders for each grade
+  Object.keys(gradeCounts).forEach(grade => {
+    const weight = defaultWeights[grade] || 1.0;
+
+    // Create a slider for this grade
+    const sliderItem = document.createElement('div');
+    sliderItem.className = 'weight-slider-item';
+
+    // Determine grade class
+    let gradeClass = 'grade-none';
+    if (grade === 'A+') gradeClass = 'grade-A-plus';
+    else if (grade === 'A') gradeClass = 'grade-A';
+    else if (grade === 'B+') gradeClass = 'grade-B-plus';
+    else if (grade === 'B') gradeClass = 'grade-B';
+    else if (grade === 'C') gradeClass = 'grade-C';
+    else if (grade === 'D') gradeClass = 'grade-D';
+
+    sliderItem.innerHTML = `
+      <div class="weight-slider-header">
+        <span class="weight-grade ${gradeClass}">${grade}</span>
+        <span class="weight-value" id="weight-value-${grade.replace('+', 'plus')}">${weight}x</span>
+      </div>
+      <input
+        type="range"
+        min="0.1"
+        max="3"
+        step="0.1"
+        value="${weight}"
+        class="weight-slider"
+        id="weight-slider-${grade.replace('+', 'plus')}"
+        data-grade="${grade}"
+      >
+    `;
+
+    weightsContainer.appendChild(sliderItem);
+
+    // Add event listener for weight change
+    const slider = sliderItem.querySelector('.weight-slider');
+    slider.addEventListener('input', function() {
+      const valueDisplay = document.getElementById(`weight-value-${grade.replace('+', 'plus')}`);
+      valueDisplay.textContent = `${this.value}x`;
+
+      // Update weights object
+      window.gradeWeights[grade] = parseFloat(this.value);
+    });
+  });
+}
+
+// Update product display when a product is selected
+function updateProductDisplay(productId) {
+  if (!productId) {
+    document.getElementById('liter-capacity-value').textContent = '0';
+    document.getElementById('shrink-capacity-value').textContent = '0';
+    document.getElementById('allocation-table-body').innerHTML = '';
+    return;
+  }
+
+  // Find the selected product
+  const productOption = document.querySelector(`#product-select option[value="${productId}"]`);
+  const literCapacity = parseFloat(productOption.dataset.liter) || 0;
+  const shrinkCapacity = parseFloat(productOption.dataset.shrink) || 0;
+
+  // Update capacity display
+  document.getElementById('liter-capacity-value').textContent = literCapacity.toLocaleString();
+  document.getElementById('shrink-capacity-value').textContent = shrinkCapacity.toLocaleString();
+
+  // Calculate and display allocation
+  calculateAllocation(productId, literCapacity, shrinkCapacity);
+}
+
+// Calculate allocation based on grade distribution and weights
+function calculateAllocation(productId, literCapacity, shrinkCapacity) {
+  const tableBody = document.getElementById('allocation-table-body');
+  if (!tableBody) return;
+
+  tableBody.innerHTML = '';
+
+  // Get the grade distribution
+  const gradeCounts = window.gradeDistribution;
+
+  // Get the weights
+  const weights = window.gradeWeights;
+
+  // Calculate total weighted count
+  let totalCustomers = 0;
+  let totalWeightedCount = 0;
+
+  Object.entries(gradeCounts).forEach(([grade, count]) => {
+    const weight = weights[grade] || 1.0;
+    totalCustomers += count;
+    totalWeightedCount += count * weight;
+  });
+
+  // Create the allocation table
+  Object.entries(gradeCounts).forEach(([grade, count]) => {
+    const weight = weights[grade] || 1.0;
+
+    // Skip if no customers in this grade
+    if (count === 0) return;
+
+    // Calculate allocation
+    const weightedPortion = (count * weight) / totalWeightedCount;
+    const literAllocation = literCapacity * weightedPortion;
+    const shrinkAllocation = shrinkCapacity * weightedPortion;
+
+    // Calculate per customer
+    const literPerCustomer = literAllocation / count;
+    const shrinkPerCustomer = shrinkAllocation / count;
+
+    // Determine grade class
+    let gradeClass = 'grade-none';
+    if (grade === 'A+') gradeClass = 'grade-A-plus';
+    else if (grade === 'A') gradeClass = 'grade-A';
+    else if (grade === 'B+') gradeClass = 'grade-B-plus';
+    else if (grade === 'B') gradeClass = 'grade-B';
+    else if (grade === 'C') gradeClass = 'grade-C';
+    else if (grade === 'D') gradeClass = 'grade-D';
+
+    // Create table row
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><span class="grade-badge ${gradeClass}">${grade}</span></td>
+      <td>${count}</td>
+      <td>${weight.toFixed(1)}x</td>
+      <td>${(weightedPortion * 100).toFixed(2)}%</td>
+      <td>${literAllocation.toFixed(2)}</td>
+      <td>${literPerCustomer.toFixed(2)}</td>
+      <td>${shrinkAllocation.toFixed(2)}</td>
+      <td>${shrinkPerCustomer.toFixed(2)}</td>
+    `;
+
+    tableBody.appendChild(row);
+  });
+
+  // Add total row
+  const totalRow = document.createElement('tr');
+  totalRow.className = 'highlight-row';
+  totalRow.innerHTML = `
+    <td>مجموع</td>
+    <td>${totalCustomers}</td>
+    <td>-</td>
+    <td>100%</td>
+    <td>${literCapacity.toFixed(2)}</td>
+    <td>-</td>
+    <td>${shrinkCapacity.toFixed(2)}</td>
+    <td>-</td>
+  `;
+
+  tableBody.appendChild(totalRow);
+}
+
+// Apply grade weights when the button is clicked
+function applyGradeWeights() {
+  // Get the selected product ID
+  const productId = document.getElementById('product-select').value;
+  if (!productId) {
+    alert('لطفاً ابتدا یک محصول انتخاب کنید');
+    return;
+  }
+
+  // Get the selected product info
+  const productOption = document.querySelector(`#product-select option[value="${productId}"]`);
+  const literCapacity = parseFloat(productOption.dataset.liter) || 0;
+  const shrinkCapacity = parseFloat(productOption.dataset.shrink) || 0;
+
+  // Recalculate allocation
+  calculateAllocation(productId, literCapacity, shrinkCapacity);
+
+  // Show success message
+  const successMessage = document.createElement('div');
+  successMessage.className = 'flash success';
+  successMessage.innerHTML = `<i class="fas fa-check"></i> وزن‌های درجه‌بندی با موفقیت اعمال شدند.`;
+
+  // Insert message after the apply button
+  const weightAdjustment = document.querySelector('.weight-adjustment');
+  weightAdjustment.appendChild(successMessage);
+
+  // Remove the message after 3 seconds
+  setTimeout(() => {
+    if (successMessage.parentNode) {
+      weightAdjustment.removeChild(successMessage);
+    }
+  }, 3000);
+}
+
+// Populate products for bulk targeting
+function populateProductsForBulkTargeting(products) {
+  const productsCheckboxGroup = document.getElementById('products-checkbox-group');
+  if (!productsCheckboxGroup) return;
+
+  // Clear previous content
+  productsCheckboxGroup.innerHTML = '';
+
+  // Add checkboxes for each product
+  products.forEach(product => {
+    const checkboxItem = document.createElement('div');
+    checkboxItem.className = 'checkbox-item';
+
+    checkboxItem.innerHTML = `
+      <input type="checkbox" id="product-${product.id}" name="product_ids" value="${product.id}" checked>
+      <label for="product-${product.id}">${product.name}</label>
+      <div style="margin-right: 1rem">
+        <input type="number" id="percentage_${product.id}" name="percentage_${product.id}"
+               class="percentage-input" min="0" max="100" step="0.01" placeholder="%">
+      </div>
+    `;
+
+    productsCheckboxGroup.appendChild(checkboxItem);
+
+    // Add change listener to update count
+    checkboxItem.querySelector('input[type="checkbox"]').addEventListener('change', function() {
+      updateSelectedProductsCount();
+    });
+  });
+
+  // Update count initially
+  updateSelectedProductsCount();
+}
+
+// Update selected products count
+function updateSelectedProductsCount() {
+  const selectedCount = document.querySelectorAll('#products-checkbox-group input[type="checkbox"]:checked').length;
+  const countElement = document.getElementById('selected-products-count');
+  if (countElement) {
+    countElement.textContent = selectedCount;
+  }
+}
+
+// Preview bulk targeting
+function previewBulkTargeting() {
+  const bulkResultsTable = document.getElementById('bulk-results-table');
+  if (!bulkResultsTable) return;
+
+  const tableBody = bulkResultsTable.querySelector('tbody');
+  tableBody.innerHTML = '';
+
+  // Get selected products
+  const selectedProducts = document.querySelectorAll('#products-checkbox-group input[type="checkbox"]:checked');
+
+  // Get grade distribution
+  const gradeCounts = window.gradeDistribution || {};
+
+  // For each selected product
+  selectedProducts.forEach(checkbox => {
+    const productId = checkbox.value;
+    const percentageInput = document.getElementById(`percentage_${productId}`);
+    const percentage = percentageInput ? percentageInput.value : '';
+
+    // Find product data
+    const product = window.productsData.find(p => p.id == productId);
+    if (!product) return;
+
+    // Calculate allocation based on percentage
+    const literCapacity = product.liter_capacity || 0;
+    const shrinkCapacity = product.shrink_capacity || 0;
+
+    const allocatedLiter = literCapacity * (percentage / 100);
+    const allocatedShrink = shrinkCapacity * (percentage / 100);
+
+    // Create table row
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${product.name}</td>
+      <td>${literCapacity.toLocaleString()}</td>
+      <td>${shrinkCapacity.toLocaleString()}</td>
+      <td>${percentage}%</td>
+      <td>${allocatedLiter.toLocaleString(undefined, {maximumFractionDigits: 2})}</td>
+      <td>${allocatedShrink.toLocaleString(undefined, {maximumFractionDigits: 2})}</td>
+      <td>
+        ${Object.entries(gradeCounts)
+          .map(([grade, count]) => {
+            return `<span class="grade-badge">${grade}: ${count}</span>`;
+          })
+          .join(' ')}
+      </td>
+    `;
+
+    tableBody.appendChild(row);
+  });
+}
+
+// Load products for report
+function loadProductsForReport(products) {
+  const reportProductsCheckboxGroup = document.getElementById('report-products-checkbox-group');
+  if (!reportProductsCheckboxGroup) return;
+
+  // If products are not provided, use the global products data
+  if (!products && window.productsData) {
+    products = window.productsData;
+  }
+
+  // If still no products, return
+  if (!products) {
+    reportProductsCheckboxGroup.innerHTML = '<div class="flash warning">هیچ محصولی یافت نشد.</div>';
+    return;
+  }
+
+  // Clear previous content
+  reportProductsCheckboxGroup.innerHTML = '';
+
+  // Add checkboxes for each product
+  products.forEach(product => {
+    const checkboxItem = document.createElement('div');
+    checkboxItem.className = 'checkbox-item';
+
+    checkboxItem.innerHTML = `
+      <input type="checkbox" id="report-product-${product.id}" name="report_product_ids" value="${product.id}" checked>
+      <label for="report-product-${product.id}">${product.name}</label>
+    `;
+
+    reportProductsCheckboxGroup.appendChild(checkboxItem);
+  });
+}
+
+// Export report function
+// Simplified exportReport function using direct download links
+
+function exportReport(type, format) {
+  // Get form based on type
+  const form = document.getElementById(`${type}-export-form`);
+  if (!form) {
+    alert('خطا در یافتن فرم گزارش.');
+    return;
+  }
+
+  // Get selected fields
+  const fields = Array.from(form.querySelectorAll(`input[name="${type}_fields"]:checked`)).map(cb => cb.value);
+
+  if (fields.length === 0) {
+    alert('لطفاً حداقل یک فیلد را انتخاب کنید.');
+    return;
+  }
+
+  // Show the preview for better UX
+  generatePreview(type, fields);
+  document.getElementById(`${type}-export-preview`).style.display = 'block';
+
+  // Show loading state
+  const exportBtn = document.querySelector(`.export-${format}`);
+  if (exportBtn) {
+    const originalText = exportBtn.innerHTML;
+    exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> درحال خروجی‌گیری...';
+    exportBtn.disabled = true;
+
+    // Restore button state after a delay
+    setTimeout(() => {
+      exportBtn.innerHTML = originalText;
+      exportBtn.disabled = false;
+    }, 3000);
+  }
+
+  // Create a temporary form to submit
+  const tempForm = document.createElement('form');
+  tempForm.style.display = 'none';
+  tempForm.method = 'POST';
+  tempForm.action = `/admin/export-report/${type}/${format}`;
+
+  // Add selected fields
+  fields.forEach(field => {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = `${type}_fields`;
+    input.value = field;
+    tempForm.appendChild(input);
+  });
+
+  // Add other necessary data
+  if (type === 'product') {
+    // Add selected products
+    const selectedProducts = document.querySelectorAll('#report-products-checkbox-group input[type="checkbox"]:checked');
+    selectedProducts.forEach(checkbox => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'report_product_ids';
+      input.value = checkbox.value;
+      tempForm.appendChild(input);
+    });
+  }
+
+  // Add batch ID if available
+  const batchIdInput = document.querySelector('input[name="batch_id"]');
+  if (batchIdInput) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'batch_id';
+    input.value = batchIdInput.value;
+    tempForm.appendChild(input);
+  }
+
+  // Add province ID if available
+  const provinceIdInput = document.querySelector('select[name="province_id"]');
+  if (provinceIdInput && provinceIdInput.value) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'province_id';
+    input.value = provinceIdInput.value;
+    tempForm.appendChild(input);
+  }
+
+  // Submit the form
+  document.body.appendChild(tempForm);
+  tempForm.submit();
+
+  // Remove the form after submission
+  setTimeout(() => {
+    document.body.removeChild(tempForm);
+  }, 1000);
+}
+
+// Helper function to get field label
+function getFieldLabel(type, field) {
+  const labels = {
+    customer: {
+      number: 'شماره مشتری',
+      name: 'نام مشتری',
+      grade: 'درجه',
+      score: 'نمره',
+      location: 'موقعیت جغرافیایی',
+      province: 'استان',
+      eval_date: 'تاریخ ارزیابی',
+      products: 'تخصیص محصولات'
+    },
+    product: {
+      name: 'نام محصول',
+      category: 'دسته‌بندی',
+      liter: 'ظرفیت لیتر',
+      shrink: 'ظرفیت شرینک',
+      province: 'تخصیص استانی',
+      grade: 'تخصیص بر اساس درجه'
+    },
+    province: {
+      name: 'نام استان',
+      population: 'جمعیت',
+      customers: 'تعداد مشتریان',
+      grades: 'توزیع درجه‌ها',
+      liter: 'تخصیص لیتر',
+      shrink: 'تخصیص شرینک',
+      products: 'جزئیات محصولات'
+    }
+  };
+
+  return labels[type][field] || field;
+}
+
+// Helper function to get sample data
+function getSampleData(type, field, index) {
+  // Sample data for preview
+  const sampleData = {
+    customer: {
+      number: ['1001', '1002', '1003', '1004', '1005'],
+      name: ['فروشگاه رضا', 'سوپرمارکت نادری', 'فروشگاه امین', 'سوپرمارکت آرمان', 'فروشگاه مهر'],
+      grade: ['A+', 'A', 'B+', 'B', 'C'],
+      score: ['95.2', '88.5', '82.7', '75.3', '68.9'],
+      location: ['35.7219,51.3347', '35.6892,51.3890', '35.7448,51.3753', '35.7137,51.4148', '35.6944,51.4215'],
+      province: ['تهران', 'تهران', 'البرز', 'قم', 'اصفهان'],
+      eval_date: ['1403/08/15', '1403/08/14', '1403/08/14', '1403/08/13', '1403/08/12'],
+      products: ['آب معدنی 1.5 لیتری (150), نوشابه (75)', 'آب معدنی 1 لیتری (100), دوغ (50)', 'نوشابه (120), آبمیوه (80)', 'آبمیوه (90), آب معدنی (60)', 'دوغ (100), نوشابه (70)']
+    },
+    product: {
+      name: ['آب معدنی 1.5 لیتری', 'آب معدنی 1 لیتری', 'نوشابه کولا', 'دوغ', 'آبمیوه'],
+      category: ['آب معدنی', 'آب معدنی', 'نوشابه گازدار', 'لبنیات', 'آبمیوه'],
+      liter: ['100,000', '75,000', '50,000', '40,000', '30,000'],
+      shrink: ['10,000', '7,500', '5,000', '4,000', '3,000'],
+      province: ['تهران (30%), اصفهان (20%), مشهد (15%)', 'تهران (25%), اصفهان (20%), شیراز (15%)', 'تهران (35%), مشهد (20%), تبریز (15%)', 'اصفهان (30%), شیراز (20%), تهران (15%)', 'مشهد (25%), تهران (20%), اصفهان (15%)'],
+      grade: ['A+ (30%), A (25%), B+ (20%)', 'A (30%), B+ (25%), B (20%)', 'B+ (30%), B (25%), C (20%)', 'A+ (25%), A (25%), B+ (20%)', 'A (30%), B (25%), C (20%)']
+    },
+    province: {
+      name: ['تهران', 'اصفهان', 'مشهد', 'شیراز', 'تبریز'],
+      population: ['13,267,637', '5,120,850', '6,434,501', '4,851,274', '3,909,652'],
+      customers: ['450', '320', '280', '210', '190'],
+      grades: ['A+: 80, A: 120, B+: 150, B: 100', 'A+: 60, A: 90, B+: 110, B: 60', 'A+: 50, A: 80, B+: 95, B: 55', 'A+: 40, A: 65, B+: 70, B: 35', 'A+: 35, A: 55, B+: 65, B: 35'],
+      liter: ['120,000', '90,000', '75,000', '60,000', '50,000'],
+      shrink: ['12,000', '9,000', '7,500', '6,000', '5,000'],
+      products: ['آب معدنی (40,000), نوشابه (30,000)', 'آب معدنی (30,000), دوغ (25,000)', 'نوشابه (25,000), آبمیوه (20,000)', 'آبمیوه (20,000), آب معدنی (15,000)', 'دوغ (15,000), نوشابه (15,000)']
+    }
+  };
+
+  return sampleData[type][field][index % sampleData[type][field].length];
+}
+
+// Generate preview for export
+function generatePreview(type, fields) {
+  const previewTable = document.getElementById(`${type}-preview-table`);
+  if (!previewTable) return;
+
+  // Set up table headers
+  const thead = previewTable.querySelector('thead tr');
+  thead.innerHTML = '';
+
+  // Add field headers based on type
+  fields.forEach(field => {
+    const label = getFieldLabel(type, field);
+    thead.innerHTML += `<th>${label}</th>`;
+  });
+
+  // Generate sample data rows
+  const tbody = previewTable.querySelector('tbody');
+  tbody.innerHTML = '';
+
+  // Add sample data based on type
+  const sampleCount = 5;
+
+  for (let i = 0; i < sampleCount; i++) {
+    const row = document.createElement('tr');
+
+    fields.forEach(field => {
+      let cellContent = getSampleData(type, field, i);
+      row.innerHTML += `<td>${cellContent}</td>`;
+    });
+
+    tbody.appendChild(row);
+  }
+}
+   function showProductQuotas(grade, evalId) {
+    const modal = document.getElementById('quotaModal');
+    const modalContent = document.getElementById('quotaModalContent');
+    const modalTitle = document.getElementById('quotaModalTitle');
+
+    // Show the modal
+    modal.style.display = 'block';
+
+    // Set the title
+    modalTitle.innerHTML = `سهمیه محصولات براساس درجه <span class="grade-badge grade-${grade[0]}">${grade}</span>`;
+
+    // Show loading
+    modalContent.innerHTML = `
+      <div class="loading-spinner" style="text-align: center; padding: 2rem;">
+        <i class="fas fa-spinner fa-spin"></i>
+        در حال بارگذاری اطلاعات...
+      </div>
+    `;
+
+    // Get the province ID for this batch
+    const provinceId = "{{ current_province.id if current_province else 'null' }}";
+
+    // Get products for this batch and grade
+    fetch(`/api/product_quotas?grade=${grade}&province_id=${provinceId}&eval_id=${evalId}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch product quotas');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Generate HTML for the product quotas
+        let quotaHtml = '';
+
+        if (data.products && data.products.length > 0) {
+          quotaHtml += `
+            <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>محصول</th>
+                    <th>تخصیص لیتر</th>
+                    <th>تخصیص شرینک</th>
+                  </tr>
+                </thead>
+                <tbody>
+          `;
+
+          data.products.forEach(product => {
+            quotaHtml += `
+              <tr>
+                <td>${product.name}</td>
+                <td>${product.liter_quota !== null ? product.liter_quota.toLocaleString('fa-IR', {maximumFractionDigits: 2}) : '-'}</td>
+                <td>${product.shrink_quota !== null ? product.shrink_quota.toLocaleString('fa-IR', {maximumFractionDigits: 2}) : '-'}</td>
+              </tr>
+            `;
+          });
+
+          quotaHtml += `
+                </tbody>
+              </table>
+            </div>
+            <div style="margin-top: 1rem; color: #64748b; font-size: 0.875rem;">
+              <i class="fas fa-info-circle"></i>
+              مقادیر سهمیه بر اساس درجه مشتری و ضریب وزنی آن محاسبه شده است.
+            </div>
+          `;
+        } else {
+          quotaHtml = `
+            <div style="text-align: center; padding: 2rem; color: #64748b;">
+              هیچ محصولی برای این درجه تعریف نشده است یا هیچ تارگت استانی وجود ندارد.
+            </div>
+          `;
+        }
+
+        modalContent.innerHTML = quotaHtml;
+      })
+      .catch(error => {
+        console.error('Error fetching product quotas:', error);
+        modalContent.innerHTML = `
+          <div style="text-align: center; padding: 2rem; color: #ef4444;">
+            <i class="fas fa-exclamation-triangle"></i>
+            خطا در بارگذاری اطلاعات محصولات: ${error.message}
+          </div>
+        `;
+      });
+}
+
+  // Function to close the modal
+  function closeQuotaModal() {
+    const modal = document.getElementById('quotaModal');
+    modal.style.display = 'none';
+}
+
+  // Close modal when clicking outside of it
+  window.onclick = function(event) {
+    const modal = document.getElementById('quotaModal');
+    if (event.target == modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+   # In batch_evaluations.html, find and update the showCustomerDetails function to better display quota source information:
+
+function showCustomerDetails(customerId, grade) {
+    // First check if customerId exists
+    if (!customerId) {
+        // If no customer ID, just show product quotas based on grade
+        showProductQuotas(grade, 0);
+        return;
+    }
+
+    const modal = document.getElementById('customerModal');
+    const modalContent = document.getElementById('customerModalContent');
+    const modalTitle = document.getElementById('customerModalTitle');
+
+    // Show the modal
+    modal.style.display = 'block';
+
+    // Show loading
+    modalContent.innerHTML = `
+      <div class="loading-spinner" style="text-align: center; padding: 2rem;">
+        <i class="fas fa-spinner fa-spin"></i>
+        در حال بارگذاری اطلاعات مشتری...
+      </div>
+    `;
+
+    // Fetch customer details
+    fetch(`/api/customer/${customerId}/details`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch customer details');
+        }
+        return response.json();
+      })
+      .then(customerData => {
+        // Set modal title
+        if (customerData.name && customerData.number) {
+          modalTitle.innerHTML = `
+            اطلاعات مشتری: ${customerData.name} (${customerData.number})
+            <span class="grade-badge grade-${customerData.grade[0] || 'none'}" style="margin-right: 0.5rem;">
+              ${customerData.grade || 'بدون درجه'}
+            </span>
+          `;
+        } else {
+          modalTitle.innerHTML = `اطلاعات مشتری`;
+        }
+
+        // Build customer details HTML
+        let customerHtml = `
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+              <h4 style="font-size: 1rem; margin-bottom: 0.75rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">اطلاعات پایه</h4>
+              <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem;">
+                <div style="color: #64748b; font-weight: 500;">نام:</div>
+                <div>${customerData.name || '-'}</div>
+                <div style="color: #64748b; font-weight: 500;">شماره:</div>
+                <div>${customerData.number || '-'}</div>
+                <div style="color: #64748b; font-weight: 500;">استان:</div>
+                <div>${customerData.province || '-'}</div>
+                <div style="color: #64748b; font-weight: 500;">درجه:</div>
+                <div>
+                  <span class="grade-badge grade-${customerData.grade && customerData.grade[0] ? customerData.grade[0] : 'none'}">
+                    ${customerData.grade || 'بدون درجه'}
+                  </span>
+                </div>
+                <div style="color: #64748b; font-weight: 500;">نوع مشتری:</div>
+                <div>${customerData.customer_type ? customerData.customer_type.name : '-'}</div>
+              </div>
+            </div>
+        `;
+
+        // Add location if available
+        if (customerData.location && customerData.location.latitude && customerData.location.longitude) {
+          customerHtml += `
+            <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+              <h4 style="font-size: 1rem; margin-bottom: 0.75rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">موقعیت جغرافیایی</h4>
+              <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem;">
+                <div style="color: #64748b; font-weight: 500;">عرض جغرافیایی:</div>
+                <div>${customerData.location.latitude}</div>
+                <div style="color: #64748b; font-weight: 500;">طول جغرافیایی:</div>
+                <div>${customerData.location.longitude}</div>
+              </div>
+              <div style="margin-top: 0.75rem; text-align: center;">
+                <a href="https://maps.google.com/?q=${customerData.location.latitude},${customerData.location.longitude}"
+                   target="_blank" class="btn btn-outline" style="font-size: 0.75rem;">
+                  <i class="fas fa-map-marked-alt"></i>
+                  نمایش در نقشه
+                </a>
+              </div>
+            </div>
+          `;
+        }
+
+        // Add evaluation info if available
+        if (customerData.evaluation) {
+          customerHtml += `
+            <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+              <h4 style="font-size: 1rem; margin-bottom: 0.75rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">اطلاعات ارزیابی</h4>
+              <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem;">
+                <div style="color: #64748b; font-weight: 500;">نمره:</div>
+                <div>${customerData.evaluation.total_score}</div>
+                <div style="color: #64748b; font-weight: 500;">درجه:</div>
+                <div>
+                  <span class="grade-badge grade-${customerData.evaluation.assigned_grade && customerData.evaluation.assigned_grade[0] ? customerData.evaluation.assigned_grade[0] : 'none'}">
+                    ${customerData.evaluation.assigned_grade || 'بدون درجه'}
+                  </span>
+                </div>
+                <div style="color: #64748b; font-weight: 500;">تاریخ ارزیابی:</div>
+                <div>${customerData.evaluation.evaluated_at}</div>
+                <div style="color: #64748b; font-weight: 500;">روش ارزیابی:</div>
+                <div>${customerData.evaluation.evaluation_method === 'manual' ? 'دستی' : 'CSV/Excel'}</div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Close the grid
+        customerHtml += `</div>`;
+
+        // Add additional fields if available
+        const additionalFields = ['textbox29', 'caption', 'bname', 'textbox16', 'textbox12', 'textbox4', 'textbox10'];
+        const additionalFieldsData = additionalFields.filter(field => customerData[field]);
+
+        if (additionalFieldsData.length > 0) {
+          customerHtml += `
+            <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; margin-bottom: 1.5rem;">
+              <h4 style="font-size: 1rem; margin-bottom: 0.75rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">اطلاعات تکمیلی</h4>
+              <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem;">
+          `;
+
+          additionalFieldsData.forEach(field => {
+            customerHtml += `
+              <div style="color: #64748b; font-weight: 500;">${field}:</div>
+              <div>${customerData[field]}</div>
+            `;
+          });
+
+          customerHtml += `
+              </div>
+            </div>
+          `;
+        }
+
+        // Now fetch the product quotas
+        fetch(`/api/customer/${customerId}/product_quotas`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to fetch product quotas');
+            }
+            return response.json();
+          })
+          .then(quotaData => {
+            if (quotaData.success && quotaData.products.length > 0) {
+              customerHtml += `
+                <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; margin-bottom: 1.5rem;">
+                  <h4 style="font-size: 1rem; margin-bottom: 0.75rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">
+                    سهمیه محصولات برای درجه ${customerData.grade || 'بدون درجه'}
+                  </h4>
+                  <div class="table-container" style="max-height: 300px; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                      <thead>
+                        <tr>
+                          <th style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">محصول</th>
+                          <th style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">سهمیه لیتر</th>
+                          <th style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">سهمیه شرینک</th>
+                          <th style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">منبع</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+              `;
+
+              quotaData.products.forEach(product => {
+                // Translate source to Persian
+                let sourceText = '';
+                switch(product.source) {
+                  case 'batch_target':
+                    sourceText = 'تارگت ذخیره شده';
+                    break;
+                  case 'type_fixed_percentage':
+                    sourceText = 'درصد ثابت نوع فروشگاه';
+                    break;
+                  case 'calculated_remaining':
+                    sourceText = 'محاسبه شده از باقیمانده';
+                    break;
+                  case 'excluded_by_type':
+                    sourceText = 'مستثنی شده توسط نوع فروشگاه';
+                    break;
+                  default:
+                    sourceText = product.source;
+                }
+
+                customerHtml += `
+                  <tr>
+                    <td>${product.name}</td>
+                    <td style="text-align: center; background-color: #f0fff4; font-weight: 600;">
+                      ${product.liter_quota !== null ? product.liter_quota.toFixed(2) : '-'}
+                    </td>
+                    <td style="text-align: center; background-color: #fff0f0; font-weight: 600;">
+                      ${product.shrink_quota !== null ? product.shrink_quota.toFixed(2) : '-'}
+                    </td>
+                    <td style="text-align: center;">
+                      ${sourceText}
+                    </td>
+                  </tr>
+                `;
+              });
+
+              customerHtml += `
+                      </tbody>
+                    </table>
+                  </div>
+                  <div style="margin-top: 0.75rem; color: #64748b; font-size: 0.875rem;">
+                    <i class="fas fa-info-circle"></i>
+                    برخی محصولات ممکن است بدلیل محدودیت نوع مشتری نمایش داده نشوند.
+                  </div>
+                </div>
+              `;
+
+              // Add special section for customer type quotas if available
+              if (quotaData.type_quota_info) {
+                customerHtml += `
+                  <div style="background: #eef2ff; padding: 1rem; border-radius: 0.5rem; border: 1px solid #c7d2fe; margin-bottom: 1.5rem;">
+                    <h4 style="font-size: 1rem; margin-bottom: 0.75rem; border-bottom: 1px solid #c7d2fe; padding-bottom: 0.5rem; color: #4338ca;">
+                      <i class="fas fa-percentage" style="margin-left: 0.5rem;"></i>
+                      تخصیص درصدی نوع فروشگاه
+                    </h4>
+                    <div class="table-container">
+                      <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                          <tr>
+                            <th style="background: #eef2ff; z-index: 10;">محصول</th>
+                            <th style="background: #eef2ff; z-index: 10;">استان</th>
+                            <th style="background: #eef2ff; z-index: 10;">درصد تخصیص</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                quotaData.type_quota_info.forEach(quota => {
+                  customerHtml += `
+                    <tr>
+                      <td>${quota.product}</td>
+                      <td>${quota.province}</td>
+                      <td style="text-align: center; font-weight: 600;">
+                        ${quota.percentage}%
+                      </td>
+                    </tr>
+                  `;
+                });
+
+                customerHtml += `
+                        </tbody>
+                      </table>
+                    </div>
+                    <div style="margin-top: 0.75rem; color: #4338ca; font-size: 0.875rem;">
+                      <i class="fas fa-info-circle"></i>
+                      این اطلاعات نشان می‌دهد که درصد مشخصی از سهمیه محصولات به این نوع فروشگاه تخصیص داده شده است.
+                    </div>
+                  </div>
+                `;
+              }
+            } else {
+              customerHtml += `
+                <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; margin-bottom: 1.5rem; text-align: center; color: #64748b;">
+                  <p>هیچ سهمیه محصولی برای این مشتری یافت نشد.</p>
+                  <p style="font-size: 0.875rem; margin-top: 0.5rem;">
+                    برای محاسبه سهمیه‌های مبتنی بر درجه، از دکمه «محاسبه تارگت‌های مبتنی بر درجه» استفاده کنید.
+                  </p>
+                </div>
+              `;
+            }
+
+            // Show the complete HTML
+            modalContent.innerHTML = customerHtml;
+          })
+          .catch(error => {
+            console.error('Error fetching product quotas:', error);
+
+            // Show the basic customer info without quotas
+            customerHtml += `
+              <div style="text-align: center; padding: 1rem; color: #ef4444; background: #fef2f2; border-radius: 0.5rem; margin-top: 1rem;">
+                <i class="fas fa-exclamation-triangle"></i>
+                خطا در بارگذاری اطلاعات سهمیه محصولات: ${error.message}
+              </div>
+            `;
+
+            modalContent.innerHTML = customerHtml;
+          });
+      })
+      .catch(error => {
+        console.error('Error fetching customer details:', error);
+        modalContent.innerHTML = `
+          <div style="text-align: center; padding: 2rem; color: #ef4444;">
+            <i class="fas fa-exclamation-triangle"></i>
+            خطا در بارگذاری اطلاعات مشتری: ${error.message}
+          </div>
+        `;
+      });
+}
+
+  // Function to close the customer modal
+  function closeCustomerModal() {
+    const modal = document.getElementById('customerModal');
+    modal.style.display = 'none';
+}
+
+  // Close modal when clicking outside of it
+  window.onclick = function(event) {
+    const customerModal = document.getElementById('customerModal');
+    const quotaModal = document.getElementById('quotaModal');
+
+    if (event.target == customerModal) {
+      customerModal.style.display = 'none';
+    }
+    if (event.target == quotaModal) {
+      quotaModal.style.display = 'none';
+    }
+  }
+  // Function to download customer or evaluation data
+// Function to download customer data including quotas
+// Replace the existing downloadCustomerData function with this improved version
+// This enhanced version adds debugging capabilities to diagnose JSON issues
+// This is an alternative approach that bypasses JSON parsing issues
+// by directly requesting CSV data from the server
+// Client-side function for downloading evaluation data
+function downloadCustomerData(evalId, grade) {
+    // Show a loading message
+    const loadingToast = document.createElement('div');
+    loadingToast.style.position = 'fixed';
+    loadingToast.style.bottom = '20px';
+    loadingToast.style.right = '20px';
+    loadingToast.style.padding = '10px 20px';
+    loadingToast.style.backgroundColor = '#4f46e5';
+    loadingToast.style.color = 'white';
+    loadingToast.style.borderRadius = '4px';
+    loadingToast.style.zIndex = '9999';
+    loadingToast.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال آماده‌سازی فایل...';
+    document.body.appendChild(loadingToast);
+
+    // Request the CSV file directly from the server
+    fetch(`/api/download_evaluation_csv/${evalId}?grade=${encodeURIComponent(grade || '')}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status} ${response.statusText}`);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            // Create a download link for the blob
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `evaluation_${evalId}_details.csv`;
+            document.body.appendChild(a);
+
+            // Remove loading toast
+            document.body.removeChild(loadingToast);
+
+            // Show success message
+            const successToast = document.createElement('div');
+            successToast.style.position = 'fixed';
+            successToast.style.bottom = '20px';
+            successToast.style.right = '20px';
+            successToast.style.padding = '10px 20px';
+            successToast.style.backgroundColor = '#22c55e';
+            successToast.style.color = 'white';
+            successToast.style.borderRadius = '4px';
+            successToast.style.zIndex = '9999';
+            successToast.innerHTML = '<i class="fas fa-check"></i> فایل آماده دانلود است';
+            document.body.appendChild(successToast);
+
+            // Trigger download
+            a.click();
+
+            // Cleanup
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            // Remove success toast after 3 seconds
+            setTimeout(() => {
+                document.body.removeChild(successToast);
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Download error:', error);
+
+            // Remove loading toast
+            if (document.body.contains(loadingToast)) {
+                document.body.removeChild(loadingToast);
+            }
+
+            // Show error message
+            const errorToast = document.createElement('div');
+            errorToast.style.position = 'fixed';
+            errorToast.style.bottom = '20px';
+            errorToast.style.right = '20px';
+            errorToast.style.padding = '10px 20px';
+            errorToast.style.backgroundColor = '#ef4444';
+            errorToast.style.color = 'white';
+            errorToast.style.borderRadius = '4px';
+            errorToast.style.zIndex = '9999';
+            errorToast.innerHTML = `<i class="fas fa-exclamation-triangle"></i> خطا در دانلود اطلاعات: ${error.message}`;
+            document.body.appendChild(errorToast);
+
+            // Remove error toast after 5 seconds
+            setTimeout(() => {
+                if (document.body.contains(errorToast)) {
+                    document.body.removeChild(errorToast);
+                }
+            }, 5000);
+        });
+}
+// Close modals when clicking outside of them
+window.onclick = function(event) {
+    const customerModal = document.getElementById('customerModal');
+    const quotaModal = document.getElementById('quotaModal');
+
+    if (event.target == customerModal) {
+        customerModal.style.display = 'none';
+    }
+    if (event.target == quotaModal) {
+        quotaModal.style.display = 'none';
+    }
+}
+   // Add this JavaScript function to batch_evaluations.html
+
+function downloadAllCustomerData(batchId) {
+    // Show a loading message
+    const loadingToast = document.createElement('div');
+    loadingToast.style.position = 'fixed';
+    loadingToast.style.bottom = '20px';
+    loadingToast.style.right = '20px';
+    loadingToast.style.padding = '10px 20px';
+    loadingToast.style.backgroundColor = '#4f46e5';
+    loadingToast.style.color = 'white';
+    loadingToast.style.borderRadius = '4px';
+    loadingToast.style.zIndex = '9999';
+    loadingToast.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال آماده‌سازی فایل اطلاعات مشتریان...';
+    document.body.appendChild(loadingToast);
+
+    // Request the batch CSV file directly from the server
+    fetch(`/api/download_batch_evaluations/${batchId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status} ${response.statusText}`);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            // Create a download link for the blob
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+
+            // Create timestamp for filename
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            a.download = `batch_${batchId}_evaluations_${timestamp}.csv`;
+
+            document.body.appendChild(a);
+
+            // Remove loading toast
+            document.body.removeChild(loadingToast);
+
+            // Show success message
+            const successToast = document.createElement('div');
+            successToast.style.position = 'fixed';
+            successToast.style.bottom = '20px';
+            successToast.style.right = '20px';
+            successToast.style.padding = '10px 20px';
+            successToast.style.backgroundColor = '#22c55e';
+            successToast.style.color = 'white';
+            successToast.style.borderRadius = '4px';
+            successToast.style.zIndex = '9999';
+            successToast.innerHTML = '<i class="fas fa-check"></i> فایل اطلاعات تمامی مشتریان آماده دانلود است';
+            document.body.appendChild(successToast);
+
+            // Trigger download
+            a.click();
+
+            // Cleanup
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            // Remove success toast after 3 seconds
+            setTimeout(() => {
+                document.body.removeChild(successToast);
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Download error:', error);
+
+            // Remove loading toast
+            if (document.body.contains(loadingToast)) {
+                document.body.removeChild(loadingToast);
+            }
+
+            // Show error message
+            const errorToast = document.createElement('div');
+            errorToast.style.position = 'fixed';
+            errorToast.style.bottom = '20px';
+            errorToast.style.right = '20px';
+            errorToast.style.padding = '10px 20px';
+            errorToast.style.backgroundColor = '#ef4444';
+            errorToast.style.color = 'white';
+            errorToast.style.borderRadius = '4px';
+            errorToast.style.zIndex = '9999';
+            errorToast.innerHTML = `<i class="fas fa-exclamation-triangle"></i> خطا در دانلود اطلاعات: ${error.message}`;
+            document.body.appendChild(errorToast);
+
+            // Remove error toast after 5 seconds
+            setTimeout(() => {
+                if (document.body.contains(errorToast)) {
+                    document.body.removeChild(errorToast);
+                }
+            }, 5000);
+        });
+}
   </script>
 </body>
 </html>

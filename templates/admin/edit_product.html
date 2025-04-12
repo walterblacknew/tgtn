@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>ویرایش محصول | پنل مدیریت</title>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Vazirmatn', sans-serif;
+      padding: 2rem;
+      color: #1e293b;
+      direction: rtl;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.75rem;
+      color: #334155;
+    }
+    .section {
+      background: #fff;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .section h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #475569;
+    }
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 0.875rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.375rem;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      border-color: #4f46e5;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+    }
+    .submit-btn {
+      background-color: #4f46e5;
+      color: #fff;
+      padding: 0.75rem 1.25rem;
+      border: none;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .submit-btn:hover {
+      background-color: #4338ca;
+    }
+
+    /* Button Styles */
+    .btn {
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      text-decoration: none;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background-color: #4f46e5;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background-color: #4338ca;
+    }
+    .btn-outline {
+      background-color: transparent;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+    .btn-outline:hover {
+      background-color: #f8fafc;
+    }
+
+    /* Capacity Display */
+    .capacity-display {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .capacity-badge {
+      background-color: #f1f5f9;
+      border-radius: 0.375rem;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .liter-badge {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+    .shrink-badge {
+      background-color: #fef9c3;
+      color: #854d0e;
+    }
+    .category-badge {
+      background-color: #f3e8ff;
+      color: #7e22ce;
+    }
+    .flavor-badge {
+      background-color: #fce7f3;
+      color: #be185d;
+    }
+    .packaging-badge {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+    .volume-badge {
+      background-color: #e0f2fe;
+      color: #0369a1;
+    }
+
+    /* Flash messages */
+    .flash {
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+    }
+    .success {
+      background-color: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      color: #166534;
+    }
+    .danger {
+      background-color: #fef2f2;
+      border-left: 4px solid #ef4444;
+      color: #b91c1c;
+    }
+    .warning {
+      background-color: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #92400e;
+    }
+    .info {
+      background-color: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      color: #1e40af;
+    }
+
+    /* Note Info */
+    .note-info {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background-color: #eff6ff;
+      border-radius: 0.5rem;
+      border-right: 4px solid #3b82f6;
+      font-size: 0.875rem;
+    }
+    .note-info strong {
+      color: #1e40af;
+    }
+
+    /* Product attributes */
+    .attribute-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .attribute-label {
+      flex: 0 0 90px;
+      font-size: 0.875rem;
+      color: #64748b;
+    }
+    .attribute-select {
+      flex: 1;
+    }
+    .attribute-input {
+      flex: 1;
+      display: flex;
+      gap: 0.5rem;
+    }
+    .attribute-input input {
+      flex: 1;
+    }
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 1rem 0;
+      color: #94a3b8;
+      font-size: 0.875rem;
+    }
+    .divider:before, .divider:after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .divider:before {
+      margin-left: 0.5rem;
+    }
+    .divider:after {
+      margin-right: 0.5rem;
+    }
+
+    /* Current attributes display */
+    .current-attributes {
+      background-color: #f8fafc;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid #e2e8f0;
+    }
+    .attribute-item {
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+    }
+    .attribute-name {
+      font-weight: 500;
+      min-width: 90px;
+      color: #64748b;
+    }
+    .attribute-value {
+      display: inline-flex;
+      align-items: center;
+      font-weight: 500;
+    }
+
+    /* Small input for units */
+    .unit-input {
+      flex: 0 0 70px;
+    }
+  </style>
+</head>
+<body>
+  <h1>ویرایش محصول</h1>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- Edit Product Section -->
+  <div class="section">
+    <div class="section-header">
+      <h2>
+        <i class="fas fa-edit" style="color: #4f46e5;"></i>
+        ویرایش محصول: {{ product.name }}
+      </h2>
+      <div>
+        <a href="{{ url_for('admin_products') }}" class="btn btn-outline">
+          <i class="fas fa-arrow-right"></i>
+          بازگشت به صفحه محصولات
+        </a>
+      </div>
+    </div>
+
+    <!-- Current attributes and capacities display -->
+    <div class="current-attributes">
+      <h3 style="margin-top: 0; margin-bottom: 1rem; font-size: 1rem;">مشخصات فعلی محصول</h3>
+
+      {% if product.category_relation or product.flavor_relation or product.packaging_relation or product.volume_relation %}
+        <div class="attribute-item">
+          {% if product.category_relation %}
+            <span class="attribute-name">دسته بندی:</span>
+            <span class="attribute-value">
+              <span class="capacity-badge category-badge">
+                <i class="fas fa-tag"></i>
+                {{ product.category_relation.name }}
+              </span>
+            </span>
+          {% endif %}
+        </div>
+
+        <div class="attribute-item">
+          {% if product.flavor_relation %}
+            <span class="attribute-name">طعم:</span>
+            <span class="attribute-value">
+              <span class="capacity-badge flavor-badge">
+                <i class="fas fa-lemon"></i>
+                {{ product.flavor_relation.name }}
+              </span>
+            </span>
+          {% endif %}
+        </div>
+
+        <div class="attribute-item">
+          {% if product.packaging_relation %}
+            <span class="attribute-name">بسته بندی:</span>
+            <span class="attribute-value">
+              <span class="capacity-badge packaging-badge">
+                <i class="fas fa-box"></i>
+                {{ product.packaging_relation.name }}
+              </span>
+            </span>
+          {% endif %}
+        </div>
+
+        <div class="attribute-item">
+          {% if product.volume_relation %}
+            <span class="attribute-name">حجم:</span>
+            <span class="attribute-value">
+              <span class="capacity-badge volume-badge">
+                <i class="fas fa-tachometer-alt"></i>
+                {{ product.volume_relation.display_name }}
+              </span>
+            </span>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <div class="attribute-item">
+        <span class="attribute-name">ظرفیت:</span>
+        <span class="attribute-value">
+          <div class="capacity-display" style="margin-bottom: 0;">
+            {% if product.liter_capacity %}
+              <span class="capacity-badge liter-badge">
+                <i class="fas fa-tint"></i>
+                {{ "{:,.0f}".format(product.liter_capacity) }} لیتر
+              </span>
+            {% endif %}
+
+            {% if product.shrink_capacity %}
+              <span class="capacity-badge shrink-badge">
+                <i class="fas fa-box"></i>
+                {{ "{:,.0f}".format(product.shrink_capacity) }} شرینک
+              </span>
+            {% endif %}
+          </div>
+        </span>
+      </div>
+    </div>
+
+    <!-- Edit Form -->
+    <form method="POST" action="{{ url_for('edit_product', product_id=product.id) }}">
+      {{ form.csrf_token }}
+
+      <div class="form-group">
+        <label for="name">{{ form.name.label }}</label>
+        {{ form.name(id="name", placeholder="مثلاً: آب معدنی طعم دار پرتقالی 1.5 لیتری") }}
+      </div>
+
+      <!-- Category Attribute -->
+      <div class="attribute-row">
+        <div class="attribute-label">{{ form.category_id.label }}</div>
+        <div class="attribute-select">
+          {{ form.category_id(id="category_id") }}
+        </div>
+      </div>
+
+      <div class="attribute-row">
+        <div class="attribute-label">جدید</div>
+        <div class="attribute-input">
+          {{ form.new_category(id="new_category", placeholder="دسته بندی جدید") }}
+        </div>
+      </div>
+
+      <!-- Flavor Attribute -->
+      <div class="attribute-row">
+        <div class="attribute-label">{{ form.flavor_id.label }}</div>
+        <div class="attribute-select">
+          {{ form.flavor_id(id="flavor_id") }}
+        </div>
+      </div>
+
+      <div class="attribute-row">
+        <div class="attribute-label">جدید</div>
+        <div class="attribute-input">
+          {{ form.new_flavor(id="new_flavor", placeholder="طعم جدید") }}
+        </div>
+      </div>
+
+      <!-- Packaging Attribute -->
+      <div class="attribute-row">
+        <div class="attribute-label">{{ form.packaging_id.label }}</div>
+        <div class="attribute-select">
+          {{ form.packaging_id(id="packaging_id") }}
+        </div>
+      </div>
+
+      <div class="attribute-row">
+        <div class="attribute-label">جدید</div>
+        <div class="attribute-input">
+          {{ form.new_packaging(id="new_packaging", placeholder="بسته بندی جدید") }}
+        </div>
+      </div>
+
+      <!-- Volume Attribute -->
+      <div class="attribute-row">
+        <div class="attribute-label">{{ form.volume_id.label }}</div>
+        <div class="attribute-select">
+          {{ form.volume_id(id="volume_id") }}
+        </div>
+      </div>
+
+      <div class="attribute-row">
+        <div class="attribute-label">جدید</div>
+        <div class="attribute-input">
+          {{ form.new_volume(id="new_volume", placeholder="حجم جدید") }}
+          {{ form.volume_unit(id="volume_unit", class="unit-input", placeholder="واحد") }}
+        </div>
+      </div>
+
+      <div class="divider">تارگت محصول</div>
+
+      <div class="form-group">
+        <label for="liter_capacity">{{ form.liter_capacity.label }}</label>
+        {{ form.liter_capacity(id="liter_capacity", placeholder="مثلاً: 100000") }}
+      </div>
+      <div class="form-group">
+        <label for="shrink_capacity">{{ form.shrink_capacity.label }}</label>
+        {{ form.shrink_capacity(id="shrink_capacity", placeholder="مثلاً: 10000") }}
+      </div>
+      {{ form.submit(class_="submit-btn", value="به‌روزرسانی محصول") }}
+    </form>
+
+    <div class="note-info">
+      <strong>توجه:</strong> با تغییر ظرفیت کل (لیتر یا شرینک)، تمام تارگت‌های استانی این محصول نیز بر اساس جمعیت هر استان به‌روزرسانی خواهند شد.
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Disable unit field if new volume is empty
+      const newVolumeInput = document.getElementById('new_volume');
+      const volumeUnitInput = document.getElementById('volume_unit');
+
+      if (newVolumeInput && volumeUnitInput) {
+        volumeUnitInput.disabled = !newVolumeInput.value;
+
+        newVolumeInput.addEventListener('input', function() {
+          volumeUnitInput.disabled = !this.value;
+          if (this.value && !volumeUnitInput.value) {
+            volumeUnitInput.value = 'لیتر';
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

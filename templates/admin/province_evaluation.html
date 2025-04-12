@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>ارزیابی استان‌ها | پنل مدیریت</title>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f0f4f8, #e9ecef);
+      font-family: 'Vazirmatn', sans-serif;
+      direction: rtl;
+      padding: 2rem;
+      margin: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #102a43;
+    }
+    h2 {
+      margin-top: 2rem;
+      font-size: 1.25rem;
+    }
+    .instructions {
+      background: #f1f5f9;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 2rem;
+      border-right: 4px solid #4f46e5;
+    }
+    .instructions h3 {
+      font-size: 1.125rem;
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+      color: #334e68;
+    }
+    .instructions p {
+      margin: 0.5rem 0;
+      line-height: 1.6;
+      font-size: 0.9375rem;
+      color: #486581;
+    }
+    .instructions ul {
+      margin: 0.75rem 0;
+      padding-right: 1.5rem;
+    }
+    .instructions li {
+      margin-bottom: 0.5rem;
+    }
+
+    .upload-form {
+      display: flex;
+      flex-direction: column;
+    }
+    .file-input-container {
+      margin-bottom: 1.5rem;
+    }
+    .file-input-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #243b53;
+    }
+    .file-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #bcccdc;
+      border-radius: 0.5rem;
+      background: #f8fafc;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .file-input:hover {
+      border-color: #9fb3c8;
+    }
+    .file-input:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+      outline: none;
+    }
+    .supported-formats {
+      font-size: 0.8125rem;
+      color: #64748b;
+      margin-top: 0.375rem;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 0.875rem;
+      background-color: #4f46e5;
+      color: #fff;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .submit-btn:hover {
+      background-color: #4338ca;
+    }
+    .submit-btn:active {
+      transform: translateY(1px);
+    }
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #486581;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+      color: #334e68;
+    }
+
+    /* Flash messages styling */
+    .flash-container {
+      margin-bottom: 1.5rem;
+    }
+    .flash {
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.9375rem;
+      display: flex;
+      align-items: center;
+    }
+    .flash-icon {
+      margin-left: 0.75rem;
+      flex-shrink: 0;
+    }
+    .flash-success {
+      background-color: #f0fdf4;
+      border: 1px solid #86efac;
+      color: #166534;
+    }
+    .flash-danger {
+      background-color: #fef2f2;
+      border: 1px solid #fca5a5;
+      color: #b91c1c;
+    }
+    .flash-info {
+      background-color: #eff6ff;
+      border: 1px solid #93c5fd;
+      color: #1e40af;
+    }
+    .flash-warning {
+      background-color: #fffbeb;
+      border: 1px solid #fcd34d;
+      color: #92400e;
+    }
+
+    /* Step indicator */
+    .steps {
+      display: flex;
+      justify-content: space-between;
+      margin: 2rem 0;
+      position: relative;
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 14px;
+      right: 0;
+      left: 0;
+      height: 2px;
+      background-color: #e2e8f0;
+      z-index: 1;
+    }
+    .step {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+    .step-number {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: #e2e8f0;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.5rem;
+      font-weight: 600;
+      border: 2px solid #fff;
+    }
+    .step.active .step-number {
+      background-color: #4f46e5;
+      color: #fff;
+    }
+    .step.completed .step-number {
+      background-color: #22c55e;
+      color: #fff;
+    }
+    .step-label {
+      font-size: 0.875rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+    .step.active .step-label {
+      color: #4f46e5;
+    }
+    .step.completed .step-label {
+      color: #22c55e;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ارزیابی استان‌ها</h1>
+
+    <!-- Step indicator -->
+    <div class="steps">
+      <div class="step active">
+        <div class="step-number">1</div>
+        <div class="step-label">بارگذاری فایل</div>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-label">تنظیم پارامترها</div>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-label">نتایج ارزیابی</div>
+      </div>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">
+              {% if category == 'success' %}
+                <span class="flash-icon">✓</span>
+              {% elif category == 'danger' %}
+                <span class="flash-icon">✗</span>
+              {% elif category == 'info' %}
+                <span class="flash-icon">ℹ</span>
+              {% elif category == 'warning' %}
+                <span class="flash-icon">⚠</span>
+              {% endif %}
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="instructions">
+      <h3>راهنمای ارزیابی استان‌ها</h3>
+      <p>با استفاده از این ابزار می‌توانید فایل CSV یا Excel حاوی اطلاعات استان‌ها را آپلود کرده و ارزیابی اتوماتیک انجام دهید:</p>
+      <ul>
+        <li>ستون اول فایل به عنوان سرستون‌ها (پارامترها) در نظر گرفته می‌شود.</li>
+        <li>در مرحله بعد می‌توانید برای هر پارامتر وزن و نوع (عددی یا توصیفی) تعیین کنید.</li>
+        <li>برای پارامترهای توصیفی، می‌توانید زیرپارامترها و نمرات آن‌ها را مشخص کنید.</li>
+        <li>در نهایت، برای هر استان یک نمره کل محاسبه شده و درجه مناسب تخصیص داده می‌شود.</li>
+      </ul>
+      <p>فایل شما باید شامل ستونی با نام استان باشد تا سیستم بتواند نمرات را به استان‌های مربوطه تخصیص دهد.</p>
+    </div>
+
+    <form class="upload-form" method="POST" enctype="multipart/form-data" action="{{ url_for('admin_upload_province_evaluation') }}">
+      <input type="hidden" name="action" value="upload_file">
+
+      <div class="file-input-container">
+        <label for="file-input" class="file-input-label">انتخاب فایل CSV یا Excel:</label>
+        <input
+          type="file"
+          name="file"
+          id="file-input"
+          class="file-input"
+          accept=".csv, .xls, .xlsx"
+          required
+        >
+        <div class="supported-formats">فرمت‌های پشتیبانی شده: CSV، XLS، XLSX</div>
+      </div>
+
+      <button type="submit" class="submit-btn">بارگذاری و ادامه</button>
+    </form>
+
+    <a href="{{ url_for('admin_quotas') }}" class="back-link">← بازگشت به صفحه سهمیه‌ها</a>
+  </div>
+</body>
+</html>

@@ -4,8 +4,12 @@
   <meta charset="UTF-8">
   <title>مدیریت کاربران</title>
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" />
-  <!-- کتابخانه Chart.js -->
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <!-- Cytoscape.js for network graph visualization -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.23.0/cytoscape.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -34,7 +38,7 @@
     }
     .flash-messages {
       margin-bottom: 1rem;
-      color: #ef4444; /* پیام‌های خطا/هشدار به رنگ قرمز */
+      color: #ef4444;
     }
     h1 {
       margin-bottom: 1rem;
@@ -73,7 +77,7 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
-      justify-content: space-between; /* فاصله بین عنوان و نمودار */
+      justify-content: space-between;
     }
     .chart-container h2 {
       margin-bottom: 1rem;
@@ -81,9 +85,28 @@
       color: #334155;
     }
     .chart-wrapper {
-      flex: 1; /* پر کردن فضای باقیمانده */
+      flex: 1;
       position: relative;
     }
+
+    /* Graph container */
+    .graph-container {
+      width: 100%;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+
+    .graph-wrapper {
+      height: 600px;
+      width: 100%;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.25rem;
+      overflow: hidden;
+    }
+
     .list-container {
       flex: 2;
       min-width: 450px;
@@ -105,7 +128,7 @@
     table th, table td {
       padding: 0.5rem;
       border-bottom: 1px solid #e2e8f0;
-      text-align: left;
+      text-align: right;
       font-size: 0.875rem;
     }
     .actions {
@@ -131,6 +154,33 @@
       font-size: 1rem;
       color: #334155;
     }
+
+    /* Tabbed interface for user form */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #e2e8f0;
+      margin-bottom: 1rem;
+    }
+    .tab {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .tab.active {
+      border-bottom: 2px solid #4f46e5;
+      font-weight: 500;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
     label {
       display: block;
       margin-top: 0.5rem;
@@ -141,6 +191,7 @@
     }
     input[type="text"],
     input[type="password"],
+    input[type="date"],
     select {
       width: 100%;
       padding: 0.5rem;
@@ -162,6 +213,16 @@
       text-decoration: none;
       color: #4f46e5;
       margin-right: 1rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+      .container {
+        flex-direction: column;
+      }
+      .form-container, .list-container {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -196,6 +257,12 @@
     <button type="submit" class="btn btn-search">جستجو</button>
   </form>
 
+  <!-- نمودار سلسله مراتبی کاربران -->
+  <div class="graph-container">
+    <h2>ساختار سلسله مراتبی کاربران</h2>
+    <div id="userGraph" class="graph-wrapper"></div>
+  </div>
+
   <div class="container">
 
     <!-- نمودار تعداد کاربران در هر نقش -->
@@ -215,7 +282,9 @@
             <th>شناسه</th>
             <th>نام کاربری</th>
             <th>نقش</th>
-            <th>ایمیل</th>
+            <th>عنوان شغلی</th>
+            <th>دپارتمان</th>
+            <th>سطح</th>
             <th>فعال؟</th>
             <th>عملیات</th>
           </tr>
@@ -226,7 +295,9 @@
             <td>{{ user.id }}</td>
             <td>{{ user.username }}</td>
             <td>{{ user.role }}</td>
-            <td>{{ user.email or '-' }}</td>
+            <td>{{ user.job_title or '-' }}</td>
+            <td>{{ user.department or '-' }}</td>
+            <td>{{ user.position_level }}</td>
             <td>{{ 'بله' if user.is_active else 'خیر' }}</td>
             <td>
               <div class="actions">
@@ -255,29 +326,67 @@
         <h2>ایجاد کاربر جدید</h2>
       {% endif %}
 
+      <!-- تب‌های فرم -->
+      <div class="tabs">
+        <div class="tab active" onclick="showTab('basic-info')">اطلاعات اصلی</div>
+        <div class="tab" onclick="showTab('job-info')">اطلاعات شغلی</div>
+      </div>
+
       <form method="POST" action="{{ url_for('admin_users') }}">
         {{ form.hidden_tag() }}
-        
-        <label for="username">نام کاربری</label>
-        {{ form.username(id='username') }}
 
-        <label for="password">رمز عبور</label>
-        {{ form.password(id='password') }}
+        <!-- تب اطلاعات اصلی -->
+        <div class="tab-content active" id="basic-info">
+          <div class="form-group">
+            <label for="username">نام کاربری</label>
+            {{ form.username(id='username') }}
+          </div>
 
-        <label for="email">ایمیل</label>
-        {{ form.email(id='email') }}
+          <div class="form-group">
+            <label for="password">رمز عبور</label>
+            {{ form.password(id='password') }}
+          </div>
 
-        <label for="fullname">نام و نام خانوادگی</label>
-        {{ form.fullname(id='fullname') }}
+          <div class="form-group">
+            <label for="email">ایمیل</label>
+            {{ form.email(id='email') }}
+          </div>
 
-        <div class="checkbox-field">
-          {{ form.is_active(id='is_active') }}
-          <label for="is_active">فعال باشد</label>
+          <div class="form-group">
+            <label for="fullname">نام و نام خانوادگی</label>
+            {{ form.fullname(id='fullname') }}
+          </div>
+
+          <div class="checkbox-field">
+            {{ form.is_active(id='is_active') }}
+            <label for="is_active">فعال باشد</label>
+          </div>
+
+          <div class="form-group">
+            <label for="role">نقش کاربر</label>
+            {{ form.role(id='role') }}
+          </div>
         </div>
 
-        <label for="role">نقش کاربر</label>
-        {{ form.role(id='role') }}
+        <!-- تب اطلاعات شغلی -->
+        <div class="tab-content" id="job-info">
+          <div class="form-group">
+            <label for="job_title">عنوان شغلی</label>
+            {{ form.job_title(id='job_title') }}
+          </div>
 
+          <div class="form-group">
+            <label for="department">دپارتمان</label>
+            {{ form.department(id='department') }}
+          </div>
+
+          <div class="form-group">
+            <label for="parent_id">زیرمجموعه کاربر</label>
+            {{ form.parent_id(id='parent_id') }}
+          </div>
+        </div>
+
+        <!-- دکمه ذخیره -->
         <button type="submit" class="btn">
           {% if edit_mode %}ویرایش{% else %}ایجاد{% endif %}
         </button>
@@ -303,7 +412,7 @@
       },
       options: {
         responsive: true,
-        maintainAspectRatio: true,  // از کش آمدن نمودار جلوگیری می‌کند
+        maintainAspectRatio: true,
         plugins: {
           legend: {
             position: 'bottom',
@@ -316,6 +425,192 @@
           }
         }
       }
+    });
+
+    // Function to switch tabs
+    function showTab(tabId) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Deactivate all tab buttons
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Activate the selected tab
+      document.getElementById(tabId).classList.add('active');
+
+      // Find and activate the tab button
+      const tabButtons = document.querySelectorAll('.tab');
+      for (let i = 0; i < tabButtons.length; i++) {
+        const tabButton = tabButtons[i];
+        if ((tabId === 'basic-info' && tabButton.textContent.trim() === 'اطلاعات اصلی') ||
+            (tabId === 'job-info' && tabButton.textContent.trim() === 'اطلاعات شغلی')) {
+          tabButton.classList.add('active');
+        }
+      }
+    }
+
+    // Initialize the graph when document is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      // Fetch hierarchy data from the API
+      fetch('/api/user-hierarchy-data')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.statusText);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Hierarchy data:', data);
+
+          // Transform data for Cytoscape
+          const elements = [];
+
+          // Role-based colors
+          const roleColors = {
+            'admin': '#4f46e5',   // Blue for admins
+            'marketer': '#22c55e', // Green for marketers
+            'observer': '#f97316'  // Orange for observers
+          };
+
+          // Process nodes and relationships
+          function processNodes(nodeData, level = 0, parentId = null) {
+            // Create box node
+            const boxId = 'box-' + nodeData.id;
+            const circleId = 'circle-' + nodeData.id;
+            const color = roleColors[nodeData.role] || '#94a3b8';
+
+            // Add box
+            elements.push({
+              group: 'nodes',
+              data: {
+                id: boxId,
+                parent: null,
+                label: nodeData.name || '',
+                type: 'box',
+                borderColor: color
+              }
+            });
+
+            // Add circle inside box
+            elements.push({
+              group: 'nodes',
+              data: {
+                id: circleId,
+                parent: boxId,
+                label: '',
+                type: 'circle',
+                color: color
+              }
+            });
+
+            // Add edge from parent box to this box if parent exists
+            if (parentId) {
+              elements.push({
+                group: 'edges',
+                data: {
+                  id: 'edge-' + parentId + '-' + boxId,
+                  source: parentId,
+                  target: boxId,
+                  color: '#22c55e'
+                }
+              });
+            }
+
+            // Process children
+            if (nodeData.children && nodeData.children.length > 0) {
+              nodeData.children.forEach(child => {
+                processNodes(child, level + 1, boxId);
+              });
+            }
+          }
+
+          // Process all top-level nodes
+          data.forEach(node => {
+            processNodes(node);
+          });
+
+          // Initialize Cytoscape
+          const cy = cytoscape({
+            container: document.getElementById('userGraph'),
+            elements: elements,
+            style: [
+              // Box nodes
+              {
+                selector: 'node[type="box"]',
+                style: {
+                  'shape': 'rectangle',
+                  'width': 60,
+                  'height': 60,
+                  'background-color': '#ffffff',
+                  'border-width': 1,
+                  'border-color': 'data(borderColor)',
+                  'label': 'data(label)',
+                  'text-valign': 'bottom',
+                  'text-halign': 'center',
+                  'text-wrap': 'wrap',
+                  'text-max-width': 80,
+                  'font-size': '10px',
+                  'font-family': 'Vazirmatn'
+                }
+              },
+              // Circle nodes
+              {
+                selector: 'node[type="circle"]',
+                style: {
+                  'shape': 'ellipse',
+                  'width': 30,
+                  'height': 30,
+                  'background-color': 'data(color)',
+                  'text-valign': 'center',
+                  'text-halign': 'center',
+                  'color': 'white',
+                  'font-size': '14px',
+                  'font-weight': 'bold',
+                  'text-background-opacity': 0
+                }
+              },
+              // Edges
+              {
+                selector: 'edge',
+                style: {
+                  'width': 1,
+                  'line-color': 'data(color)',
+                  'curve-style': 'bezier',
+                  'target-arrow-shape': 'none'
+                }
+              }
+            ],
+            layout: {
+              name: 'cose',
+              idealEdgeLength: 100,
+              nodeOverlap: 20,
+              refresh: 20,
+              fit: true,
+              padding: 30,
+              randomize: false,
+              componentSpacing: 100,
+              nodeRepulsion: 400000,
+              edgeElasticity: 100,
+              nestingFactor: 5
+            }
+          });
+
+          // Fit to view all nodes and center
+          cy.fit();
+          cy.center();
+        })
+        .catch(error => {
+          console.error('Error fetching hierarchy data:', error);
+          document.getElementById('userGraph').innerHTML = `
+            <p style="text-align: center; padding: 2rem; color: #dc2626;">
+              خطا در بارگذاری اطلاعات ساختار سازمانی: ${error.message}
+            </p>
+          `;
+        });
     });
   </script>
 

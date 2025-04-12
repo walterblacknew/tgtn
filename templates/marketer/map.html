@@ -148,57 +148,146 @@
 
         // Load points from server
         async function loadPoints() {
-            try {
-                const response = await fetch('{{ url_for('get_marketer_assigned_routes') }}');
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    try {
+        // Add error message div if it doesn't exist
+        let errorMsgDiv = document.getElementById('error-message');
+        if (!errorMsgDiv) {
+            errorMsgDiv = document.createElement('div');
+            errorMsgDiv.id = 'error-message';
+            errorMsgDiv.style.backgroundColor = '#fee2e2';
+            errorMsgDiv.style.color = '#ef4444';
+            errorMsgDiv.style.padding = '1rem';
+            errorMsgDiv.style.borderRadius = '0.5rem';
+            errorMsgDiv.style.margin = '1rem';
+            errorMsgDiv.style.display = 'none';
+            document.body.appendChild(errorMsgDiv);
+        }
 
-                const routes = await response.json();
-                clearMarkers();
+        // Reset error message
+        errorMsgDiv.style.display = 'none';
 
-                let allPoints = [];
-                routes.forEach(route => {
+        // Use a timeout to catch network issues
+        const fetchPromise = fetch('{{ url_for('get_marketer_assigned_routes') }}');
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Request timed out')), 5000)
+        );
+
+        // Race between fetch and timeout
+        const response = await Promise.race([fetchPromise, timeoutPromise]);
+
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        const routes = await response.json();
+        clearMarkers();
+
+        // Show response data for debugging
+        console.log("API Response:", routes);
+
+        let allPoints = [];
+        if (Array.isArray(routes)) {
+            routes.forEach(route => {
+                // Check if route has points array
+                if (route.points && Array.isArray(route.points)) {
                     route.points.forEach(point => {
-                        allPoints.push({
-                            ...point,
-                            routeName: route.name
-                        });
+                        // Check if point has required coordinates
+                        if (point && (point.latitude || point.lat) && (point.longitude || point.lng)) {
+                            // Handle either naming convention
+                            allPoints.push({
+                                ...point,
+                                latitude: point.latitude || point.lat,
+                                longitude: point.longitude || point.lng,
+                                routeName: route.name
+                            });
+                        } else {
+                            console.warn("Invalid point data:", point);
+                        }
                     });
-                });
+                } else {
+                    console.warn("Route has no points array:", route);
+                }
+            });
+        } else {
+            console.warn("API did not return an array:", routes);
+        }
 
-                displayPoints(allPoints);
-            } catch (error) {
-                alert('خطا در بارگیری نقاط');
+        displayPoints(allPoints);
+    } catch (error) {
+        console.error('Error in loadPoints:', error);
+
+        // Show error message to user
+        const errorMsgDiv = document.getElementById('error-message');
+        if (errorMsgDiv) {
+            errorMsgDiv.textContent = `خطا در بارگیری نقاط: ${error.message}`;
+            errorMsgDiv.style.display = 'block';
+        }
+
+        // Try to display any cached points if available
+        if (localStorage.getItem('cachedPoints')) {
+            try {
+                const cachedPoints = JSON.parse(localStorage.getItem('cachedPoints'));
+                displayPoints(cachedPoints);
+                console.log("Displayed cached points");
+            } catch (e) {
+                console.error("Error displaying cached points:", e);
             }
         }
+    }
+}
 
         // Display points on map
-        function displayPoints(points) {
-            const bounds = L.latLngBounds();
+        // Display points on map
+function displayPoints(points) {
+    if (!points || points.length === 0) {
+        console.warn("No points to display");
+        return;
+    }
 
-            points.forEach((point, index) => {
-                const marker = L.marker([point.lat, point.lng], {
-                    icon: L.divIcon({
-                        className: 'point-marker',
-                        html: `${index + 1}`,
-                        iconSize: [24, 24]
-                    })
-                });
+    try {
+        const bounds = L.latLngBounds();
 
-                marker.bindPopup(`
-                    <strong>${point.name}</strong><br>
-                    ${point.address || ''}<br>
-                    مسیر: ${point.routeName}
-                `);
+        points.forEach((point, index) => {
+            // Handle both naming conventions
+            const lat = point.latitude || point.lat;
+            const lng = point.longitude || point.lng;
 
-                marker.addTo(map);
-                markers.push(marker);
-                bounds.extend([point.lat, point.lng]);
+            if (!lat || !lng) {
+                console.warn("Point missing coordinates:", point);
+                return;
+            }
+
+            console.log(`Adding marker at: ${lat}, ${lng}`);
+
+            const marker = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: 'point-marker',
+                    html: `${index + 1}`,
+                    iconSize: [24, 24]
+                })
             });
 
-            if (markers.length > 0) {
-                map.fitBounds(bounds, { padding: [50, 50] });
-            }
+            marker.bindPopup(`
+                <strong>${point.name || 'نقطه بدون نام'}</strong><br>
+                ${point.address || ''}<br>
+                مسیر: ${point.routeName || 'نامشخص'}
+            `);
+
+            marker.addTo(map);
+            markers.push(marker);
+            bounds.extend([lat, lng]);
+        });
+
+        // Cache points for offline use
+        localStorage.setItem('cachedPoints', JSON.stringify(points));
+
+        if (markers.length > 0) {
+            map.fitBounds(bounds, { padding: [50, 50] });
+        } else {
+            console.warn("No valid markers to display");
         }
+    } catch (error) {
+        console.error("Error in displayPoints:", error);
+    }
+}
 
         // Clear all markers
         function clearMarkers() {
@@ -243,15 +332,16 @@
         }
 
         // Check proximity to store
-        function checkProximity(lat, lng) {
-            markers.forEach(marker => {
-                const distance = map.distance([lat, lng], marker.getLatLng());
+        // Check proximity to store
+function checkProximity(lat, lng) {
+    markers.forEach(marker => {
+        const distance = map.distance([lat, lng], marker.getLatLng());
 
-                if (distance < 100) {
-                    showProximityNotification(marker);
-                }
-            });
+        if (distance < 100) {
+            showProximityNotification(marker);
         }
+    });
+}
 
         // Show proximity notification
         function showProximityNotification(marker) {

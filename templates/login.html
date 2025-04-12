@@ -193,17 +193,22 @@
             <img src="https://foodexiran.com/wp-content/uploads/2024/04/Untitled-1.webp" alt="Logo" width="64" height="64">
         </div>
         
-        <h1>ورود به سامانه</h1>
+        <!-- Add this below the h1 and above the flash messages section -->
+<h1>ورود به سامانه</h1>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="flash-message {{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
+<div class="flash-message warning">
+    لطفا برای دسترسی به این صفحه وارد شوید.
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
 
         <form method="POST" action="{{ url_for('login') }}" id="loginForm">
             {{ form.hidden_tag() }}

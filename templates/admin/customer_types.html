@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>مدیریت انواع مشتری | پنل مدیریت</title>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Global Styles */
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Vazirmatn', sans-serif;
+      padding: 2rem;
+      color: #1e293b;
+      direction: rtl;
+      line-height: 1.6;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 1.75rem;
+      color: #334155;
+      position: relative;
+      padding-bottom: 1rem;
+    }
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 3px;
+      background: linear-gradient(to right, #4f46e5, #818cf8);
+      border-radius: 3px;
+    }
+
+    /* Section styling */
+    .section {
+      background: #fff;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: linear-gradient(to bottom, #4f46e5, #818cf8);
+      border-radius: 5px 0 0 5px;
+    }
+    .section:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .section h2 {
+      font-size: 1.25rem;
+      margin: 0;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .section h2 i {
+      font-size: 1.5rem;
+      color: #4f46e5;
+      background: #eef2ff;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    /* Form styling */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #475569;
+    }
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 0.875rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      box-sizing: border-box;
+      transition: all 0.3s;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    input[type="text"]:focus,
+    textarea:focus {
+      border-color: #4f46e5;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .submit-btn {
+      background: linear-gradient(to right, #4f46e5, #6366f1);
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .submit-btn:hover {
+      background: linear-gradient(to right, #4338ca, #4f46e5);
+      box-shadow: 0 6px 8px -1px rgba(79, 70, 229, 0.3);
+      transform: translateY(-2px);
+    }
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Table styling */
+    .customer-types-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 1.5rem;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .customer-types-table th,
+    .customer-types-table td {
+      padding: 1rem;
+      text-align: right;
+    }
+    .customer-types-table th {
+      background: linear-gradient(to right, #f8fafc, #f1f5f9);
+      font-weight: 600;
+      color: #334155;
+      border-bottom: 2px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .customer-types-table tr {
+      transition: all 0.2s;
+    }
+    .customer-types-table tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+    .customer-types-table tr:hover {
+      background-color: #eef2ff;
+    }
+    .customer-types-table td {
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .customer-types-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .customer-types-table .description-cell {
+      max-width: 300px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .customer-types-table .description-cell:hover {
+      white-space: normal;
+      overflow: visible;
+    }
+
+    .customer-count {
+      font-weight: 600;
+      background-color: #eef2ff;
+      color: #4f46e5;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Button styling */
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    .btn-primary {
+      background: linear-gradient(to right, #4f46e5, #6366f1);
+      color: #fff;
+      border: none;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(to right, #4338ca, #4f46e5);
+      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+      transform: translateY(-2px);
+    }
+    .btn-danger {
+      background: linear-gradient(to right, #ef4444, #f87171);
+      color: #fff;
+      border: none;
+    }
+    .btn-danger:hover {
+      background: linear-gradient(to right, #dc2626, #ef4444);
+      box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+      transform: translateY(-2px);
+    }
+    .btn-danger:disabled {
+      background: linear-gradient(to right, #9ca3af, #d1d5db);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .btn-outline {
+      background-color: transparent;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+    .btn-outline:hover {
+      background-color: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* Flash messages */
+    .flash {
+      padding: 1rem;
+      border-radius: 0.75rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .flash i {
+      font-size: 1.25rem;
+    }
+    .success {
+      background-color: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      color: #166534;
+    }
+    .danger {
+      background-color: #fef2f2;
+      border-left: 4px solid #ef4444;
+      color: #b91c1c;
+    }
+    .warning {
+      background-color: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #92400e;
+    }
+    .info {
+      background-color: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      color: #1e40af;
+    }
+
+    /* Empty state styling */
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      background-color: #f8fafc;
+      border-radius: 0.75rem;
+      border: 1px dashed #cbd5e1;
+      margin: 1.5rem 0;
+    }
+    .empty-state i {
+      font-size: 3rem;
+      color: #94a3b8;
+      margin-bottom: 1rem;
+    }
+    .empty-state p {
+      color: #64748b;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Tooltip */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      width: 180px;
+      background-color: #334155;
+      color: #fff;
+      text-align: center;
+      border-radius: 0.375rem;
+      padding: 0.5rem;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.75rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .tooltip .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #334155 transparent transparent transparent;
+    }
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      .section {
+        padding: 1.5rem;
+      }
+      .customer-types-table th,
+      .customer-types-table td {
+        padding: 0.75rem 0.5rem;
+      }
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>مدیریت انواع مشتری</h1>
+  <div class="section-header">
+      <h2>
+        <i class="fas fa-plus"></i>
+        افزودن نوع مشتری جدید
+      </h2>
+      <div>
+        <a href="{{ url_for('admin_customer_type_quotas') }}" class="btn btn-primary">
+          <i class="fas fa-percentage"></i>
+          تخصیص درصدی سهمیه
+        </a>
+        <a href="{{ url_for('admin_product_exclusions') }}" class="btn btn-primary">
+          <i class="fas fa-ban"></i>
+          مدیریت عدم تخصیص محصول
+        </a>
+        <a href="{{ url_for('admin_quotas') }}" class="btn btn-outline">
+          <i class="fas fa-arrow-right"></i>
+          بازگشت به صفحه سهمیه‌ها
+        </a>
+      </div>
+    </div>
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">
+          {% if category == 'success' %}
+            <i class="fas fa-check-circle"></i>
+          {% elif category == 'danger' %}
+            <i class="fas fa-exclamation-circle"></i>
+          {% elif category == 'warning' %}
+            <i class="fas fa-exclamation-triangle"></i>
+          {% else %}
+            <i class="fas fa-info-circle"></i>
+          {% endif %}
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="section">
+    <div class="section-header">
+      <h2>
+        <i class="fas fa-plus"></i>
+        افزودن نوع مشتری جدید
+      </h2>
+      <div>
+        <a href="{{ url_for('admin_product_exclusions') }}" class="btn btn-primary">
+          <i class="fas fa-ban"></i>
+          مدیریت عدم تخصیص محصول
+        </a>
+        <a href="{{ url_for('admin_quotas') }}" class="btn btn-outline">
+          <i class="fas fa-arrow-right"></i>
+          بازگشت به صفحه سهمیه‌ها
+        </a>
+      </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin_customer_types') }}">
+      {{ form.csrf_token }}
+      <div class="form-group">
+        <label for="name">نام نوع مشتری</label>
+        <input type="text" name="name" id="name" placeholder="مثلاً: رستوران، کافه، سوپرمارکت"
+               value="{{ form.name.data if form.name.data else '' }}" required>
+      </div>
+      <div class="form-group">
+        <label for="description">توضیحات</label>
+        <textarea name="description" id="description" rows="3" placeholder="توضیحات مربوط به این نوع مشتری را وارد کنید...">{{ form.description.data if form.description.data else '' }}</textarea>
+      </div>
+      <button type="submit" class="submit-btn">
+        <i class="fas fa-save"></i>
+        ذخیره
+      </button>
+    </form>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <h2>
+        <i class="fas fa-list"></i>
+        لیست انواع مشتری
+      </h2>
+      <div class="info flash" style="margin: 0; padding: 0.5rem 1rem;">
+        <i class="fas fa-info-circle"></i>
+        <span>انواع مشتری برای تنظیم عدم تخصیص محصولات استفاده می‌شوند.</span>
+      </div>
+    </div>
+
+    {% if customer_types %}
+      <div style="overflow-x: auto;">
+        <table class="customer-types-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>نام</th>
+              <th>توضیحات</th>
+              <th>تعداد مشتریان</th>
+              <th>عملیات</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for type in customer_types %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>
+                <strong>{{ type.name }}</strong>
+              </td>
+              <td class="description-cell">
+                {% if type.description %}
+                  {{ type.description }}
+                {% else %}
+                  <span style="color: #94a3b8; font-style: italic;">بدون توضیحات</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="customer-count">
+                  <i class="fas fa-users"></i>
+                  {{ type.customers|length }}
+                </span>
+              </td>
+              <td class="actions">
+                <form method="POST" action="{{ url_for('delete_customer_type', type_id=type.id) }}" style="display: inline-block;" onsubmit="return confirm('آیا از حذف نوع مشتری «{{ type.name }}» مطمئن هستید؟');">
+                  {% if type.customers|length > 0 %}
+                    <div class="tooltip">
+                      <button type="button" class="btn btn-danger" disabled>
+                        <i class="fas fa-trash"></i>
+                        حذف
+                      </button>
+                      <span class="tooltip-text">این نوع مشتری به {{ type.customers|length }} مشتری متصل است و قابل حذف نیست.</span>
+                    </div>
+                  {% else %}
+                    <button type="submit" class="btn btn-danger">
+                      <i class="fas fa-trash"></i>
+                      حذف
+                    </button>
+                  {% endif %}
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-users-slash"></i>
+        <p>هیچ نوع مشتری تعریف نشده است.</p>
+        <div>
+          <a href="#name" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            افزودن نوع مشتری
+          </a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>
