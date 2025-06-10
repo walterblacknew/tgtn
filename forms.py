@@ -197,28 +197,28 @@ class ProductForm(FlaskForm):
 
 
 
-# Add to forms.py
-class CustomerTypeForm(FlaskForm):
-    name = StringField('نوع مشتری', validators=[DataRequired(), Length(max=100)])
+class StoreTypeForm(FlaskForm):
+    """Form for creating and editing store types"""
+    name = StringField('نام نوع فروشگاه', validators=[DataRequired(), Length(max=100)])
     description = TextAreaField('توضیحات', validators=[Optional()])
-    submit = SubmitField('ذخیره')
+    submit = SubmitField('ذخیره نوع فروشگاه')
 
 
-# Add this to forms.py
+class ProductExclusionForm(FlaskForm):
+    """Form for managing product exclusions by store type"""
+    store_type_id = SelectField('نوع فروشگاه', coerce=int, validators=[DataRequired()])
+    product_ids = SelectMultipleField('محصولات استثنا شده', coerce=int)
+    batch_id = StringField('شناسه دسته ارزیابی', validators=[Optional()])
+    submit = SubmitField('ذخیره استثنائات محصول')
 
-class CustomerTypeQuotaForm(FlaskForm):
-    customer_type_id = SelectField('نوع فروشگاه', coerce=int, validators=[DataRequired()])
-    product_id = SelectField('محصول', coerce=int, validators=[Optional()])
-    province_id = SelectField('استان', coerce=int, validators=[Optional()])
-    percentage = FloatField('درصد تخصیص', validators=[
+
+class StoreTypeAllocationForm(FlaskForm):
+    """Form for allocating quota percentages to store types"""
+    store_type_id = SelectField('نوع فروشگاه', coerce=int, validators=[DataRequired()])
+    batch_id = StringField('شناسه دسته ارزیابی', validators=[DataRequired()])
+    province_id = SelectField('استان', coerce=int, validators=[DataRequired()])
+    percentage = FloatField('درصد تخصیص از سهمیه کل', validators=[
         DataRequired(),
         NumberRange(min=0, max=100, message='درصد باید بین 0 تا 100 باشد')
     ])
-    is_active = BooleanField('فعال', default=True)
-    submit = SubmitField('ذخیره تخصیص')
-
-    def validate_percentage(self, field):
-        # Additional validation can be added here, for example:
-        # - Check if the sum of all active percentages doesn't exceed 100%
-        # This would require database access, which is typically done in route functions
-        pass
+    submit = SubmitField('ذخیره درصد تخصیص')
