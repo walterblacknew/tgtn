@@ -457,7 +457,6 @@
   </style>
 </head>
 <body>
-
   <h1>مدیریت ارزیابی و درجه‌بندی مشتریان</h1>
 
   <!-- Flash messages -->
@@ -617,17 +616,7 @@
       <p>هیچ درجه‌ای تعریف نشده است.</p>
     {% endif %}
   </div>
-<!-- Add this to the section-header div in the "Customer List & Evaluations" section -->
-<div>
-  <a href="{{ url_for('admin_customer_types') }}" class="btn btn-primary">
-    <i class="fas fa-users-cog"></i>
-    مدیریت انواع مشتری
-  </a>
-  <a href="{{ url_for('admin_product_exclusions') }}" class="btn btn-success">
-    <i class="fas fa-ban"></i>
-    مدیریت عدم تخصیص محصول
-  </a>
-</div>
+
   <!-- Section: Target Setting -->
   <div class="section">
     <div class="section-header">
@@ -984,27 +973,7 @@
       {% endif %}
     </div>
   </div>
-  <div class="section">
-    <div class="section-header">
-      <h2>
-        <i class="fas fa-bullseye"></i>
-        تارگت زدن
-      </h2>
-      <div>
-        <a href="{{ url_for('admin_province_targets') }}" class="btn btn-primary">
-          <i class="fas fa-map-marked-alt"></i>
-          نمایش نقشه تارگت استان‌ها
-        </a>
-        <a href="{{ url_for('admin_customer_type_quotas') }}" class="btn btn-primary">
-          <i class="fas fa-percentage"></i>
-          تخصیص درصدی به انواع فروشگاه
-        </a>
-        <a href="{{ url_for('init_provinces') }}" class="btn btn-outline">
-          <i class="fas fa-database"></i>
-          راه‌اندازی اولیه استان‌ها
-        </a>
-      </div>
-    </div>
+
   <script>
     // JavaScript for filtering the customer table
     const searchInput = document.getElementById('customerSearch');
