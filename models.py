@@ -150,6 +150,63 @@ class QuotaCategory(db.Model):
         return f'<QuotaCategory {self.category} quota={self.monthly_quota}>'
 
 
+class StoreType(db.Model):
+    """Store type model to categorize stores (supermarket, cafe, etc.)"""
+    __tablename__ = 'store_type'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    description = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+
+    # Relationships
+    exclusion_rules = db.relationship('ProductExclusionRule', backref='store_type', lazy=True)
+    allocation_rules = db.relationship('StoreTypeAllocation', backref='store_type', lazy=True)
+
+    def __repr__(self):
+        return f'<StoreType {self.name}>'
+
+
+class ProductExclusionRule(db.Model):
+    """Rules for excluding products from specific store types"""
+    __tablename__ = 'product_exclusion_rule'
+    id = db.Column(db.Integer, primary_key=True)
+    store_type_id = db.Column(db.Integer, db.ForeignKey('store_type.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    batch_id = db.Column(db.String(50), nullable=True)  # Optional: for batch-specific rules
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+
+    # Relationship
+    product = db.relationship('Product', backref='exclusion_rules', lazy=True)
+
+    __table_args__ = (
+        db.UniqueConstraint('store_type_id', 'product_id', 'batch_id', name='_store_product_batch_uc'),
+    )
+
+    def __repr__(self):
+        return f'<ProductExclusionRule store_type={self.store_type_id} product={self.product_id}>'
+
+
+class StoreTypeAllocation(db.Model):
+    """Allocation percentages for store types from total quota"""
+    __tablename__ = 'store_type_allocation'
+    id = db.Column(db.Integer, primary_key=True)
+    store_type_id = db.Column(db.Integer, db.ForeignKey('store_type.id'), nullable=False)
+    batch_id = db.Column(db.String(50), nullable=False)
+    province_id = db.Column(db.Integer, db.ForeignKey('province.id'), nullable=False)
+    percentage = db.Column(db.Float, nullable=False)  # Percentage of total allocation
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+
+    # Relationship
+    province = db.relationship('Province', backref='store_allocations', lazy=True)
+
+    __table_args__ = (
+        db.UniqueConstraint('store_type_id', 'batch_id', 'province_id', name='_store_batch_province_uc'),
+    )
+
+    def __repr__(self):
+        return f'<StoreTypeAllocation store_type={self.store_type_id} batch={self.batch_id} percentage={self.percentage}%>'
+
+
 class CustomerReport(db.Model):
     __tablename__ = 'customer_report'
     id = db.Column(db.Integer, primary_key=True)
@@ -167,11 +224,11 @@ class CustomerReport(db.Model):
     grade = db.Column(db.String(10), nullable=True)
     province = db.Column(db.String(100), nullable=True)  # Province field
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-
+    store_type_id = db.Column(db.Integer, db.ForeignKey('store_type.id'), nullable=True)
+    store_type = db.relationship('StoreType', backref='customers', lazy=True)
     evaluations = db.relationship('CustomerEvaluation', backref='customer', lazy=True)
     csv_evaluations = db.relationship('CSVEvaluationRecord', backref='customer', lazy=True)
-    customer_type_id = db.Column(db.Integer, db.ForeignKey('customer_type.id'), nullable=True)
-    customer_type = db.relationship('CustomerType', backref='customers', lazy=True)
+
     def __repr__(self):
         return f'<CustomerReport {self.name}>'
 
@@ -365,6 +422,8 @@ class ProductProvinceTarget(db.Model):
 
 
 # Add this to models.py (a new model for batch targets)
+# Update the BatchGradeTarget model in models.py
+
 class BatchGradeTarget(db.Model):
     __tablename__ = 'batch_grade_target'
     id = db.Column(db.Integer, primary_key=True)
@@ -376,65 +435,20 @@ class BatchGradeTarget(db.Model):
     shrink_capacity = db.Column(db.Float, nullable=True)
     customer_count = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    # Add the store type field
+    store_type_id = db.Column(db.Integer, db.ForeignKey('store_type.id'), nullable=True)
 
     # Relationships
     province = db.relationship('Province', backref='batch_grade_targets', lazy=True)
     product = db.relationship('Product', backref='batch_grade_targets', lazy=True)
+    store_type = db.relationship('StoreType', backref='batch_grade_targets', lazy=True)
 
     __table_args__ = (
-    db.UniqueConstraint('batch_id', 'province_id', 'product_id', 'grade', name='_batch_product_grade_uc'),)
-
-    def __repr__(self):
-        return f'<BatchGradeTarget batch={self.batch_id} product={self.product_id} grade={self.grade}>'
-
-
-# Add to models.py
-
-class CustomerType(db.Model):
-    __tablename__ = 'customer_type'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False, unique=True)
-    description = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-
-
-class ProductCustomerTypeExclusion(db.Model):
-    __tablename__ = 'product_customer_type_exclusion'
-    id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
-    customer_type_id = db.Column(db.Integer, db.ForeignKey('customer_type.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-
-    __table_args__ = (db.UniqueConstraint('product_id', 'customer_type_id', name='_product_customer_type_uc'),)
-
-
-# Add this new model to models.py
-
-class CustomerTypeQuota(db.Model):
-    """
-    Model to store quota percentage assignments for specific customer types.
-    This allows allocating a fixed percentage of a product's quota to specific customer types.
-    """
-    __tablename__ = 'customer_type_quota'
-    id = db.Column(db.Integer, primary_key=True)
-    customer_type_id = db.Column(db.Integer, db.ForeignKey('customer_type.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=True)  # NULL means all products
-    province_id = db.Column(db.Integer, db.ForeignKey('province.id'), nullable=True)  # NULL means all provinces
-    percentage = db.Column(db.Float, nullable=False, default=0)  # Percentage of total quota
-    is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
-
-    # Relationships
-    customer_type = db.relationship('CustomerType', backref='quota_assignments', lazy=True)
-    product = db.relationship('Product', backref='customer_type_quotas', lazy=True)
-    province = db.relationship('Province', backref='customer_type_quotas', lazy=True)
-
-    __table_args__ = (
-        db.UniqueConstraint('customer_type_id', 'product_id', 'province_id', name='_customer_type_product_province_uc'),
+        db.UniqueConstraint('batch_id', 'province_id', 'product_id', 'grade', 'store_type_id', name='_batch_product_grade_storetype_uc'),
     )
 
     def __repr__(self):
-        product_name = self.product.name if self.product else "All Products"
-        province_name = self.province.name if self.province else "All Provinces"
-        return f"<CustomerTypeQuota {self.customer_type.name}: {self.percentage}% of {product_name} in {province_name}>"
+        store_type_info = f", store_type={self.store_type_id}" if self.store_type_id else ""
+        return f'<BatchGradeTarget batch={self.batch_id} product={self.product_id} grade={self.grade}{store_type_info}>'
+
+
