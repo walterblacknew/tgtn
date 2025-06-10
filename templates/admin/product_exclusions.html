@@ -1,10 +1,15 @@
+<!-- admin/product_exclusions.html -->
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>مدیریت عدم تخصیص محصول | پنل مدیریت</title>
+  <title>مدیریت عدم تخصیص محصولات | پنل مدیریت</title>
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Select2 for better multiselect -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <style>
     /* Global Styles */
     body {
@@ -19,19 +24,6 @@
       margin-bottom: 1.5rem;
       font-size: 1.75rem;
       color: #334155;
-      position: relative;
-      padding-bottom: 1rem;
-    }
-    h1:after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      right: 50%;
-      transform: translateX(50%);
-      width: 60px;
-      height: 4px;
-      background-color: #4f46e5;
-      border-radius: 2px;
     }
     /* Section styling */
     .section {
@@ -39,23 +31,11 @@
       padding: 1.5rem;
       margin-bottom: 2rem;
       border-radius: 0.75rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .section:hover {
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-    }
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     .section h2 {
       font-size: 1.25rem;
-      margin: 0;
+      margin-bottom: 1rem;
       color: #334155;
       display: flex;
       align-items: center;
@@ -63,22 +43,59 @@
     }
     .section h2 i {
       color: #4f46e5;
-      font-size: 1.5rem;
     }
-
-    /* Buttons */
-    .btn {
-      padding: 0.5rem 0.75rem;
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #475569;
+    }
+    select {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 0.875rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.375rem;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    select:focus {
+      border-color: #4f46e5;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+    }
+    .submit-btn {
+      background-color: #4f46e5;
+      color: #fff;
+      padding: 0.75rem 1.25rem;
+      border: none;
       border-radius: 0.375rem;
       font-size: 0.875rem;
       font-weight: 500;
       cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .submit-btn:hover {
+      background-color: #4338ca;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.375rem 0.75rem;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      text-decoration: none;
-      border: none;
+      gap: 0.25rem;
       transition: all 0.2s;
+      text-decoration: none;
     }
     .btn-primary {
       background-color: #4f46e5;
@@ -86,15 +103,6 @@
     }
     .btn-primary:hover {
       background-color: #4338ca;
-      transform: translateY(-1px);
-    }
-    .btn-success {
-      background-color: #22c55e;
-      color: #fff;
-    }
-    .btn-success:hover {
-      background-color: #16a34a;
-      transform: translateY(-1px);
     }
     .btn-outline {
       background-color: transparent;
@@ -103,138 +111,13 @@
     }
     .btn-outline:hover {
       background-color: #f8fafc;
-      transform: translateY(-1px);
     }
-
-    /* Form Styles */
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: #475569;
-    }
-    select, input {
-      width: 100%;
-      padding: 0.75rem;
-      font-size: 0.875rem;
-      border: 1px solid #e2e8f0;
-      border-radius: 0.375rem;
-      background-color: #fff;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-      transition: all 0.2s;
-    }
-    select:focus, input:focus {
-      outline: none;
-      border-color: #4f46e5;
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-    }
-
-    /* Submit Button */
-    .submit-btn {
-      display: block;
-      width: 100%;
-      max-width: 300px;
-      margin: 1.5rem auto 0;
-      padding: 0.875rem 1.5rem;
-      background-color: #4f46e5;
-      color: #fff;
-      font-size: 1rem;
-      font-weight: 600;
-      text-align: center;
-      border: none;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
-    }
-    .submit-btn:hover {
-      background-color: #4338ca;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 8px -1px rgba(79, 70, 229, 0.3);
-    }
-    .submit-btn:active {
-      transform: translateY(0);
-    }
-
-    /* Product Selection */
-    .product-selector {
-      background: linear-gradient(to right, #f8fafc, #ffffff);
-      border: 1px solid #e2e8f0;
-      border-radius: 0.5rem;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-    .product-icon {
-      color: #4f46e5;
-      margin-left: 0.5rem;
-    }
-
-    /* Customer Types Checkbox Grid */
-    .customer-types-container {
-      background: #f8fafc;
-      border-radius: 0.75rem;
-      padding: 1.5rem;
-      border: 1px solid #e2e8f0;
-      margin-top: 1rem;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-    .customer-types-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 1rem;
-    }
-    .customer-type-item {
-      background: #fff;
-      border-radius: 0.5rem;
-      padding: 0.75rem 1rem;
-      border: 1px solid #e2e8f0;
-      transition: all 0.2s;
-    }
-    .customer-type-item:hover {
-      border-color: #cbd5e1;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-      transform: translateY(-1px);
-    }
-    .customer-type-checkbox {
-      display: flex;
-      align-items: center;
-    }
-    .customer-type-checkbox input[type="checkbox"] {
-      width: 1.25rem;
-      height: 1.25rem;
-      margin-left: 0.75rem;
-      accent-color: #4f46e5;
-    }
-    .customer-type-label {
-      font-weight: 500;
-      color: #334155;
-      cursor: pointer;
-    }
-    .customer-type-description {
-      margin-top: 0.5rem;
-      padding-right: 2rem;
-      font-size: 0.75rem;
-      color: #64748b;
-    }
-
-    /* Flash Messages */
+    /* Flash messages */
     .flash {
-      padding: 1rem;
+      padding: 0.75rem 1rem;
       border-radius: 0.5rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
       font-size: 0.875rem;
-      display: flex;
-      align-items: center;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-    .flash i {
-      font-size: 1.25rem;
-      margin-left: 0.75rem;
     }
     .success {
       background-color: #f0fdf4;
@@ -257,517 +140,206 @@
       color: #1e40af;
     }
 
-    /* Info Box */
-    .info-box {
-      background-color: #eff6ff;
-      border-radius: 0.5rem;
-      padding: 1.25rem;
-      margin-bottom: 1.5rem;
-      border: 1px solid #bfdbfe;
-      position: relative;
-      overflow: hidden;
+    /* Product cards */
+    .product-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
     }
-    .info-box::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: 4px;
-      background-color: #3b82f6;
-    }
-    .info-box i {
-      font-size: 1.25rem;
-      color: #3b82f6;
-      margin-left: 0.75rem;
-      float: right;
-      margin-top: 0.25rem;
-    }
-    .info-box p {
-      margin: 0;
-      color: #1e40af;
-      line-height: 1.6;
-    }
-
-    /* Current Selections Panel */
-    .current-selections {
-      background: #f8fafc;
+    .product-card {
+      background-color: #fff;
+      border: 1px solid #e2e8f0;
       border-radius: 0.5rem;
       padding: 1rem;
-      margin-top: 1.5rem;
-      border: 1px solid #e2e8f0;
-    }
-    .current-selections h3 {
-      font-size: 1rem;
-      color: #334155;
-      margin-top: 0;
-      margin-bottom: 0.75rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    .selection-list {
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
+      flex-direction: column;
+      position: relative;
     }
-    .selection-item {
-      display: inline-flex;
-      align-items: center;
-      background-color: #dbeafe;
-      color: #1e40af;
-      padding: 0.375rem 0.75rem;
+    .product-card.excluded {
+      background-color: #fef2f2;
+      border-color: #fecaca;
+    }
+    .product-checkbox {
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+    }
+    .product-name {
+      font-weight: 500;
+      color: #334155;
+      margin-bottom: 0.5rem;
+    }
+    .product-capacity {
+      color: #64748b;
+      font-size: 0.75rem;
+    }
+
+    /* Select2 customization */
+    .select2-container--default .select2-selection--multiple {
+      border-color: #e2e8f0;
       border-radius: 0.375rem;
-      font-size: 0.875rem;
+      min-height: 38px;
     }
-    .selection-item i {
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+      background-color: #f1f5f9;
+      border-color: #e2e8f0;
+      border-radius: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      margin-right: 0;
       margin-left: 0.5rem;
     }
 
-    /* Action Buttons Bar */
-    .action-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #e2e8f0;
+    /* Store Type Section */
+    .store-type-section {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
     }
-
-    /* Circle Badge */
-    .circle-badge {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      width: 1.5rem;
-      height: 1.5rem;
-      border-radius: 50%;
-      background-color: #4f46e5;
-      color: white;
-      font-size: 0.75rem;
-      font-weight: bold;
-      margin-right: 0.5rem;
-    }
-
-    /* Toggle Switch */
-    .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 3rem;
-      height: 1.5rem;
-      margin-right: 0.5rem;
-    }
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      right: 0;
-      left: 0;
-      bottom: 0;
-      background-color: #cbd5e1;
-      transition: .4s;
-      border-radius: 1.5rem;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 1rem;
-      width: 1rem;
-      right: 0.25rem;
-      bottom: 0.25rem;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-    input:checked + .slider {
-      background-color: #4f46e5;
-    }
-    input:checked + .slider:before {
-      transform: translateX(-1.5rem);
-    }
-    .toggle-label {
-      cursor: pointer;
-    }
-
-    /* Step Indicators */
-    .steps {
+    .store-type-header {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 2rem;
-      position: relative;
-    }
-    .steps::before {
-      content: '';
-      position: absolute;
-      top: 1rem;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background-color: #e2e8f0;
-      z-index: 1;
-    }
-    .step {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
       align-items: center;
-      width: 33.333%;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #e2e8f0;
     }
-    .step-number {
-      width: 2rem;
-      height: 2rem;
-      background-color: #e2e8f0;
-      color: #64748b;
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-    }
-    .step.active .step-number {
-      background-color: #4f46e5;
-      color: white;
-    }
-    .step-label {
-      font-size: 0.875rem;
-      color: #64748b;
-      text-align: center;
-    }
-    .step.active .step-label {
+    .store-type-name {
+      font-weight: 600;
       color: #334155;
+    }
+    .excluded-label {
+      display: inline-block;
+      background-color: #fecaca;
+      color: #b91c1c;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
       font-weight: 500;
     }
   </style>
 </head>
 <body>
-  <h1>مدیریت عدم تخصیص محصول</h1>
+  <div class="header-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h1>مدیریت عدم تخصیص محصولات - دسته ارزیابی {{ batch_id }}</h1>
+    <div>
+      <a href="{{ url_for('view_batch_evaluations', batch_id=batch_id) }}" class="btn btn-outline">
+        <i class="fas fa-arrow-right"></i>
+        بازگشت به جزئیات دسته ارزیابی
+      </a>
+    </div>
+  </div>
 
   <!-- Flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       {% for category, message in messages %}
-        <div class="flash {{ category }}">
-          {% if category == 'success' %}
-            <i class="fas fa-check-circle"></i>
-          {% elif category == 'danger' %}
-            <i class="fas fa-exclamation-circle"></i>
-          {% elif category == 'warning' %}
-            <i class="fas fa-exclamation-triangle"></i>
-          {% elif category == 'info' %}
-            <i class="fas fa-info-circle"></i>
-          {% endif %}
-          {{ message }}
-        </div>
+        <div class="flash {{ category }}">{{ message }}</div>
       {% endfor %}
     {% endif %}
   {% endwith %}
 
+  <!-- Introduction Section -->
   <div class="section">
-    <div class="section-header">
-      <h2>
-        <i class="fas fa-ban"></i>
-        تعریف عدم تخصیص محصول به انواع مشتری
-      </h2>
-      <div>
-        <a href="{{ url_for('admin_customer_types') }}" class="btn btn-primary">
-          <i class="fas fa-users-cog"></i>
-          مدیریت انواع مشتری
-        </a>
-        <a href="{{ url_for('admin_quotas') }}" class="btn btn-outline">
-          <i class="fas fa-arrow-right"></i>
-          بازگشت به صفحه سهمیه‌ها
-        </a>
-      </div>
-    </div>
-
-    <!-- Steps -->
-    <div class="steps">
-      <div class="step active">
-        <div class="step-number">1</div>
-        <div class="step-label">انتخاب محصول</div>
-      </div>
-      <div class="step" id="step2">
-        <div class="step-number">2</div>
-        <div class="step-label">انتخاب انواع مشتری</div>
-      </div>
-      <div class="step" id="step3">
-        <div class="step-number">3</div>
-        <div class="step-label">ذخیره تنظیمات</div>
-      </div>
-    </div>
-
-    <div class="info-box">
+    <h2>
+      <i class="fas fa-info-circle"></i>
+      راهنمای عدم تخصیص محصولات
+    </h2>
+    <p>
+      در این بخش می‌توانید برای هر نوع فروشگاه، محصولاتی را که نباید به آن تخصیص داده شوند مشخص کنید.
+      محصولات انتخاب شده در لیست عدم تخصیص، در محاسبات سهمیه برای فروشگاه‌های این نوع در نظر گرفته نخواهند شد.
+    </p>
+    <div class="flash info">
       <i class="fas fa-lightbulb"></i>
-      <p>در این بخش می‌توانید مشخص کنید که کدام محصولات نباید به کدام انواع مشتری تخصیص داده شوند. برای مثال، نوشابه به کافه‌هایی که فقط نوشیدنی‌های گرم ارائه می‌دهند یا محصولات حجیم به فروشگاه‌های کوچک.</p>
+      توجه: قوانین عدم تخصیص برای هر دسته ارزیابی به صورت جداگانه تنظیم می‌شوند و بر محاسبات سهمیه در همان دسته تأثیر می‌گذارند.
     </div>
-
-    <form method="POST" action="{{ url_for('admin_product_exclusions') }}" id="exclusionForm">
-      <div class="product-selector">
-        <div class="form-group" style="margin-bottom: 0;">
-          <label for="product_id">
-            <i class="fas fa-box product-icon"></i>
-            انتخاب محصول
-          </label>
-          <select name="product_id" id="product_id" class="form-control" required onchange="showCurrentExclusions(this.value); updateSteps();">
-            <option value="">-- انتخاب محصول --</option>
-            {% for product in products %}
-              <option value="{{ product.id }}">{{ product.name }}</option>
-            {% endfor %}
-          </select>
-        </div>
-      </div>
-
-      <!-- Product Details Card - Shown after selection -->
-      <div id="productDetails" style="display: none;" class="current-selections">
-        <h3>
-          <i class="fas fa-info-circle" style="color: #4f46e5; margin-left: 0.5rem;"></i>
-          اطلاعات محصول انتخاب شده
-        </h3>
-        <div id="productInfo">
-          <!-- Product info will be populated by JavaScript -->
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>
-          <i class="fas fa-users" style="color: #4f46e5; margin-left: 0.5rem;"></i>
-          انتخاب انواع مشتری که نباید این محصول را دریافت کنند
-        </label>
-        <div class="customer-types-container">
-          <div class="customer-types-grid">
-            {% for type in customer_types %}
-              <div class="customer-type-item">
-                <div class="customer-type-checkbox">
-                  <input type="checkbox" name="customer_type_ids" id="type_{{ type.id }}" value="{{ type.id }}" class="type-checkbox" onchange="updateSelection()">
-                  <label for="type_{{ type.id }}" class="customer-type-label">{{ type.name }}</label>
-                </div>
-                {% if type.description %}
-                  <div class="customer-type-description">{{ type.description }}</div>
-                {% endif %}
-              </div>
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-
-      <!-- Current Selections Panel -->
-      <div id="selectionSummary" class="current-selections" style="display: none;">
-        <h3>
-          <i class="fas fa-ban" style="color: #ef4444; margin-left: 0.5rem;"></i>
-          خلاصه تنظیمات عدم تخصیص
-        </h3>
-        <div class="selection-list" id="selectionList">
-          <!-- Selected items will be added here via JavaScript -->
-        </div>
-      </div>
-
-      <div class="action-buttons">
-        <button type="submit" class="submit-btn" id="saveButton" disabled>
-          <i class="fas fa-save"></i>
-          ذخیره تنظیمات
-        </button>
-      </div>
-    </form>
   </div>
 
-  <script>
-    // Enhanced JavaScript for better user experience
-    let selectedProduct = null;
-    let selectedCustomerTypes = [];
-
-    // Product information (you can populate this from backend)
-    const productDetails = {
-      {% for product in products %}
-        "{{ product.id }}": {
-          name: "{{ product.name }}",
-          {% if product.liter_capacity %}
-          literCapacity: {{ product.liter_capacity }},
-          {% endif %}
-          {% if product.shrink_capacity %}
-          shrinkCapacity: {{ product.shrink_capacity }},
-          {% endif %}
-          {% if product.category_relation %}
-          category: "{{ product.category_relation.name }}",
-          {% endif %}
-        },
-      {% endfor %}
-    };
-
-    // Load current exclusions when product is selected
-    function showCurrentExclusions(productId) {
-      // Reset all checkboxes
-      document.querySelectorAll('.type-checkbox').forEach(cb => {
-        cb.checked = false;
-      });
-
-      if (!productId) {
-        selectedProduct = null;
-        document.getElementById('productDetails').style.display = 'none';
-        return;
-      }
-
-      selectedProduct = productId;
-      updateProductDetails();
-
-      // Get exclusions for this product
-      const exclusions = {
-        {% for product_id, type_ids in exclusions.items() %}
-          "{{ product_id }}": {{ type_ids|tojson }},
-        {% endfor %}
-      };
-
-      // Check boxes for current exclusions
-      if (exclusions[productId]) {
-        exclusions[productId].forEach(typeId => {
-          const checkbox = document.getElementById(`type_${typeId}`);
-          if (checkbox) {
-            checkbox.checked = true;
-          }
-        });
-      }
-
-      updateSelection();
-    }
-
-    function updateProductDetails() {
-      if (!selectedProduct) return;
-
-      const details = productDetails[selectedProduct];
-      if (!details) return;
-
-      const detailsContainer = document.getElementById('productDetails');
-      const infoContainer = document.getElementById('productInfo');
-
-      let html = `<div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">`;
-
-      // Add product name with icon
-      html += `
-        <div style="flex: 1; min-width: 200px;">
-          <div style="font-weight: 600; font-size: 1.125rem; margin-bottom: 0.5rem; color: #334155;">
-            <i class="fas fa-box" style="color: #4f46e5; margin-left: 0.5rem;"></i>
-            ${details.name}
-          </div>
-      `;
-
-      // Add category if available
-      if (details.category) {
-        html += `
-          <div style="display: inline-block; background-color: #f3e8ff; color: #7e22ce; padding: 0.25rem 0.5rem; border-radius: 0.375rem; font-size: 0.75rem; margin-top: 0.5rem;">
-            <i class="fas fa-tag" style="margin-left: 0.25rem;"></i>
-            ${details.category}
-          </div>
-        `;
-      }
-
-      html += `</div>`;
-
-      // Add capacities if available
-      html += `<div style="flex: 1; min-width: 200px; display: flex; gap: 0.75rem;">`;
-
-      if (details.literCapacity) {
-        html += `
-          <div style="background-color: #dbeafe; color: #1e40af; padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; display: flex; align-items: center;">
-            <i class="fas fa-tint" style="margin-left: 0.375rem;"></i>
-            <span>${details.literCapacity.toLocaleString()} لیتر</span>
-          </div>
-        `;
-      }
-
-      if (details.shrinkCapacity) {
-        html += `
-          <div style="background-color: #fef9c3; color: #854d0e; padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; display: flex; align-items: center;">
-            <i class="fas fa-box" style="margin-left: 0.375rem;"></i>
-            <span>${details.shrinkCapacity.toLocaleString()} شرینک</span>
-          </div>
-        `;
-      }
-
-      html += `</div>`;
-      html += `</div>`;
-
-      infoContainer.innerHTML = html;
-      detailsContainer.style.display = 'block';
-    }
-
-    function updateSelection() {
-      selectedCustomerTypes = [];
-
-      document.querySelectorAll('.type-checkbox:checked').forEach(checkbox => {
-        const typeId = checkbox.value;
-        const typeName = checkbox.parentElement.querySelector('label').textContent;
-        selectedCustomerTypes.push({ id: typeId, name: typeName });
-      });
-
-      const summaryContainer = document.getElementById('selectionSummary');
-      const selectionList = document.getElementById('selectionList');
-
-      if (selectedCustomerTypes.length > 0 && selectedProduct) {
-        // Build selection summary
-        let html = '';
-        const productName = productDetails[selectedProduct]?.name || 'محصول انتخاب شده';
-
-        selectedCustomerTypes.forEach(type => {
-          html += `
-            <div class="selection-item">
+  <!-- Store Types and Product Exclusions -->
+  {% if store_types %}
+    {% for store_type in store_types %}
+      <div class="section store-type-section">
+        <div class="store-type-header">
+          <div class="store-type-name">{{ store_type.name }}</div>
+          <div>
+            <span class="excluded-label">
               <i class="fas fa-ban"></i>
-              ${productName} ➔ ${type.name}
-            </div>
-          `;
-        });
+              {{ exclusions_by_store_type.get(store_type.id, [])|length }} محصول استثنا شده
+            </span>
+          </div>
+        </div>
 
-        selectionList.innerHTML = html;
-        summaryContainer.style.display = 'block';
+        <form method="POST" action="{{ url_for('manage_product_exclusions', batch_id=batch_id) }}">
+          <input type="hidden" name="store_type_id" value="{{ store_type.id }}">
 
-        // Enable save button
-        document.getElementById('saveButton').disabled = false;
-      } else {
-        summaryContainer.style.display = 'none';
+          <div class="form-group">
+            <label for="product-select-{{ store_type.id }}">انتخاب محصولات برای عدم تخصیص</label>
+            <select id="product-select-{{ store_type.id }}" name="product_ids[]" class="product-multiselect" multiple="multiple" style="width: 100%;">
+              {% for product in products %}
+                <option value="{{ product.id }}" {% if product.id in exclusions_by_store_type.get(store_type.id, []) %}selected{% endif %}>
+                  {{ product.name }}
+                  {% if product.liter_capacity %}(لیتر: {{ "{:,.0f}".format(product.liter_capacity) }}){% endif %}
+                  {% if product.shrink_capacity %}(شرینک: {{ "{:,.0f}".format(product.shrink_capacity) }}){% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
 
-        // Disable save button
-        document.getElementById('saveButton').disabled = true;
-      }
+          <button type="submit" class="submit-btn">
+            <i class="fas fa-save"></i>
+            ذخیره عدم تخصیص‌های {{ store_type.name }}
+          </button>
+        </form>
 
-      updateSteps();
-    }
+        <!-- Visual product cards -->
+        <div class="product-cards">
+          {% for product in products %}
+            {% if product.id in exclusions_by_store_type.get(store_type.id, []) %}
+              <div class="product-card excluded">
+                <div class="product-checkbox">
+                  <i class="fas fa-ban" style="color: #b91c1c;"></i>
+                </div>
+                <div class="product-name">{{ product.name }}</div>
+                <div class="product-capacity">
+                  {% if product.liter_capacity %}
+                    <div>لیتر: {{ "{:,.0f}".format(product.liter_capacity) }}</div>
+                  {% endif %}
+                  {% if product.shrink_capacity %}
+                    <div>شرینک: {{ "{:,.0f}".format(product.shrink_capacity) }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="section">
+      <div style="text-align: center; padding: 2rem; color: #64748b;">
+        <p>هیچ نوع فروشگاهی تعریف نشده است. لطفاً ابتدا انواع فروشگاه را تعریف کنید.</p>
+        <a href="{{ url_for('admin_store_types') }}" class="btn btn-primary" style="margin-top: 1rem;">
+          <i class="fas fa-plus"></i>
+          تعریف انواع فروشگاه
+        </a>
+      </div>
+    </div>
+  {% endif %}
 
-    function updateSteps() {
-      const step2 = document.getElementById('step2');
-      const step3 = document.getElementById('step3');
-
-      if (selectedProduct) {
-        step2.classList.add('active');
-      } else {
-        step2.classList.remove('active');
-        step3.classList.remove('active');
-        return;
-      }
-
-      if (selectedCustomerTypes.length > 0) {
-        step3.classList.add('active');
-      } else {
-        step3.classList.remove('active');
-      }
-    }
-
-    // Initialize with selected product if any
-    document.addEventListener('DOMContentLoaded', function() {
-      const productSelect = document.getElementById('product_id');
-      if (productSelect.value) {
-        showCurrentExclusions(productSelect.value);
-      }
-
-      // Add form submission animation
-      const form = document.getElementById('exclusionForm');
-      form.addEventListener('submit', function() {
-        const button = document.getElementById('saveButton');
-        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال ذخیره‌سازی...';
-        button.disabled = true;
+  <script>
+    $(document).ready(function() {
+      // Initialize Select2 for all multiselect dropdowns
+      $('.product-multiselect').select2({
+        dir: 'rtl',
+        placeholder: 'محصولات را انتخاب کنید...',
+        allowClear: true,
+        closeOnSelect: false
       });
     });
   </script>
