@@ -14,26 +14,23 @@ from forms import (
     GradeMappingForm, CustomerEvaluationForm, TargetSettingForm
 )
 from models import (
-    User, Route, RoutePoint, RouteAssignment,CustomerTypeQuota,
+    User, Route, RoutePoint, RouteAssignment,
     Store, EvaluationParameter, StoreEvaluation, StoreEvaluationDetail, QuotaCategory,
     CustomerReport, RouteReport, GradeMapping, CustomerEvaluation, DescriptiveCriterion,
     CSVEvaluationRecord, Province, ProvinceTarget, Product, ProductProvinceTarget,
     ProductCategory, ProductFlavor, ProductPackaging, ProductVolume, # Add these new models
 )
-# Add to your imports in app.py
 from forms import (
-    LoginForm, UserForm, RouteForm, RoutePointForm,CustomerTypeQuotaForm,
+    LoginForm, UserForm, RouteForm, RoutePointForm,
     StoreForm, EvaluationParameterForm, StoreEvaluationForm, QuotaCategoryForm,
-    GradeMappingForm, CustomerEvaluationForm, TargetSettingForm, ProductForm, CustomerTypeForm  # Add CustomerTypeForm here
+    GradeMappingForm, CustomerEvaluationForm, TargetSettingForm, ProductForm, StoreTypeForm, ProductExclusionForm, StoreTypeAllocationForm  # Add ProductForm here
 )
-# Update your imports in app.py to include the new models
 from models import (
     User, Route, RoutePoint, RouteAssignment,
     Store, EvaluationParameter, StoreEvaluation, StoreEvaluationDetail, QuotaCategory,
     CustomerReport, RouteReport, GradeMapping, CustomerEvaluation, DescriptiveCriterion,
     CSVEvaluationRecord, Province, ProvinceTarget, UserHierarchy, Product, ProductCategory,
-    ProductFlavor, ProductPackaging, ProductVolume, ProductProvinceTarget, BatchGradeTarget,
-    CustomerType, ProductCustomerTypeExclusion  # Add these new models
+    ProductFlavor, ProductPackaging, ProductVolume, ProductProvinceTarget, BatchGradeTarget, StoreType, ProductExclusionRule, StoreTypeAllocation
 )
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_, desc, text
@@ -62,8 +59,8 @@ def create_admin_user():
     admin_user = User.query.filter_by(username='admin').first()
     if not admin_user:
         new_admin = User(
-            username='AR.ad-@min',
-            password=generate_password_hash('3jnckdj2de@dadjc-AdBasE'),
+            username='admin',
+            password=generate_password_hash('adminpassword'),
             role='admin',
             email='admin@example.com',
             fullname='مدیر سیستم',
@@ -372,37 +369,37 @@ def create_app():
             # Create provinces if they don't exist
             if Province.query.count() == 0:
                 provinces_data = [
-                    ("تهران", 13267637),
-                    ("خراسان رضوی", 6434501),
-                    ("اصفهان", 5120850),
-                    ("فارس", 4851274),
-                    ("خوزستان", 4710509),
-                    ("آذربایجان شرقی", 3909652),
-                    ("مازندران", 3283582),
-                    ("آذربایجان غربی", 3265219),
-                    ("کرمان", 3164718),
-                    ("سیستان و بلوچستان", 2775014),
-                    ("البرز", 2712400),
-                    ("گیلان", 2530696),
-                    ("کرمانشاه", 1952434),
-                    ("لرستان", 1760649),
-                    ("همدان", 1738234),
-                    ("گلستان", 1777014),
-                    ("کردستان", 1603011),
-                    ("هرمزگان", 1578183),
-                    ("مرکزی", 1429475),
-                    ("اردبیل", 1270420),
-                    ("قزوین", 1201565),
-                    ("قم", 1151672),
-                    ("یزد", 1074428),
-                    ("زنجان", 1015734),
-                    ("بوشهر", 1032949),
-                    ("چهارمحال و بختیاری", 895263),
-                    ("خراسان شمالی", 867727),
-                    ("کهگیلویه و بویراحمد", 658629),
-                    ("خراسان جنوبی", 622534),
-                    ("سمنان", 631218),
-                    ("ایلام", 557599)
+                    ("مرکز فروش تهران", 13267637),
+                    ("مرکز فروش خراسان رضوی", 6434501),
+                    ("مرکز فروش اصفهان", 5120850),
+                    ("مرکز فروش شیراز", 4851274),
+                    ("مرکز فروش خوزستان", 4710509),
+                    ("مرکز فروش آذربایجان ", 3909652),
+                    ("مرکز فروش مازندران", 3283582),
+                    ("مرکز فروش آذربایجان غربی", 3265219),
+                    ("مرکز فروش کرمان", 3164718),
+                    ("مرکز فروش سیستان و بلوچستان", 2775014),
+                    ("مرکز فروش البرز", 2712400),
+                    ("مرکز فروش گیلان", 2530696),
+                    ("مرکز فروش کرمانشاه", 1952434),
+                    ("مرکز فروش لرستان", 1760649),
+                    ("مرکز فروش همدان", 1738234),
+                    ("مرکز فروش گلستان", 1777014),
+                    ("مرکز فروش کردستان", 1603011),
+                    ("مرکز فروش هرمزگان", 1578183),
+                    ("مرکز فروش مرکزی", 1429475),
+                    ("مرکز فروش اردبیل", 1270420),
+                    ("مرکز فروش قزوین", 1201565),
+                    ("مرکز فروش قم", 1151672),
+                    ("مرکز فروش یزد", 1074428),
+                    ("مرکز فروش زنجان", 1015734),
+                    ("مرکز فروش بوشهر", 1032949),
+                    ("مرکز فروش چهار محال و بختیاری", 895263),
+                    ("مرکز فروش خراسان شمالی", 867727),
+                    ("مرکز فروش کهکولویه و بویراحد", 658629),
+                    ("مرکز فروش خراسان جنوبی", 622534),
+                    ("مرکز فروش سمنان", 631218),
+                    ("مرکز فروش ایلام", 557599)
                 ]
 
                 for name, population in provinces_data:
@@ -1135,37 +1132,37 @@ def create_app():
 
         # Province data (name, population)
         provinces_data = [
-            ("تهران", 13267637),
-            ("خراسان رضوی", 6434501),
-            ("اصفهان", 5120850),
-            ("فارس", 4851274),
-            ("خوزستان", 4710509),
-            ("آذربایجان شرقی", 3909652),
-            ("مازندران", 3283582),
-            ("آذربایجان غربی", 3265219),
-            ("کرمان", 3164718),
-            ("سیستان و بلوچستان", 2775014),
-            ("البرز", 2712400),
-            ("گیلان", 2530696),
-            ("کرمانشاه", 1952434),
-            ("لرستان", 1760649),
-            ("همدان", 1738234),
-            ("گلستان", 1777014),
-            ("کردستان", 1603011),
-            ("هرمزگان", 1578183),
-            ("مرکزی", 1429475),
-            ("اردبیل", 1270420),
-            ("قزوین", 1201565),
-            ("قم", 1151672),
-            ("یزد", 1074428),
-            ("زنجان", 1015734),
-            ("بوشهر", 1032949),
-            ("چهارمحال و بختیاری", 895263),
-            ("خراسان شمالی", 867727),
-            ("کهگیلویه و بویراحمد", 658629),
-            ("خراسان جنوبی", 622534),
-            ("سمنان", 631218),
-            ("ایلام", 557599)
+            ("مرکز فروش تهران", 13267637),
+                    ("مرکز فروش خراسان رضوی", 6434501),
+                    ("مرکز فروش اصفهان", 5120850),
+                    ("مرکز فروش شیراز", 4851274),
+                    ("مرکز فروش خوزستان", 4710509),
+                    ("مرکز فروش آذربایجان ", 3909652),
+                    ("مرکز فروش مازندران", 3283582),
+                    ("مرکز فروش آذربایجان غربی", 3265219),
+                    ("مرکز فروش کرمان", 3164718),
+                    ("مرکز فروش سیستان و بلوچستان", 2775014),
+                    ("مرکز فروش البرز", 2712400),
+                    ("مرکز فروش گیلان", 2530696),
+                    ("مرکز فروش کرمانشاه", 1952434),
+                    ("مرکز فروش لرستان", 1760649),
+                    ("مرکز فروش همدان", 1738234),
+                    ("مرکز فروش گلستان", 1777014),
+                    ("مرکز فروش کردستان", 1603011),
+                    ("مرکز فروش هرمزگان", 1578183),
+                    ("مرکز فروش مرکزی", 1429475),
+                    ("مرکز فروش اردبیل", 1270420),
+                    ("مرکز فروش قزوین", 1201565),
+                    ("مرکز فروش قم", 1151672),
+                    ("مرکز فروش یزد", 1074428),
+                    ("مرکز فروش زنجان", 1015734),
+                    ("مرکز فروش بوشهر", 1032949),
+                    ("مرکز فروش چهار محال و بختیاری", 895263),
+                    ("مرکز فروش خراسان شمالی", 867727),
+                    ("مرکز فروش کهکولویه و بویراحد", 658629),
+                    ("مرکز فروش خراسان جنوبی", 622534),
+                    ("مرکز فروش سمنان", 631218),
+                    ("مرکز فروش ایلام", 557599)
         ]
 
         for name, population in provinces_data:
@@ -2109,6 +2106,22 @@ def create_app():
        flash('معیار حذف شد.', 'info')
        return redirect(url_for('descriptive_criteria'))
 
+    # --- Helper function to get/create the permanent evaluation files directory ---
+    def get_evaluation_dir():
+        """Create and return the directory path for permanently saved evaluation files"""
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        # Define the permanent directory name
+        eval_dir = os.path.join(base_dir, 'evaluation_files')
+        if not os.path.exists(eval_dir):
+            try:
+                os.makedirs(eval_dir)
+                print(f"Created evaluation files directory: {eval_dir}")
+            except OSError as e:
+                print(f"Error creating directory {eval_dir}: {e}")
+                raise OSError(f"Could not create evaluation_files directory: {e}") from e
+        return eval_dir
+
+    from datetime import datetime, timezone, date
     # --------------------- ADMIN: EVALUATE WITH CSV/EXCEL (Enhanced) ---------------------
     @app.route('/admin/evaluate_csv', methods=['GET', 'POST'])
     @login_required
@@ -2117,307 +2130,334 @@ def create_app():
             flash('دسترسی غیرمجاز!', 'danger')
             return redirect(url_for('dashboard'))
 
+        # Use a session key for the permanent file path
+        perm_filepath_session_key = 'csv_eval_perm_filepath'
+
         if request.method == 'GET':
+            # No file cleanup needed here anymore for GET requests
+            # Just show the upload form
+            # Clear session key in case user navigates away and comes back
+            session.pop(perm_filepath_session_key, None)
             return render_template('admin/evaluate_csv_upload.html')
 
-        else:
-            action = request.form.get('action')
-            if action == 'upload_file':
+        # --- POST Request Logic ---
+        action = request.form.get('action')
+
+        if action == 'upload_file':
+            # --- Upload Action: Save file PERMANENTLY, store path in session ---
+            permanent_save_path = None  # Define for potential error handling
+            try:
                 file = request.files.get('file')
-                if not file:
-                    flash('هیچ فایلی انتخاب نشده است.', 'danger')
+                if not file or not file.filename:
+                    flash('هیچ فایلی انتخاب نشده است یا نام فایل نامعتبر است.', 'danger')
                     return redirect(url_for('admin_evaluate_csv'))
 
-                filename = file.filename.lower()
-                try:
-                    if filename.endswith('.csv'):
-                        df = pd.read_csv(file)
-                    elif filename.endswith(('.xls', '.xlsx')):
-                        df = pd.read_excel(file)
-                    else:
-                        flash('فایل پشتیبانی نمی‌شود. لطفاً CSV یا Excel آپلود کنید.', 'danger')
-                        return redirect(url_for('admin_evaluate_csv'))
-                except Exception as e:
-                    flash(f'خطا در خواندن فایل: {e}', 'danger')
+                filename = secure_filename(file.filename)  # Keep original case potentially, but sanitize
+                file_base, file_ext = os.path.splitext(filename)
+                file_ext = file_ext.lower()  # Use lower case extension for checks
+
+                # --- Define permanent save path ---
+                eval_dir = get_evaluation_dir()
+                # Create a unique name to avoid overwrites, keeping original name part
+                unique_save_filename = f"{file_base}_{uuid.uuid4().hex}{file_ext}"
+                permanent_save_path = os.path.join(eval_dir, unique_save_filename)
+                # --- End Define path ---
+
+                # --- Save the file ---
+                file.save(permanent_save_path)
+                print(f"Saved evaluation file permanently: {permanent_save_path}")
+                # --- End Save ---
+
+                # --- Read file to validate and get columns ---
+                if file_ext == '.csv':
+                    df = pd.read_csv(permanent_save_path, encoding='utf-8-sig')
+                elif file_ext in ['.xls', '.xlsx']:
+                    df = pd.read_excel(permanent_save_path)
+                else:
+                    # Invalid file type, delete the saved file
+                    if os.path.exists(permanent_save_path): os.remove(permanent_save_path)
+                    flash('فایل پشتیبانی نمی‌شود. لطفاً CSV یا Excel آپلود کنید.', 'danger')
                     return redirect(url_for('admin_evaluate_csv'))
+                # --- End Read file ---
 
-                columns = list(df.columns)
-                file_content = df.to_csv(index=False)
+                # Store PERMANENT path in session
+                session[perm_filepath_session_key] = permanent_save_path
 
-                # Get all defined descriptive criteria for dropdown options
+                # --- Prepare data for configuration template ---
+                columns = [str(col) for col in df.columns]
                 descriptive_criteria = DescriptiveCriterion.query.all()
                 criteria_by_param = {}
                 for crit in descriptive_criteria:
-                    if crit.parameter_name not in criteria_by_param:
-                        criteria_by_param[crit.parameter_name] = []
-                    criteria_by_param[crit.parameter_name].append({
-                        'criterion': crit.criterion,
-                        'score': crit.score
-                    })
-
-                # Get all grade mappings for debugging/display
+                    param_name = str(crit.parameter_name);
+                    if param_name not in criteria_by_param: criteria_by_param[param_name] = []
+                    criteria_by_param[param_name].append({'criterion': crit.criterion, 'score': crit.score})
                 grade_mappings = GradeMapping.query.order_by(GradeMapping.min_score.desc()).all()
+                # --- End Prepare data ---
 
                 return render_template('admin/evaluate_csv_configure.html',
-                                      columns=columns,
-                                      file_content=file_content,
-                                      criteria_by_param=criteria_by_param,
-                                      grade_mappings=grade_mappings)
+                                       columns=columns, criteria_by_param=criteria_by_param,
+                                       grade_mappings=grade_mappings)
 
-            elif action == 'configure':
-                file_content = request.form.get('file_content')
-                if not file_content:
-                    flash('مشکل در بازیابی فایل آپلود شده.', 'danger')
-                    return redirect(url_for('admin_evaluate_csv'))
-
-                config = {}
-                criteria_config = {}
-
-                # Build configuration for each column from checkboxes, weights, and types
-                for key in request.form:
-                    if key.startswith('use_'):
-                        col = key[4:]
-                        if request.form.get(key) == 'on':
-                            try:
-                                weight = float(request.form.get(f'weight_{col}', 1))
-                            except ValueError:
-                                weight = 1
-                            var_type = request.form.get(f'type_{col}', 'numeric')
-                            config[col] = {'weight': weight, 'type': var_type}
-
-                            # For descriptive parameters, collect the criteria data
-                            if var_type == 'descriptive':
-                                criteria_config[col] = []
-
-                                # Get new criteria added in the form
-                                criteria_values = request.form.getlist(f'criteria_{col}[]')
-                                criteria_scores = request.form.getlist(f'score_{col}[]')
-
-                                for i in range(len(criteria_values)):
-                                    if i < len(criteria_scores):
-                                        try:
-                                            score = float(criteria_scores[i])
-                                            criteria_config[col].append({
-                                                'criterion': criteria_values[i],
-                                                'score': score
-                                            })
-                                        except (ValueError, IndexError):
-                                            continue
-
-                                # Get existing criteria (that may have been edited)
-                                existing_criteria = request.form.getlist(f'existing_criteria_{col}[]')
-                                existing_scores = request.form.getlist(f'existing_score_{col}[]')
-
-                                for i in range(len(existing_criteria)):
-                                    if i < len(existing_scores):
-                                        try:
-                                            score = float(existing_scores[i])
-                                            criteria_config[col].append({
-                                                'criterion': existing_criteria[i],
-                                                'score': score
-                                            })
-                                        except (ValueError, IndexError):
-                                            continue
-
-                if not config:
-                    flash('هیچ ستونی انتخاب نشده است.', 'danger')
-                    return redirect(url_for('admin_evaluate_csv'))
-
-                try:
-                    df = pd.read_csv(io.StringIO(file_content))
-                except Exception as e:
-                    flash(f'خطا در بازیابی فایل: {e}', 'danger')
-                    return redirect(url_for('admin_evaluate_csv'))
-
-                valid_rows = []
-                missing_rows = []
-                total_scores = []
-                grades = []
-
-                # Get all grade mappings for scoring
-                all_grade_mappings = GradeMapping.query.order_by(GradeMapping.min_score.desc()).all()
-
-                # Create a batch identifier for this evaluation session
-                evaluation_batch_id = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')
-                print(f"Created batch ID: {evaluation_batch_id}")
-
-                # Process each row
-                successful_evaluations = 0
-
-                for index, row in df.iterrows():
-                    missing = False
-                    # Check for missing numeric values for selected numeric parameters
-                    for col, params in config.items():
-                        if params['type'] == 'numeric' and pd.isnull(row.get(col)):
-                            missing = True
-                            break
-
-                    if missing:
-                        missing_rows.append(row.to_dict())
-                        continue
-
-                    score = 0
-                    parameter_scores = {}
-
-                    for col, params in config.items():
-                        val = row.get(col, 0)
-                        if pd.isnull(val):
-                            val = 0
-
-                        # Handle different parameter types
-                        if params['type'] == 'numeric':
-                            try:
-                                numeric_val = float(val)
-                            except:
-                                numeric_val = 0
-                            param_score = params['weight'] * numeric_val
-
-                        else:
-                            # For descriptive parameters, look up the corresponding criterion
-                            val_str = str(val).strip()
-                            param_score = 0
-
-                            # First check if we have specific criteria defined in the form
-                            if col in criteria_config:
-                                found_match = False
-                                for criterion_data in criteria_config[col]:
-                                    if criterion_data['criterion'].lower() == val_str.lower():
-                                        # Multiply by weight here
-                                        param_score = params['weight'] * criterion_data['score']
-                                        found_match = True
-                                        break
-
-                                # If no match was found in the form criteria, check database
-                                if not found_match:
-                                    # Otherwise use existing criteria from database
-                                    crit = DescriptiveCriterion.query.filter(
-                                        DescriptiveCriterion.parameter_name.ilike(col),
-                                        DescriptiveCriterion.criterion.ilike(val_str)
-                                    ).first()
-                                    if crit:
-                                        param_score = params['weight'] * crit.score
-
-                        # Add to total score and track individual parameter score
-                        score += param_score
-                        parameter_scores[col] = param_score
-
-                    # Round score to 2 decimal places for consistency
-                    score = round(score, 2)
-                    total_scores.append(score)
-
-                    # Find the appropriate grade based on the score
-                    mapping_obj = GradeMapping.query.filter(GradeMapping.min_score <= score)\
-                                .order_by(GradeMapping.min_score.desc()).first()
-
-                    if mapping_obj:
-                        assigned_grade = mapping_obj.grade_letter
-                    else:
-                        assigned_grade = "بدون درجه"
-
-                    grades.append(assigned_grade)
-
-                    row_dict = row.to_dict()
-                    row_dict["نمره کل"] = f"{score:.2f}"
-                    row_dict["درجه"] = assigned_grade
-                    row_dict["batch_id"] = evaluation_batch_id
-
-                    # Add parameter scores to row data
-                    for param, param_score in parameter_scores.items():
-                        row_dict[f"نمره {param}"] = f"{param_score:.2f}"
-
-                    valid_rows.append(row_dict)
-
-                    # Always create a CSV evaluation record regardless of customer match
+            except Exception as e_upload:
+                flash(f'خطا در مرحله آپلود و ذخیره فایل: {e_upload}', 'danger')
+                print(f"Error during 'upload_file' action: {e_upload}")
+                # Cleanup attempt if path was assigned but process failed
+                if permanent_save_path and os.path.exists(permanent_save_path):
+                    # Decide if you want to delete on upload error or keep the partially uploaded file
+                    # Let's delete it for now if upload stage fails completely
                     try:
-                        # Create a new CSVEvaluationRecord
-                        csv_record = CSVEvaluationRecord(
-                            row_data=row_dict,
-                            total_score=score,
-                            assigned_grade=assigned_grade,
-                            evaluated_at=datetime.now(timezone.utc),
-                            batch_id=evaluation_batch_id
-                        )
-
-                        # Associate with customer if found
-                        cust_number = row.get("Number")
-                        if cust_number:
-                            customer = CustomerReport.query.filter_by(number=str(cust_number)).first()
-                            if customer:
-                                print(f"Found customer with ID: {customer.id} for number: {cust_number}")
-
-                                # Link to customer and update customer's grade
-                                csv_record.customer_id = customer.id
-                                customer.grade = assigned_grade
-
-                                # Also create a CustomerEvaluation record for backward compatibility
-                                try:
-                                    new_evaluation = CustomerEvaluation(
-                                        customer_id=customer.id,
-                                        total_score=score,
-                                        assigned_grade=assigned_grade,
-                                        evaluated_at=datetime.now(timezone.utc),
-                                        evaluation_method="csv",
-                                        batch_id=evaluation_batch_id
-                                    )
-                                    db.session.add(new_evaluation)
-                                except Exception as e:
-                                    print(f"Error creating CustomerEvaluation for {cust_number}: {e}")
-
-                        # Add and commit the CSV record
-                        db.session.add(csv_record)
-                        db.session.commit()
-                        successful_evaluations += 1
-                        print(f"Saved evaluation record for row {index} with grade {assigned_grade}")
-                    except Exception as e:
-                        db.session.rollback()
-                        print(f"Error saving evaluation record for row {index}: {e}")
-
-                # Get list of descriptive parameters for the template
-                descriptive_params = [col for col, params in config.items() if params['type'] == 'descriptive']
-
-                # Save the criteria to database if they don't exist yet
-                try:
-                    for col, criteria_list in criteria_config.items():
-                        for criteria_data in criteria_list:
-                            existing = DescriptiveCriterion.query.filter_by(
-                                parameter_name=col,
-                                criterion=criteria_data['criterion']
-                            ).first()
-
-                            if not existing:
-                                new_criterion = DescriptiveCriterion(
-                                    parameter_name=col,
-                                    criterion=criteria_data['criterion'],
-                                    score=criteria_data['score']
-                                )
-                                db.session.add(new_criterion)
-                            elif existing.score != criteria_data['score']:
-                                # Update score if it's different
-                                existing.score = criteria_data['score']
-
-                    db.session.commit()
-                    print("Successfully saved all criteria")
-                    flash(f'ارزیابی با موفقیت انجام شد. {successful_evaluations} مشتری ارزیابی شدند.', 'success')
-                except Exception as e:
-                    db.session.rollback()
-                    print(f"Error saving criteria: {e}")
-                    flash(f'خطا در ذخیره‌سازی معیارها: {e}', 'danger')
-
-                return render_template('admin/evaluate_csv.html',
-                                      valid_rows=valid_rows,
-                                      missing_rows=missing_rows,
-                                      descriptive_params=descriptive_params,
-                                      config=config,
-                                      grades=grades,
-                                      grade_mappings=all_grade_mappings,
-                                      batch_id=evaluation_batch_id)
-            else:
-                flash('عملیات نامشخص.', 'danger')
+                        os.remove(permanent_save_path); print(
+                            f"Deleted file due to upload error: {permanent_save_path}")
+                    except OSError as e_del_err:
+                        print(f"Error deleting file during upload error cleanup: {e_del_err}")
+                session.pop(perm_filepath_session_key, None)  # Clear session key on error
                 return redirect(url_for('admin_evaluate_csv'))
 
+
+        elif action == 'configure':
+            # --- Configure Action: Read PERMANENT file, process, render results ---
+            permanent_filepath = session.get(perm_filepath_session_key)  # Retrieve permanent path
+
+            try:
+                if not permanent_filepath or not os.path.exists(permanent_filepath):
+                    flash('فایل ذخیره شده یافت نشد. لطفاً دوباره آپلود کنید.', 'danger')
+                    print(
+                        f"Permanent file path error before processing: Path='{permanent_filepath}', Exists={os.path.exists(permanent_filepath) if permanent_filepath else 'N/A'}")
+                    session.pop(perm_filepath_session_key, None)  # Clean potentially invalid session key
+                    return redirect(url_for('admin_evaluate_csv'))  # Redirect if file is gone
+
+                # Determine file type from extension
+                file_ext = os.path.splitext(permanent_filepath)[1].lower()
+                if file_ext not in ['.csv', '.xls', '.xlsx']:
+                    flash(f'نوع فایل ذخیره شده نامعتبر است: {file_ext}', 'danger')
+                    session.pop(perm_filepath_session_key, None)
+                    # Optionally delete the invalid file here if desired
+                    # if os.path.exists(permanent_filepath): os.remove(permanent_filepath)
+                    return redirect(url_for('admin_evaluate_csv'))
+
+                # --- Build configuration ---
+                config = {};
+                criteria_config = {}
+                # (Same logic as before to build config and criteria_config)
+                submitted_columns = [key[4:] for key in request.form if key.startswith('use_')]
+                for col in submitted_columns:
+                    if request.form.get(f'use_{col}') == 'on':
+                        try:
+                            weight = float(request.form.get(f'weight_{col}', 1))
+                        except ValueError:
+                            weight = 1
+                        var_type = request.form.get(f'type_{col}', 'numeric')
+                        config[col] = {'weight': weight, 'type': var_type}
+                        if var_type == 'descriptive':
+                            criteria_config[col] = []
+                            for prefix in ['criteria', 'existing_criteria']:
+                                values = request.form.getlist(f'{prefix}_{col}[]');
+                                scores = request.form.getlist(f'{prefix.replace("criteria", "score")}_{col}[]')
+                                for i in range(len(values)):
+                                    if values[i].strip() and i < len(scores):
+                                        try:
+                                            s_val = float(scores[i]);
+                                            c_val = values[i].strip()
+                                            if prefix == 'criteria' or not any(
+                                                d['criterion'] == c_val for d in criteria_config[col]): criteria_config[
+                                                col].append({'criterion': c_val, 'score': s_val})
+                                        except (ValueError, IndexError, TypeError):
+                                            continue
+                if not config:
+                    flash('هیچ ستونی برای ارزیابی انتخاب نشده است.', 'danger')
+                    # Keep permanent file path in session, allow user to re-configure
+                    return redirect(url_for('admin_evaluate_csv'))
+                # --- End Build Configuration ---
+
+                # --- Read DataFrame from PERMANENT file ---
+                try:
+                    if file_ext == '.csv':
+                        df = pd.read_csv(permanent_filepath, encoding='utf-8-sig')
+                    else:
+                        df = pd.read_excel(permanent_filepath)
+                except Exception as e_read:
+                    flash(f'خطا در خواندن فایل ذخیره شده برای پردازش: {e_read}', 'danger');
+                    print(f"Error reading {permanent_filepath} for processing: {e_read}")
+                    # Keep permanent file path in session, allow user to re-configure
+                    return redirect(url_for('admin_evaluate_csv'))
+                # --- End Read DataFrame ---
+
+                # --- Process Rows ---
+                # (Row processing logic remains the same)
+                valid_rows = [];
+                error_saving_rows = [];
+                successful_evaluations = 0
+                all_grade_mappings = GradeMapping.query.order_by(GradeMapping.min_score.desc()).all()
+                evaluation_batch_id = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')
+                print(f"Processing batch ID: {evaluation_batch_id} using file {permanent_filepath}")
+
+                for index, row in df.iterrows():
+                    score = 0.0;
+                    parameter_scores = {}
+                    for col, params in config.items():  # Process based on config
+                        if col not in row.index: continue  # Skip if col missing in row
+                        val = row.get(col);
+                        param_score = 0.0
+                        if params['type'] == 'numeric':  # Numeric processing
+                            try:
+                                numeric_val = 0.0 if pd.isnull(val) or (
+                                            isinstance(val, str) and val.strip() == '') else float(val)
+                            except (ValueError, TypeError):
+                                numeric_val = 0.0
+                            param_score = params['weight'] * numeric_val
+                        elif params['type'] == 'descriptive':  # Descriptive processing
+                            val_str = "" if pd.isnull(val) or (isinstance(val, str) and val.strip() == '') else str(
+                                val).strip()
+                            if val_str:  # Only lookup if value exists
+                                found_match = False
+                                if col in criteria_config:  # Check configured criteria first
+                                    for crit_data in criteria_config[col]:
+                                        if crit_data['criterion'].lower() == val_str.lower(): param_score = params[
+                                                                                                                'weight'] * \
+                                                                                                            crit_data[
+                                                                                                                'score']; found_match = True; break
+                                if not found_match:  # Check DB if not found in config
+                                    try:
+                                        crit_db = DescriptiveCriterion.query.filter(
+                                            DescriptiveCriterion.parameter_name.ilike(col),
+                                            DescriptiveCriterion.criterion.ilike(val_str)).first()
+                                        if crit_db: param_score = params['weight'] * crit_db.score
+                                    except Exception as e_lk:
+                                        print(f"Crit lookup err: {e_lk}")
+                        score += param_score;
+                        parameter_scores[col] = param_score  # Accumulate score
+
+                    score = round(score, 2);
+                    assigned_grade = "بدون درجه"  # Assign grade
+                    for mapping in all_grade_mappings:
+                        if score >= mapping.min_score: assigned_grade = mapping.grade_letter; break
+
+                    row_dict = {};  # Prepare row dictionary for output/DB
+                    for k, v in row.items():  # Serialize row data safely
+                        key_str = str(k)
+                        if pd.isnull(v):
+                            row_dict[key_str] = None
+                        elif isinstance(v, (datetime, date, pd.Timestamp)):
+                            row_dict[key_str] = v.isoformat()
+                        else:
+                            try:
+                                row_dict[key_str] = v if isinstance(v, (str, int, float, bool)) else str(v)
+                            except Exception:
+                                row_dict[key_str] = "[Serialization Error]"
+                    row_dict["نمره کل"] = f"{score:.2f}";
+                    row_dict["درجه"] = assigned_grade;
+                    row_dict["batch_id"] = evaluation_batch_id
+                    for param, p_score in parameter_scores.items():  # Add parameter scores
+                        safe_param_name = ''.join(c if c.isalnum() else '_' for c in str(param));
+                        score_key = f"نمره_{safe_param_name}";
+                        row_dict[score_key] = f"{p_score:.2f}"
+                    valid_rows.append(row_dict)
+
+                    # --- Database Saving ---
+                    try:  # Attempt to save evaluation record
+                        csv_record = CSVEvaluationRecord(row_data=row_dict, total_score=score,
+                                                         assigned_grade=assigned_grade,
+                                                         evaluated_at=datetime.now(timezone.utc),
+                                                         batch_id=evaluation_batch_id)
+                        cust_number_col = "Number";
+                        cust_number = row.get(cust_number_col);
+                        customer_province = None
+                        if cust_number and not pd.isnull(cust_number):  # Try linking customer
+                            cust_number_str = str(cust_number).strip()
+                            if cust_number_str:
+                                customer = CustomerReport.query.filter_by(number=cust_number_str).first()
+                                if customer:
+                                    csv_record.customer_id = customer.id;
+                                    customer.grade = assigned_grade;
+                                    customer_province = customer.province;
+                                    csv_record.province = customer_province
+                                    try:
+                                        db.session.add(CustomerEvaluation(customer_id=customer.id, total_score=score,
+                                                                          assigned_grade=assigned_grade,
+                                                                          evaluated_at=datetime.now(timezone.utc),
+                                                                          evaluation_method="csv",
+                                                                          batch_id=evaluation_batch_id,
+                                                                          province=customer_province))
+                                    except Exception as e_ce:
+                                        print(f"Err CustEval: {e_ce}")
+                        db.session.add(csv_record);
+                        db.session.commit();
+                        successful_evaluations += 1
+                    except Exception as e_db:  # Handle DB save errors
+                        db.session.rollback();
+                        print(f"DB ERROR row {index}, Batch {evaluation_batch_id}: {e_db}");
+                        error_info = {};
+                        try:
+                            error_info = row.to_dict(); error_info['error_message'] = str(e_db)
+                        except Exception as e_conv:
+                            error_info = {'row_index': index, 'error_message': str(e_db),
+                                          'conversion_error': str(e_conv)}
+                        error_saving_rows.append(error_info)
+                # --- End Row Processing ---
+
+                # Save descriptive criteria definitions
+                if criteria_config:
+                    try:
+                        for col, criteria_list in criteria_config.items():
+                            for crit_data in criteria_list:
+                                existing = DescriptiveCriterion.query.filter_by(parameter_name=col, criterion=crit_data[
+                                    'criterion']).first()
+                                if not existing:
+                                    db.session.add(
+                                        DescriptiveCriterion(parameter_name=col, criterion=crit_data['criterion'],
+                                                             score=crit_data['score']))
+                                elif existing.score != crit_data['score']:
+                                    existing.score = crit_data['score']
+                        db.session.commit();
+                        print("Descriptive criteria definitions updated/saved.")
+                    except Exception as e_crit:
+                        db.session.rollback(); print(f"Error saving criteria definitions: {e_crit}"); flash(
+                            f'خطا در ذخیره‌سازی معیارها: {e_crit}', 'danger')
+
+                # Final status message
+                total_rows = len(df);
+                failed_saves = len(error_saving_rows)
+                flash(
+                    f'ارزیابی کامل شد. {successful_evaluations} رکورد ذخیره شد. {failed_saves} خطا در ذخیره‌سازی (از {total_rows} ردیف).',
+                    'info' if failed_saves == 0 else 'warning')
+                if failed_saves > 0: print(f"Batch {evaluation_batch_id}: {failed_saves} rows failed DB save.")
+
+                descriptive_params = [col for col, params in config.items() if params['type'] == 'descriptive']
+
+                # Clear the session key AFTER successful processing
+                session.pop(perm_filepath_session_key, None)
+                print(f"Cleared session key {perm_filepath_session_key} after successful processing.")
+
+                # Render results page
+                return render_template('admin/evaluate_csv.html',
+                                       valid_rows=valid_rows, error_saving_rows=error_saving_rows,
+                                       descriptive_params=descriptive_params, config=config,
+                                       grade_mappings=all_grade_mappings, batch_id=evaluation_batch_id)
+
+            except Exception as e_configure:
+                flash(f'خطای کلی در مرحله پردازش: {e_configure}', 'danger')
+                print(f"Error during 'configure' action processing: {e_configure}")
+                # Don't clear session key on general error, maybe user can retry config
+                return redirect(url_for('admin_evaluate_csv'))
+
+            # --- REMOVED the finally block for cleanup ---
+            # Cleanup is no longer needed as file is permanent
+
+        else:  # Invalid action POSTed
+            flash('درخواست نامعتبر.', 'danger')
+            # Clean up session key if it exists from an unknown state
+            session.pop(perm_filepath_session_key, None)
+            return redirect(url_for('admin_evaluate_csv'))
+
+    # --- End of admin_evaluate_csv function ---
     # --------------------- NEW ROUTES FOR BATCH EVALUATION MANAGEMENT ---------------------
     # Replace the existing view_batch_evaluations function with this updated version
-    @app.route('/admin/batch_evaluations/<batch_id>', methods=['GET', 'POST'])
+    # Replace the existing view_batch_evaluations function with this updated version
+
+    # Fix for the 'min' is undefined error in batch_evaluations.html
+
+    # Option 1: Fix in the view_batch_evaluations function - add a simple min function to the template context
+    @app.route('/admin/batch_evaluations/<batch_id>')
     @login_required
     def view_batch_evaluations(batch_id):
         if current_user.role != 'admin':
@@ -2426,9 +2466,6 @@ def create_app():
 
         # Get all provinces for the dropdown
         provinces = Province.query.order_by(Province.name).all()
-
-        # Get customer types for the dropdown
-        customer_types = CustomerType.query.order_by(CustomerType.name).all()
 
         # First try CSVEvaluationRecord
         csv_evals = CSVEvaluationRecord.query.filter_by(batch_id=batch_id).order_by(
@@ -2476,30 +2513,37 @@ def create_app():
             if current_province:
                 batch_targets = BatchGradeTarget.query.filter_by(
                     batch_id=batch_id,
-                    province_id=current_province.id
+                    province_id=current_province.id,
+                    store_type_id=None  # Only get general targets, not store-type specific
                 ).order_by(BatchGradeTarget.grade, BatchGradeTarget.product_id).all()
 
             # Get all products for target display
             products = Product.query.all()
 
-            # Handle POST request to update customer type
-            if request.method == 'POST' and 'update_customer_type' in request.form:
-                customer_id = request.form.get('customer_id')
-                customer_type_id = request.form.get('customer_type_id')
+            # Get store types for quota management
+            store_types = StoreType.query.all()
 
-                if customer_id and customer_type_id:
-                    customer = CustomerReport.query.get_or_404(customer_id)
-                    customer.customer_type_id = customer_type_id if customer_type_id else None
+            # Get product exclusion rules
+            exclusion_rules = ProductExclusionRule.query.filter_by(batch_id=batch_id).all()
+            exclusions_by_store_type = {}
+            for store_type in store_types:
+                exclusions = [rule.product_id for rule in exclusion_rules if rule.store_type_id == store_type.id]
+                exclusions_by_store_type[store_type.id] = exclusions
 
-                    try:
-                        db.session.commit()
-                        flash('نوع مشتری با موفقیت به روز شد.', 'success')
-                    except Exception as e:
-                        db.session.rollback()
-                        flash(f'خطا در به روزرسانی نوع مشتری: {str(e)}', 'danger')
+            # Get store type allocations
+            store_allocations = StoreTypeAllocation.query.filter_by(
+                batch_id=batch_id,
+                province_id=current_province.id if current_province else None
+            ).all()
+            allocations_by_store_type = {alloc.store_type_id: alloc.percentage for alloc in store_allocations}
 
-                # Redirect to the same page to prevent form resubmission
-                return redirect(url_for('view_batch_evaluations', batch_id=batch_id))
+            # Calculate total allocation percentage
+            total_allocation = sum(allocations_by_store_type.values())
+            remaining_allocation = 100 - total_allocation
+
+            # Add a safe_min function for the template to use
+            def safe_min(a, b):
+                return min(a, b)
 
             return render_template('admin/batch_evaluations.html',
                                    batch_id=batch_id,
@@ -2512,7 +2556,12 @@ def create_app():
                                    current_province=current_province,
                                    batch_targets=batch_targets,
                                    products=products,
-                                   customer_types=customer_types)
+                                   store_types=store_types,
+                                   exclusions_by_store_type=exclusions_by_store_type,
+                                   allocations_by_store_type=allocations_by_store_type,
+                                   total_allocation=total_allocation,
+                                   remaining_allocation=remaining_allocation,
+                                   safe_min=safe_min)  # Pass the function to the template
         else:
             # Get grade distribution for CSVEvaluationRecord
             grade_query = text("""
@@ -2533,30 +2582,37 @@ def create_app():
             if current_province:
                 batch_targets = BatchGradeTarget.query.filter_by(
                     batch_id=batch_id,
-                    province_id=current_province.id
+                    province_id=current_province.id,
+                    store_type_id=None  # Only get general targets, not store-type specific
                 ).order_by(BatchGradeTarget.grade, BatchGradeTarget.product_id).all()
 
             # Get all products for target display
             products = Product.query.all()
 
-            # Handle POST request to update customer type
-            if request.method == 'POST' and 'update_customer_type' in request.form:
-                customer_id = request.form.get('customer_id')
-                customer_type_id = request.form.get('customer_type_id')
+            # Get store types for quota management
+            store_types = StoreType.query.all()
 
-                if customer_id and customer_type_id:
-                    customer = CustomerReport.query.get_or_404(customer_id)
-                    customer.customer_type_id = customer_type_id if customer_type_id else None
+            # Get product exclusion rules
+            exclusion_rules = ProductExclusionRule.query.filter_by(batch_id=batch_id).all()
+            exclusions_by_store_type = {}
+            for store_type in store_types:
+                exclusions = [rule.product_id for rule in exclusion_rules if rule.store_type_id == store_type.id]
+                exclusions_by_store_type[store_type.id] = exclusions
 
-                    try:
-                        db.session.commit()
-                        flash('نوع مشتری با موفقیت به روز شد.', 'success')
-                    except Exception as e:
-                        db.session.rollback()
-                        flash(f'خطا در به روزرسانی نوع مشتری: {str(e)}', 'danger')
+            # Get store type allocations
+            store_allocations = StoreTypeAllocation.query.filter_by(
+                batch_id=batch_id,
+                province_id=current_province.id if current_province else None
+            ).all()
+            allocations_by_store_type = {alloc.store_type_id: alloc.percentage for alloc in store_allocations}
 
-                # Redirect to the same page to prevent form resubmission
-                return redirect(url_for('view_batch_evaluations', batch_id=batch_id))
+            # Calculate total allocation percentage
+            total_allocation = sum(allocations_by_store_type.values())
+            remaining_allocation = 100 - total_allocation
+
+            # Add a safe_min function for the template to use
+            def safe_min(a, b):
+                return min(a, b)
 
             return render_template('admin/batch_evaluations.html',
                                    batch_id=batch_id,
@@ -2569,7 +2625,12 @@ def create_app():
                                    current_province=current_province,
                                    batch_targets=batch_targets,
                                    products=products,
-                                   customer_types=customer_types)
+                                   store_types=store_types,
+                                   exclusions_by_store_type=exclusions_by_store_type,
+                                   allocations_by_store_type=allocations_by_store_type,
+                                   total_allocation=total_allocation,
+                                   remaining_allocation=remaining_allocation,
+                                   safe_min=safe_min)  # Pass the function to the template
     @app.route('/admin/batch_evaluations/delete/<batch_id>', methods=['POST'])
     @login_required
     def delete_batch_evaluations(batch_id):
@@ -3612,10 +3673,6 @@ def create_app():
             # Get all products
             products = Product.query.all()
 
-            # Get all customer types
-            customer_types = CustomerType.query.all()
-            customer_type_lookup = {ct.id: ct.name for ct in customer_types}
-
             # Generate a unique timestamp for the filename
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
 
@@ -3637,7 +3694,7 @@ def create_app():
 
             # Add basic customer fields that may not be in row_data
             standard_fields = ["شماره ردیف", "شماره مشتری", "نام مشتری", "درجه", "نمره کل", "استان",
-                               "تاریخ ارزیابی", "latitude", "longitude", "Latitude", "Longitude", "نوع مشتری"]
+                               "تاریخ ارزیابی", "latitude", "longitude", "Latitude", "Longitude"]
 
             for field in standard_fields:
                 all_customer_fields.add(field)
@@ -3651,7 +3708,7 @@ def create_app():
             customer_fields = sorted(list(all_customer_fields))
 
             # Ensure basic fields are at the beginning for better readability
-            for field in reversed(["نوع مشتری", "استان", "نمره کل", "درجه", "نام مشتری", "شماره مشتری", "شماره ردیف"]):
+            for field in reversed(["استان", "نمره کل", "درجه", "نام مشتری", "شماره مشتری", "شماره ردیف"]):
                 if field in customer_fields:
                     customer_fields.remove(field)
                     customer_fields.insert(0, field)
@@ -3710,9 +3767,7 @@ def create_app():
                         "Latitude": customer.latitude,
                         "Longitude": customer.longitude,
                         "latitude": customer.latitude,
-                        "longitude": customer.longitude,
-                        "نوع مشتری": customer_type_lookup.get(customer.customer_type_id,
-                                                              "") if customer.customer_type_id else ""
+                        "longitude": customer.longitude
                     }
 
                     # Map additional customer fields
@@ -3746,25 +3801,12 @@ def create_app():
                             field_index = customer_fields.index(field)
                             row_data[field_index] = value if value is not None else ""
 
-                # Get the grade for quota calculation
+                # Get the grade for quota calculation - IMPORTANT PART
                 grade = eval_record.assigned_grade or ""
-
-                # Check if customer has a type with product exclusions
-                excluded_product_ids = []
-                if customer and customer.customer_type_id:
-                    exclusions = ProductCustomerTypeExclusion.query.filter_by(
-                        customer_type_id=customer.customer_type_id
-                    ).all()
-                    excluded_product_ids = [ex.product_id for ex in exclusions]
 
                 # Calculate product quotas for this specific customer's grade
                 product_quotas = []
                 for product in products:
-                    # Skip excluded products
-                    if product.id in excluded_product_ids:
-                        product_quotas.extend(["-", "-"])  # Add empty quotas for excluded products
-                        continue
-
                     liter_quota = "-"
                     shrink_quota = "-"
 
@@ -3821,7 +3863,7 @@ def create_app():
                 row_index += 1
 
             # Process CustomerEvaluation records if needed
-            if not csv_evals and customer_evals:
+            if not csv_evals:
                 for eval_record in customer_evals:
                     # Initialize row data with empty values for all fields
                     row_data = [""] * len(customer_fields)
@@ -3843,9 +3885,7 @@ def create_app():
                             "Latitude": customer.latitude,
                             "Longitude": customer.longitude,
                             "latitude": customer.latitude,
-                            "longitude": customer.longitude,
-                            "نوع مشتری": customer_type_lookup.get(customer.customer_type_id,
-                                                                  "") if customer.customer_type_id else ""
+                            "longitude": customer.longitude
                         }
 
                         # Map additional customer fields
@@ -3872,25 +3912,12 @@ def create_app():
                             field_index = customer_fields.index(field)
                             row_data[field_index] = value if value is not None else ""
 
-                    # Get the grade for quota calculation
+                    # Get the grade for quota calculation - IMPORTANT PART
                     grade = eval_record.assigned_grade or ""
-
-                    # Check if customer has a type with product exclusions
-                    excluded_product_ids = []
-                    if customer and customer.customer_type_id:
-                        exclusions = ProductCustomerTypeExclusion.query.filter_by(
-                            customer_type_id=customer.customer_type_id
-                        ).all()
-                        excluded_product_ids = [ex.product_id for ex in exclusions]
 
                     # Calculate product quotas for this customer using the same logic as above
                     product_quotas = []
                     for product in products:
-                        # Skip excluded products
-                        if product.id in excluded_product_ids:
-                            product_quotas.extend(["-", "-"])  # Add empty quotas for excluded products
-                            continue
-
                         liter_quota = "-"
                         shrink_quota = "-"
 
@@ -4921,6 +4948,8 @@ def create_app():
 
         return labels.get(report_type, {}).get(field, field)
 
+    # Update the api_product_quotas function to account for store type exclusions
+
     @app.route('/api/product_quotas')
     @login_required
     def api_product_quotas():
@@ -4931,6 +4960,8 @@ def create_app():
         grade = request.args.get('grade')
         province_id = request.args.get('province_id')
         eval_id = request.args.get('eval_id')
+        store_type_id = request.args.get('store_type_id')
+        batch_id = request.args.get('batch_id')
 
         if not grade:
             return jsonify({'error': 'Grade is required'}), 400
@@ -4965,12 +4996,45 @@ def create_app():
                 'products': []
             }
 
+            # If store_type_id is provided, get exclusion rules
+            excluded_products = []
+            if store_type_id and store_type_id != 'null':
+                store_type = StoreType.query.get(store_type_id)
+                if store_type:
+                    result['store_type'] = {
+                        'id': store_type.id,
+                        'name': store_type.name
+                    }
+
+                    # Get exclusion rules for this store type
+                    exclusion_query = ProductExclusionRule.query.filter_by(store_type_id=store_type_id)
+                    if batch_id and batch_id != 'null':
+                        exclusion_query = exclusion_query.filter(
+                            db.or_(
+                                ProductExclusionRule.batch_id == batch_id,
+                                ProductExclusionRule.batch_id == None
+                            )
+                        )
+
+                    exclusions = exclusion_query.all()
+                    excluded_products = [rule.product_id for rule in exclusions]
+
+                    # Also get allocation percentage for this store type if available
+                    if province and batch_id and batch_id != 'null':
+                        allocation = StoreTypeAllocation.query.filter_by(
+                            store_type_id=store_type_id,
+                            batch_id=batch_id,
+                            province_id=province.id
+                        ).first()
+
+                        if allocation:
+                            result['allocation_percentage'] = allocation.percentage
+
             if province:
                 # Get customer count by grade in this province
                 customers_by_grade = {}
                 province_customers = CustomerReport.query.filter_by(province=province.name).all()
                 total_customers = len(province_customers)
-                total_weighted_count = 0
 
                 for customer in province_customers:
                     customer_grade = customer.grade or 'بدون درجه'
@@ -4978,15 +5042,32 @@ def create_app():
                         customers_by_grade[customer_grade] = 0
                     customers_by_grade[customer_grade] += 1
 
-                    # Add to weighted count
-                    customer_weight = grade_weights.get(customer_grade, 0.5)
-                    total_weighted_count += customer_weight
+                # Calculate total weighted count for this grade
+                total_weighted_count = 0
+                for g, count in customers_by_grade.items():
+                    w = grade_weights.get(g, 0.5)
+                    total_weighted_count += count * w
 
                 # Get the number of customers with the specified grade
                 grade_count = customers_by_grade.get(grade, 0)
 
+                # If store_type_id is provided, get count of customers with this grade and store type
+                store_type_grade_count = 0
+                if store_type_id and store_type_id != 'null':
+                    store_type_grade_count = CustomerReport.query.filter_by(
+                        province=province.name,
+                        grade=grade,
+                        store_type_id=store_type_id
+                    ).count()
+
+                    result['store_type_customer_count'] = store_type_grade_count
+
                 # Calculate quotas for each product
                 for product in products:
+                    # Skip excluded products
+                    if product.id in excluded_products:
+                        continue
+
                     product_data = {
                         'id': product.id,
                         'name': product.name,
@@ -4994,34 +5075,96 @@ def create_app():
                         'shrink_quota': None
                     }
 
-                    # Get product's province target
-                    target = ProductProvinceTarget.query.filter_by(
+                    # First check if there's a specific batch target for this combination
+                    if batch_id and batch_id != 'null':
+                        # Query parameters for batch target
+                        target_params = {
+                            'batch_id': batch_id,
+                            'province_id': province.id,
+                            'product_id': product.id,
+                            'grade': grade
+                        }
+
+                        # If store_type_id is provided, check for specific store type target
+                        if store_type_id and store_type_id != 'null':
+                            target_params['store_type_id'] = store_type_id
+                        else:
+                            target_params['store_type_id'] = None
+
+                        batch_target = BatchGradeTarget.query.filter_by(**target_params).first()
+
+                        if batch_target:
+                            product_data['liter_quota'] = batch_target.liter_capacity
+                            product_data['shrink_quota'] = batch_target.shrink_capacity
+                            product_data['source'] = 'batch_target'
+                            result['products'].append(product_data)
+                            continue
+
+                    # If no batch target or no batch_id, fall back to regular product-province target
+                    product_target = ProductProvinceTarget.query.filter_by(
                         product_id=product.id,
                         province_id=province.id
                     ).first()
 
-                    if target and grade_count > 0 and total_weighted_count > 0:
-                        # Calculate allocation based on grade weight
-                        if target.liter_capacity is not None:
-                            # Calculate the total allocation for this grade group
-                            grade_allocation = (target.liter_capacity * weight * grade_count / total_weighted_count)
-                            # Calculate allocation per customer
-                            product_data['liter_quota'] = grade_allocation / grade_count
+                    if product_target:
+                        # If store_type_id is provided and allocation exists, use it
+                        if store_type_id and store_type_id != 'null' and batch_id and batch_id != 'null':
+                            allocation = StoreTypeAllocation.query.filter_by(
+                                store_type_id=store_type_id,
+                                batch_id=batch_id,
+                                province_id=province.id
+                            ).first()
 
-                        if target.shrink_capacity is not None:
-                            # Calculate the total allocation for this grade group
-                            grade_allocation = (target.shrink_capacity * weight * grade_count / total_weighted_count)
-                            # Calculate allocation per customer
-                            product_data['shrink_quota'] = grade_allocation / grade_count
+                            if allocation and store_type_grade_count > 0:
+                                # Calculate quota based on allocation percentage
+                                if product_target.liter_capacity is not None:
+                                    total_allocation = product_target.liter_capacity * (allocation.percentage / 100)
+                                    product_data['liter_quota'] = total_allocation / store_type_grade_count
 
-                    # Add product data to results if either quota is defined
-                    if product_data['liter_quota'] is not None or product_data['shrink_quota'] is not None:
-                        result['products'].append(product_data)
+                                if product_target.shrink_capacity is not None:
+                                    total_allocation = product_target.shrink_capacity * (allocation.percentage / 100)
+                                    product_data['shrink_quota'] = total_allocation / store_type_grade_count
+
+                                product_data['source'] = 'store_type_allocation'
+                                result['products'].append(product_data)
+                                continue
+
+                        # Otherwise, use grade-based allocation
+                        if grade_count > 0 and total_weighted_count > 0:
+                            # Calculate allocation based on grade weight
+                            if product_target.liter_capacity is not None:
+                                # Calculate the total allocation for this grade group
+                                grade_allocation = (
+                                            product_target.liter_capacity * weight * grade_count / total_weighted_count)
+                                # Calculate allocation per customer
+                                product_data['liter_quota'] = grade_allocation / grade_count
+
+                            if product_target.shrink_capacity is not None:
+                                # Calculate the total allocation for this grade group
+                                grade_allocation = (
+                                            product_target.shrink_capacity * weight * grade_count / total_weighted_count)
+                                # Calculate allocation per customer
+                                product_data['shrink_quota'] = grade_allocation / grade_count
+
+                            product_data['source'] = 'grade_based'
+                            result['products'].append(product_data)
 
                 return jsonify(result)
-
             else:
-                # If no province found, return an empty result
+                # If no province found, just include product basic info without quotas
+                for product in products:
+                    # Skip excluded products
+                    if product.id in excluded_products:
+                        continue
+
+                    result['products'].append({
+                        'id': product.id,
+                        'name': product.name,
+                        'liter_quota': None,
+                        'shrink_quota': None,
+                        'source': None
+                    })
+
                 return jsonify(result)
 
         except Exception as e:
@@ -5030,7 +5173,333 @@ def create_app():
             return jsonify({'error': str(e)}), 500
 
     # Add this to app.py
-    # Update the calculate_batch_targets function in app.py
+
+    @app.route('/admin/store-types', methods=['GET', 'POST'])
+    @login_required
+    def admin_store_types():
+        if current_user.role != 'admin':
+            flash('دسترسی غیرمجاز!', 'danger')
+            return redirect(url_for('dashboard'))
+
+        form = StoreTypeForm()
+
+        if form.validate_on_submit():
+            store_type = StoreType(
+                name=form.name.data.strip(),
+                description=form.description.data
+            )
+
+            try:
+                db.session.add(store_type)
+                db.session.commit()
+                flash(f'نوع فروشگاه {store_type.name} با موفقیت ایجاد شد.', 'success')
+                return redirect(url_for('admin_store_types'))
+            except IntegrityError:
+                db.session.rollback()
+                flash('خطا: این نوع فروشگاه قبلاً تعریف شده است.', 'danger')
+
+        # Get all store types
+        store_types = StoreType.query.all()
+
+        return render_template(
+            'admin/store_types.html',
+            form=form,
+            store_types=store_types
+        )
+
+    @app.route('/admin/store-types/<int:store_type_id>/edit', methods=['GET', 'POST'])
+    @login_required
+    def edit_store_type(store_type_id):
+        if current_user.role != 'admin':
+            flash('دسترسی غیرمجاز!', 'danger')
+            return redirect(url_for('dashboard'))
+
+        store_type = StoreType.query.get_or_404(store_type_id)
+        form = StoreTypeForm(obj=store_type)
+
+        if form.validate_on_submit():
+            store_type.name = form.name.data.strip()
+            store_type.description = form.description.data
+
+            try:
+                db.session.commit()
+                flash(f'نوع فروشگاه {store_type.name} با موفقیت ویرایش شد.', 'success')
+                return redirect(url_for('admin_store_types'))
+            except IntegrityError:
+                db.session.rollback()
+                flash('خطا: این نوع فروشگاه قبلاً تعریف شده است.', 'danger')
+
+        return render_template(
+            'admin/edit_store_type.html',
+            form=form,
+            store_type=store_type
+        )
+
+    @app.route('/admin/store-types/<int:store_type_id>/delete', methods=['POST'])
+    @login_required
+    def delete_store_type(store_type_id):
+        if current_user.role != 'admin':
+            flash('دسترسی غیرمجاز!', 'danger')
+            return redirect(url_for('dashboard'))
+
+        store_type = StoreType.query.get_or_404(store_type_id)
+
+        try:
+            # Delete associated exclusion rules and allocations
+            ProductExclusionRule.query.filter_by(store_type_id=store_type_id).delete()
+            StoreTypeAllocation.query.filter_by(store_type_id=store_type_id).delete()
+
+            # Delete the store type
+            db.session.delete(store_type)
+            db.session.commit()
+            flash(f'نوع فروشگاه {store_type.name} با موفقیت حذف شد.', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'خطا در حذف نوع فروشگاه: {str(e)}', 'danger')
+
+        return redirect(url_for('admin_store_types'))
+
+    # --------------------- PRODUCT EXCLUSION ROUTES ---------------------
+    @app.route('/admin/batch_evaluations/<batch_id>/exclusions', methods=['GET', 'POST'])
+    @login_required
+    def manage_product_exclusions(batch_id):
+        if current_user.role != 'admin':
+            flash('دسترسی غیرمجاز!', 'danger')
+            return redirect(url_for('dashboard'))
+
+        # Get store types and products
+        store_types = StoreType.query.all()
+        products = Product.query.all()
+
+        if request.method == 'POST':
+            store_type_id = request.form.get('store_type_id')
+            excluded_product_ids = request.form.getlist('product_ids[]')
+
+            if not store_type_id:
+                flash('لطفاً یک نوع فروشگاه انتخاب کنید.', 'warning')
+                return redirect(url_for('manage_product_exclusions', batch_id=batch_id))
+
+            try:
+                # Delete existing exclusion rules for this store type and batch
+                ProductExclusionRule.query.filter_by(
+                    store_type_id=store_type_id,
+                    batch_id=batch_id
+                ).delete()
+
+                # Add new exclusion rules
+                for product_id in excluded_product_ids:
+                    exclusion = ProductExclusionRule(
+                        store_type_id=store_type_id,
+                        product_id=product_id,
+                        batch_id=batch_id
+                    )
+                    db.session.add(exclusion)
+
+                db.session.commit()
+                flash('قوانین عدم تخصیص با موفقیت به‌روزرسانی شدند.', 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash(f'خطا در به‌روزرسانی قوانین عدم تخصیص: {str(e)}', 'danger')
+
+            return redirect(url_for('manage_product_exclusions', batch_id=batch_id))
+
+        # Get existing exclusions for each store type
+        exclusions_by_store_type = {}
+        for store_type in store_types:
+            exclusions = ProductExclusionRule.query.filter_by(
+                store_type_id=store_type.id,
+                batch_id=batch_id
+            ).all()
+
+            excluded_product_ids = [exclusion.product_id for exclusion in exclusions]
+            exclusions_by_store_type[store_type.id] = excluded_product_ids
+
+        return render_template(
+            'admin/product_exclusions.html',
+            batch_id=batch_id,
+            store_types=store_types,
+            products=products,
+            exclusions_by_store_type=exclusions_by_store_type
+        )
+
+    # --------------------- STORE TYPE ALLOCATION ROUTES ---------------------
+    @app.route('/admin/batch_evaluations/<batch_id>/allocations', methods=['GET', 'POST'])
+    @login_required
+    def manage_store_allocations(batch_id):
+        if current_user.role != 'admin':
+            flash('دسترسی غیرمجاز!', 'danger')
+            return redirect(url_for('dashboard'))
+
+        # Find province for this batch
+        province = None
+        csv_eval = CSVEvaluationRecord.query.filter_by(batch_id=batch_id).first()
+        if csv_eval and csv_eval.province:
+            province = Province.query.filter_by(name=csv_eval.province).first()
+
+        if not province:
+            flash('لطفاً ابتدا یک استان را به این دسته ارزیابی تخصیص دهید.', 'warning')
+            return redirect(url_for('view_batch_evaluations', batch_id=batch_id))
+
+        # Get store types
+        store_types = StoreType.query.all()
+
+        if request.method == 'POST':
+            allocations = []
+            total_percentage = 0
+
+            # Process each store type allocation
+            for store_type in store_types:
+                percentage_key = f'percentage_{store_type.id}'
+                if percentage_key in request.form and request.form[percentage_key].strip():
+                    try:
+                        percentage = float(request.form[percentage_key])
+                        total_percentage += percentage
+
+                        allocations.append({
+                            'store_type_id': store_type.id,
+                            'percentage': percentage
+                        })
+                    except ValueError:
+                        flash(f'مقدار درصد برای {store_type.name} نامعتبر است.', 'danger')
+                        return redirect(url_for('manage_store_allocations', batch_id=batch_id))
+
+            # Validate total percentage doesn't exceed 100%
+            if total_percentage > 100:
+                flash('مجموع درصدهای تخصیص نمی‌تواند بیش از 100% باشد.', 'danger')
+                return redirect(url_for('manage_store_allocations', batch_id=batch_id))
+
+            try:
+                # Delete existing allocations for this batch and province
+                StoreTypeAllocation.query.filter_by(
+                    batch_id=batch_id,
+                    province_id=province.id
+                ).delete()
+
+                # Add new allocations
+                for allocation in allocations:
+                    new_allocation = StoreTypeAllocation(
+                        store_type_id=allocation['store_type_id'],
+                        batch_id=batch_id,
+                        province_id=province.id,
+                        percentage=allocation['percentage']
+                    )
+                    db.session.add(new_allocation)
+
+                db.session.commit()
+                flash('تخصیص‌های نوع فروشگاه با موفقیت به‌روزرسانی شدند.', 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash(f'خطا در به‌روزرسانی تخصیص‌ها: {str(e)}', 'danger')
+
+            return redirect(url_for('manage_store_allocations', batch_id=batch_id))
+
+        # Get existing allocations
+        existing_allocations = StoreTypeAllocation.query.filter_by(
+            batch_id=batch_id,
+            province_id=province.id
+        ).all()
+
+        # Create a dictionary for easier access
+        allocations_dict = {allocation.store_type_id: allocation.percentage for allocation in existing_allocations}
+
+        # Calculate total allocated percentage
+        total_allocated = sum(allocations_dict.values())
+        remaining_percentage = 100 - total_allocated
+
+        return render_template(
+            'admin/store_allocations.html',
+            batch_id=batch_id,
+            province=province,
+            store_types=store_types,
+            allocations=allocations_dict,
+            total_allocated=total_allocated,
+            remaining_percentage=remaining_percentage
+        )
+
+    # --------------------- API ENDPOINTS FOR STORE TYPES ---------------------
+    @app.route('/api/store-types')
+    @login_required
+    def api_store_types():
+        if current_user.role != 'admin':
+            return jsonify({'error': 'Unauthorized'}), 403
+
+        store_types = StoreType.query.all()
+        result = [{
+            'id': st.id,
+            'name': st.name,
+            'description': st.description
+        } for st in store_types]
+
+        return jsonify(result)
+
+    @app.route('/api/batch/<batch_id>/store-type-exclusions')
+    @login_required
+    def api_batch_exclusions(batch_id):
+        if current_user.role != 'admin':
+            return jsonify({'error': 'Unauthorized'}), 403
+
+        # Get exclusions for each store type in this batch
+        exclusions = ProductExclusionRule.query.filter_by(batch_id=batch_id).all()
+
+        # Group by store type
+        result = {}
+        for exclusion in exclusions:
+            if exclusion.store_type_id not in result:
+                store_type = StoreType.query.get(exclusion.store_type_id)
+                if store_type:
+                    result[exclusion.store_type_id] = {
+                        'id': store_type.id,
+                        'name': store_type.name,
+                        'excluded_products': []
+                    }
+
+            if exclusion.store_type_id in result:
+                product = Product.query.get(exclusion.product_id)
+                if product:
+                    result[exclusion.store_type_id]['excluded_products'].append({
+                        'id': product.id,
+                        'name': product.name
+                    })
+
+        return jsonify(list(result.values()))
+
+    @app.route('/api/batch/<batch_id>/store-type-allocations')
+    @login_required
+    def api_batch_allocations(batch_id):
+        if current_user.role != 'admin':
+            return jsonify({'error': 'Unauthorized'}), 403
+
+        # Find province for this batch
+        province = None
+        csv_eval = CSVEvaluationRecord.query.filter_by(batch_id=batch_id).first()
+        if csv_eval and csv_eval.province:
+            province = Province.query.filter_by(name=csv_eval.province).first()
+
+        if not province:
+            return jsonify({'error': 'No province found for this batch'}), 404
+
+        # Get allocations for this batch and province
+        allocations = StoreTypeAllocation.query.filter_by(
+            batch_id=batch_id,
+            province_id=province.id
+        ).all()
+
+        result = [{
+            'store_type_id': allocation.store_type_id,
+            'store_type_name': StoreType.query.get(allocation.store_type_id).name if StoreType.query.get(
+                allocation.store_type_id) else 'Unknown',
+            'percentage': allocation.percentage
+        } for allocation in allocations]
+
+        # Calculate total allocated percentage
+        total_allocated = sum(allocation.percentage for allocation in allocations)
+
+        return jsonify({
+            'allocations': result,
+            'total_allocated': total_allocated,
+            'remaining_percentage': 100 - total_allocated
+        })
+
 
     @app.route('/admin/batch_evaluations/<batch_id>/calculate_targets', methods=['POST'])
     @login_required
@@ -5093,45 +5562,39 @@ def create_app():
             'بدون درجه': 0.5
         }
 
-        # Get customers in this batch
-        batch_customers = []
-
-        # Try with CSVEvaluationRecord first
-        csv_records = CSVEvaluationRecord.query.filter_by(batch_id=batch_id).all()
-        for record in csv_records:
-            if record.customer_id:
-                customer = CustomerReport.query.get(record.customer_id)
-                if customer and customer not in batch_customers:
-                    batch_customers.append(customer)
-
-        # If no customers found, try with CustomerEvaluation
-        if not batch_customers:
-            cust_evals = CustomerEvaluation.query.filter_by(batch_id=batch_id).all()
-            for eval in cust_evals:
-                if eval.customer and eval.customer not in batch_customers:
-                    batch_customers.append(eval.customer)
-
-        # Count customers by type, grade, and excluded status
-        # Structure: {type_id: {grade: count}}
-        customers_by_type_grade = {}
-
-        # Default for None type (customers without type)
-        customers_by_type_grade[None] = {}
-
-        for customer in batch_customers:
-            type_id = customer.customer_type_id
-            grade = customer.grade or 'بدون درجه'
-
-            if type_id not in customers_by_type_grade:
-                customers_by_type_grade[type_id] = {}
-
-            if grade not in customers_by_type_grade[type_id]:
-                customers_by_type_grade[type_id][grade] = 0
-
-            customers_by_type_grade[type_id][grade] += 1
+        # Calculate total weighted count
+        total_customers = sum(grade_counts.values())
+        total_weighted_count = 0
+        for grade, count in grade_counts.items():
+            weight = grade_weights.get(grade, 0.5)
+            total_weighted_count += count * weight
 
         # Delete existing targets for this batch
         BatchGradeTarget.query.filter_by(batch_id=batch_id).delete()
+
+        # Get store type allocations
+        store_type_allocations = StoreTypeAllocation.query.filter_by(
+            batch_id=batch_id,
+            province_id=province_id
+        ).all()
+
+        # Create a dictionary of store type allocations for easier access
+        allocation_by_store_type = {
+            allocation.store_type_id: allocation.percentage / 100  # Convert to decimal
+            for allocation in store_type_allocations
+        }
+
+        # Get exclusion rules
+        exclusion_rules = ProductExclusionRule.query.filter_by(
+            batch_id=batch_id
+        ).all()
+
+        # Create a dictionary of excluded products by store type
+        excluded_products = {}
+        for rule in exclusion_rules:
+            if rule.store_type_id not in excluded_products:
+                excluded_products[rule.store_type_id] = []
+            excluded_products[rule.store_type_id].append(rule.product_id)
 
         # Calculate and save targets for each product and grade
         for product in products:
@@ -5144,159 +5607,123 @@ def create_app():
             if not product_target:
                 continue
 
-            # Get customer type quota allocations for this product/province
-            fixed_allocations = []
+            # Create a dictionary to track capacity allocation by store type
+            store_type_capacity_allocation = {}
 
-            # 1. Most specific: product AND province
-            type_quotas = CustomerTypeQuota.query.filter_by(
-                product_id=product.id,
-                province_id=province_id,
-                is_active=True
-            ).all()
-            fixed_allocations.extend(type_quotas)
-
-            # 2. Product-specific, all provinces
-            if not any(fa.product_id == product.id and fa.province_id == province_id for fa in fixed_allocations):
-                type_quotas = CustomerTypeQuota.query.filter_by(
-                    product_id=product.id,
-                    province_id=None,
-                    is_active=True
-                ).all()
-                fixed_allocations.extend(type_quotas)
-
-            # 3. Province-specific, all products
-            product_specific_types = [fa.customer_type_id for fa in fixed_allocations if fa.product_id == product.id]
-            province_quotas = CustomerTypeQuota.query.filter(
-                CustomerTypeQuota.product_id == None,
-                CustomerTypeQuota.province_id == province_id,
-                CustomerTypeQuota.is_active == True,
-                ~CustomerTypeQuota.customer_type_id.in_(product_specific_types) if product_specific_types else True
-            ).all()
-            fixed_allocations.extend(province_quotas)
-
-            # 4. Global: all products, all provinces
-            specific_types = [fa.customer_type_id for fa in fixed_allocations]
-            global_quotas = CustomerTypeQuota.query.filter(
-                CustomerTypeQuota.product_id == None,
-                CustomerTypeQuota.province_id == None,
-                CustomerTypeQuota.is_active == True,
-                ~CustomerTypeQuota.customer_type_id.in_(specific_types) if specific_types else True
-            ).all()
-            fixed_allocations.extend(global_quotas)
-
-            # Calculate total fixed percentage
-            total_fixed_percentage = sum(fa.percentage for fa in fixed_allocations)
-
-            # Cap at 100% just in case
-            total_fixed_percentage = min(total_fixed_percentage, 100)
-
-            # Remaining percentage for grade-based distribution
-            remaining_percentage = 100 - total_fixed_percentage
-
-            # Types with fixed allocations
-            fixed_type_ids = [fa.customer_type_id for fa in fixed_allocations]
-
-            # Process each customer type with fixed allocation
-            for fixed_allocation in fixed_allocations:
-                type_id = fixed_allocation.customer_type_id
-
-                # Process each grade for this customer type
-                for grade, count in (customers_by_type_grade.get(type_id) or {}).items():
-                    if count <= 0:
-                        continue
-
-                    # Calculate per customer allocation based on fixed percentage
-                    liter_capacity = None
-                    shrink_capacity = None
-
-                    if product_target.liter_capacity is not None:
-                        type_total_liter = product_target.liter_capacity * (fixed_allocation.percentage / 100.0)
-                        liter_capacity = type_total_liter / count
-
-                    if product_target.shrink_capacity is not None:
-                        type_total_shrink = product_target.shrink_capacity * (fixed_allocation.percentage / 100.0)
-                        shrink_capacity = type_total_shrink / count
-
-                    # Save batch target for this type+grade
-                    batch_target = BatchGradeTarget(
-                        batch_id=batch_id,
-                        province_id=province_id,
-                        product_id=product.id,
-                        grade=grade,
-                        liter_capacity=liter_capacity,
-                        shrink_capacity=shrink_capacity,
-                        customer_count=count
-                    )
-                    db.session.add(batch_target)
-
-            # Now handle the remaining capacity based on grades
-            if remaining_percentage > 0:
-                # Count remaining customers (those without fixed type allocations)
-                remaining_customers_by_grade = {}
-
-                for type_id, grades in customers_by_type_grade.items():
-                    # Skip types with fixed allocation
-                    if type_id in fixed_type_ids:
-                        continue
-
-                    for grade, count in grades.items():
-                        if grade not in remaining_customers_by_grade:
-                            remaining_customers_by_grade[grade] = 0
-                        remaining_customers_by_grade[grade] += count
-
-                # Calculate weighted total for remaining customers
-                remaining_weighted_count = 0
-                for grade, count in remaining_customers_by_grade.items():
-                    weight = grade_weights.get(grade, 0.5)
-                    remaining_weighted_count += count * weight
-
-                # Skip if no remaining customers
-                if remaining_weighted_count <= 0:
+            # First, handle store type allocations
+            for store_type_id, allocation_percentage in allocation_by_store_type.items():
+                # Check if this product is excluded for this store type
+                if store_type_id in excluded_products and product.id in excluded_products[store_type_id]:
                     continue
 
-                # Calculate allocation for each remaining grade
-                for grade, count in remaining_customers_by_grade.items():
-                    if count <= 0:
+                # Calculate allocation for this store type
+                if product_target.liter_capacity is not None:
+                    liter_allocation = product_target.liter_capacity * allocation_percentage
+                else:
+                    liter_allocation = None
+
+                if product_target.shrink_capacity is not None:
+                    shrink_allocation = product_target.shrink_capacity * allocation_percentage
+                else:
+                    shrink_allocation = None
+
+                store_type_capacity_allocation[store_type_id] = {
+                    'liter': liter_allocation,
+                    'shrink': shrink_allocation
+                }
+
+            # Calculate the remaining capacity after store type allocations
+            total_allocated_liter = sum(alloc['liter'] or 0 for alloc in store_type_capacity_allocation.values())
+            total_allocated_shrink = sum(alloc['shrink'] or 0 for alloc in store_type_capacity_allocation.values())
+
+            remaining_liter = None
+            if product_target.liter_capacity is not None:
+                remaining_liter = product_target.liter_capacity - total_allocated_liter
+
+            remaining_shrink = None
+            if product_target.shrink_capacity is not None:
+                remaining_shrink = product_target.shrink_capacity - total_allocated_shrink
+
+            # Now calculate grade-based targets for the remaining capacity
+            for grade, count in grade_counts.items():
+                if count == 0 or total_weighted_count == 0:
+                    continue
+
+                weight = grade_weights.get(grade, 0.5)
+
+                # Calculate allocation based on weight for the remaining capacity
+                liter_capacity = None
+                shrink_capacity = None
+
+                if remaining_liter is not None:
+                    # Calculate total for this grade group
+                    grade_liter = remaining_liter * weight * count / total_weighted_count
+                    # Convert to per customer
+                    liter_capacity = grade_liter / count
+
+                if remaining_shrink is not None:
+                    # Calculate total for this grade group
+                    grade_shrink = remaining_shrink * weight * count / total_weighted_count
+                    # Convert to per customer
+                    shrink_capacity = grade_shrink / count
+
+                # Save to database
+                batch_target = BatchGradeTarget(
+                    batch_id=batch_id,
+                    province_id=province_id,
+                    product_id=product.id,
+                    grade=grade,
+                    liter_capacity=liter_capacity,
+                    shrink_capacity=shrink_capacity,
+                    customer_count=count
+                )
+                db.session.add(batch_target)
+
+                # Now add targets for specific store types
+                for store_type_id, capacity in store_type_capacity_allocation.items():
+                    # Check if this product is excluded for this store type
+                    if store_type_id in excluded_products and product.id in excluded_products[store_type_id]:
                         continue
 
-                    weight = grade_weights.get(grade, 0.5)
-
-                    # Calculate allocation based on grade weight and customer count
-                    liter_capacity = None
-                    shrink_capacity = None
-
-                    if product_target.liter_capacity is not None:
-                        remaining_liter = product_target.liter_capacity * (remaining_percentage / 100.0)
-                        grade_liter = remaining_liter * weight * count / remaining_weighted_count
-                        liter_capacity = grade_liter / count
-
-                    if product_target.shrink_capacity is not None:
-                        remaining_shrink = product_target.shrink_capacity * (remaining_percentage / 100.0)
-                        grade_shrink = remaining_shrink * weight * count / remaining_weighted_count
-                        shrink_capacity = grade_shrink / count
-
-                    # Save batch target for this grade
-                    batch_target = BatchGradeTarget(
-                        batch_id=batch_id,
-                        province_id=province_id,
-                        product_id=product.id,
+                    # Get customers of this grade and store type
+                    store_type_customers = CustomerReport.query.filter_by(
+                        province=province.name,
                         grade=grade,
-                        liter_capacity=liter_capacity,
-                        shrink_capacity=shrink_capacity,
-                        customer_count=count
-                    )
-                    db.session.add(batch_target)
+                        store_type_id=store_type_id
+                    ).count()
+
+                    if store_type_customers > 0:
+                        # Calculate per customer capacity
+                        st_liter_capacity = None
+                        st_shrink_capacity = None
+
+                        if capacity['liter'] is not None:
+                            st_liter_capacity = capacity['liter'] / store_type_customers
+
+                        if capacity['shrink'] is not None:
+                            st_shrink_capacity = capacity['shrink'] / store_type_customers
+
+                        # Create a special target for this store type
+                        store_type_target = BatchGradeTarget(
+                            batch_id=batch_id,
+                            province_id=province_id,
+                            product_id=product.id,
+                            grade=grade,
+                            liter_capacity=st_liter_capacity,
+                            shrink_capacity=st_shrink_capacity,
+                            customer_count=store_type_customers,
+                            store_type_id=store_type_id  # Add this field to the model
+                        )
+                        db.session.add(store_type_target)
 
         try:
             db.session.commit()
-            flash('تارگت‌های مبتنی بر درجه‌بندی با در نظر گرفتن سهمیه انواع فروشگاه با موفقیت محاسبه و ذخیره شدند.',
-                  'success')
+            flash('تارگت‌های مبتنی بر درجه‌بندی و نوع فروشگاه با موفقیت محاسبه و ذخیره شدند.', 'success')
         except Exception as e:
             db.session.rollback()
             flash(f'خطا در ذخیره تارگت‌ها: {str(e)}', 'danger')
 
         return redirect(url_for('view_batch_evaluations', batch_id=batch_id))
-
 
     @app.route('/admin/batch_target/<int:target_id>/edit', methods=['POST'])
     @login_required
@@ -5347,6 +5774,8 @@ def create_app():
 
         return redirect(url_for('view_batch_evaluations', batch_id=batch_id))
 
+    # Update the get_customer_product_quotas function
+
     @app.route('/api/customer/<int:customer_id>/product_quotas')
     @login_required
     def get_customer_product_quotas(customer_id):
@@ -5373,19 +5802,6 @@ def create_app():
         # Get all products
         products = Product.query.all()
 
-        # Get customer type exclusions if customer has a type
-        excluded_product_ids = []
-        if customer.customer_type_id:
-            exclusions = ProductCustomerTypeExclusion.query.filter_by(
-                customer_type_id=customer.customer_type_id
-            ).all()
-            excluded_product_ids = [ex.product_id for ex in exclusions]
-
-        # Get the customer type info if available
-        customer_type = None
-        if customer.customer_type_id:
-            customer_type = CustomerType.query.get(customer.customer_type_id)
-
         # Prepare result with customer info
         result = {
             'success': True,
@@ -5395,10 +5811,10 @@ def create_app():
                 'number': customer.number,
                 'grade': customer.grade,
                 'province': customer.province,
-                'customer_type': {
-                    'id': customer_type.id,
-                    'name': customer_type.name
-                } if customer_type else None,
+                'store_type': {
+                    'id': customer.store_type_id,
+                    'name': customer.store_type.name if customer.store_type else None
+                },
                 'location': {
                     'latitude': customer.latitude,
                     'longitude': customer.longitude
@@ -5407,73 +5823,405 @@ def create_app():
             'products': []
         }
 
-        # Grade weights for allocation
-        grade_weights = {
-            'A+': 2.0,
-            'A': 1.75,
-            'B+': 1.5,
-            'B': 1.25,
-            'C': 1.0,
-            'D': 0.75,
-            'بدون درجه': 0.5
-        }
-
-        # Get customer count by grade in this province (for quota calculation)
-        customers_by_grade = {}
-        province_customers = CustomerReport.query.filter_by(province=province.name).all()
-
-        for c in province_customers:
-            grade = c.grade or 'بدون درجه'
-            if grade not in customers_by_grade:
-                customers_by_grade[grade] = 0
-            customers_by_grade[grade] += 1
-
-        # Calculate total weighted count
-        total_weighted_count = 0
-        for grade, count in customers_by_grade.items():
-            weight = grade_weights.get(grade, 0.5)
-            total_weighted_count += count * weight
-
         # Find targets for each product
         for product in products:
-            # Skip excluded products
-            if product.id in excluded_product_ids:
-                continue
+            # Check if this customer belongs to a store type with product exclusions
+            if customer.store_type_id:
+                # Check if this product is excluded for this store type
+                exclusion = ProductExclusionRule.query.filter_by(
+                    store_type_id=customer.store_type_id,
+                    product_id=product.id
+                ).first()
 
-            # Calculate quotas using our utility function
-            liter_quota, shrink_quota, source = calculate_customer_quota(
-                customer, product, province, grade_weights,
-                customers_by_grade, total_weighted_count
-            )
+                if exclusion:
+                    # Skip this product as it's excluded for this store type
+                    continue
 
-            # Add product with quotas if either quota exists
-            if liter_quota is not None or shrink_quota is not None:
+            # First check if there are store-type specific targets for this customer
+            store_type_target = None
+            batch_id = None
+
+            # Check if this customer has been evaluated in a batch
+            customer_eval = CustomerEvaluation.query.filter_by(customer_id=customer.id).order_by(
+                CustomerEvaluation.evaluated_at.desc()).first()
+
+            if not customer_eval:
+                # Try CSV evaluation
+                csv_eval = CSVEvaluationRecord.query.filter_by(customer_id=customer.id).order_by(
+                    CSVEvaluationRecord.evaluated_at.desc()).first()
+                if csv_eval:
+                    batch_id = csv_eval.batch_id
+            else:
+                batch_id = customer_eval.batch_id
+
+            # If we have a batch ID and customer has a store type, check for store-type specific targets
+            if batch_id and customer.store_type_id:
+                store_type_target = BatchGradeTarget.query.filter_by(
+                    batch_id=batch_id,
+                    province_id=province.id,
+                    product_id=product.id,
+                    grade=customer.grade,
+                    store_type_id=customer.store_type_id
+                ).first()
+
+                if store_type_target:
+                    result['products'].append({
+                        'id': product.id,
+                        'name': product.name,
+                        'liter_quota': store_type_target.liter_capacity,
+                        'shrink_quota': store_type_target.shrink_capacity,
+                        'source': 'store_type_target'
+                    })
+                    continue
+
+            # If no store-type target, check regular batch targets
+            batch_target = None
+            if batch_id:
+                batch_target = BatchGradeTarget.query.filter_by(
+                    batch_id=batch_id,
+                    province_id=province.id,
+                    product_id=product.id,
+                    grade=customer.grade,
+                    store_type_id=None  # General targets have no store_type_id
+                ).first()
+
+            # If batch target found, use it
+            if batch_target:
                 result['products'].append({
                     'id': product.id,
                     'name': product.name,
-                    'liter_quota': liter_quota,
-                    'shrink_quota': shrink_quota,
-                    'source': source
+                    'liter_quota': batch_target.liter_capacity,
+                    'shrink_quota': batch_target.shrink_capacity,
+                    'source': 'batch_target'
                 })
+                continue
 
-        # Add some debugging info for administrators
-        if customer.customer_type_id:
-            # Get any fixed percentage allocations for this customer type
-            type_quotas = CustomerTypeQuota.query.filter(
-                CustomerTypeQuota.customer_type_id == customer.customer_type_id,
-                CustomerTypeQuota.is_active == True
-            ).all()
+            # If no batch target, calculate based on general province-product targets
+            product_target = ProductProvinceTarget.query.filter_by(
+                product_id=product.id,
+                province_id=province.id
+            ).first()
 
-            if type_quotas:
-                result['type_quota_info'] = []
-                for quota in type_quotas:
-                    result['type_quota_info'].append({
-                        'product': quota.product.name if quota.product else 'همه محصولات',
-                        'province': quota.province.name if quota.province else 'همه استان‌ها',
-                        'percentage': quota.percentage
-                    })
+            if product_target:
+                # Check for store type allocation
+                if customer.store_type_id:
+                    allocation = StoreTypeAllocation.query.filter_by(
+                        store_type_id=customer.store_type_id,
+                        province_id=province.id
+                    ).first()
+
+                    if allocation:
+                        # Calculate based on allocation percentage
+                        store_type_customers = CustomerReport.query.filter_by(
+                            province=province.name,
+                            store_type_id=customer.store_type_id,
+                            grade=customer.grade
+                        ).count()
+
+                        if store_type_customers > 0:
+                            liter_allocation = None
+                            shrink_allocation = None
+
+                            if product_target.liter_capacity is not None:
+                                total_allocation = product_target.liter_capacity * (allocation.percentage / 100)
+                                liter_allocation = total_allocation / store_type_customers
+
+                            if product_target.shrink_capacity is not None:
+                                total_allocation = product_target.shrink_capacity * (allocation.percentage / 100)
+                                shrink_allocation = total_allocation / store_type_customers
+
+                            result['products'].append({
+                                'id': product.id,
+                                'name': product.name,
+                                'liter_quota': liter_allocation,
+                                'shrink_quota': shrink_allocation,
+                                'source': 'store_type_allocation'
+                            })
+                            continue
+
+                # Grade weights for regular calculation
+                grade_weights = {
+                    'A+': 2.0,
+                    'A': 1.75,
+                    'B+': 1.5,
+                    'B': 1.25,
+                    'C': 1.0,
+                    'D': 0.75,
+                    'بدون درجه': 0.5
+                }
+
+                # Get customer count by grade in this province
+                customers_by_grade = {}
+                province_customers = CustomerReport.query.filter_by(province=province.name).all()
+
+                for prov_customer in province_customers:
+                    grade = prov_customer.grade or 'بدون درجه'
+                    if grade not in customers_by_grade:
+                        customers_by_grade[grade] = 0
+                    customers_by_grade[grade] += 1
+
+                # Calculate weighted total
+                total_weighted_count = 0
+                for grade, count in customers_by_grade.items():
+                    weight = grade_weights.get(grade, 0.5)
+                    total_weighted_count += count * weight
+
+                # If this grade has customers and there's a total weighted count
+                if customer.grade in customers_by_grade and customers_by_grade[
+                    customer.grade] > 0 and total_weighted_count > 0:
+                    grade_count = customers_by_grade[customer.grade]
+                    weight = grade_weights.get(customer.grade, 0.5)
+
+                    # Calculate liter allocation
+                    liter_allocation = None
+                    if product_target.liter_capacity is not None:
+                        grade_liter = product_target.liter_capacity * weight * grade_count / total_weighted_count
+                        liter_allocation = grade_liter / grade_count
+
+                    # Calculate shrink allocation
+                    shrink_allocation = None
+                    if product_target.shrink_capacity is not None:
+                        grade_shrink = product_target.shrink_capacity * weight * grade_count / total_weighted_count
+                        shrink_allocation = grade_shrink / grade_count
+
+                    # Add product if it has any allocation
+                    if liter_allocation is not None or shrink_allocation is not None:
+                        result['products'].append({
+                            'id': product.id,
+                            'name': product.name,
+                            'liter_quota': liter_allocation,
+                            'shrink_quota': shrink_allocation,
+                            'source': 'calculated'
+                        })
 
         return jsonify(result)
+
+    # API endpoints for managing customer store types
+
+    @app.route('/api/customer/<int:customer_id>/store-type', methods=['POST'])
+    @login_required
+    def update_customer_store_type(customer_id):
+        """Update a customer's store type"""
+        if current_user.role != 'admin':
+            return jsonify({'error': 'Unauthorized'}), 403
+
+        customer = CustomerReport.query.get_or_404(customer_id)
+        store_type_id = request.json.get('store_type_id')
+
+        if store_type_id is not None:
+            # If store_type_id is 0 or empty string, set to None
+            if store_type_id == 0 or store_type_id == '':
+                customer.store_type_id = None
+            else:
+                # Verify store type exists
+                store_type = StoreType.query.get(store_type_id)
+                if not store_type:
+                    return jsonify({'success': False, 'message': 'نوع فروشگاه یافت نشد'}), 404
+                customer.store_type_id = store_type_id
+
+            try:
+                db.session.commit()
+                return jsonify({
+                    'success': True,
+                    'message': 'نوع فروشگاه مشتری با موفقیت به‌روزرسانی شد',
+                    'store_type': {
+                        'id': customer.store_type_id,
+                        'name': customer.store_type.name if customer.store_type else None
+                    }
+                })
+            except Exception as e:
+                db.session.rollback()
+                return jsonify({'success': False, 'message': f'خطا در به‌روزرسانی: {str(e)}'}), 500
+        else:
+            return jsonify({'success': False, 'message': 'شناسه نوع فروشگاه ارائه نشده است'}), 400
+
+    @app.route('/api/batch/<batch_id>/customers/store-type', methods=['POST'])
+    @login_required
+    def batch_update_customer_store_types(batch_id):
+        """Update store types for multiple customers in a batch"""
+        if current_user.role != 'admin':
+            return jsonify({'error': 'Unauthorized'}), 403
+
+        data = request.json
+        if not data or 'updates' not in data:
+            return jsonify({'success': False, 'message': 'داده‌های به‌روزرسانی ارائه نشده است'}), 400
+
+        updates = data['updates']
+        if not isinstance(updates, list):
+            return jsonify({'success': False, 'message': 'فرمت داده‌های به‌روزرسانی نامعتبر است'}), 400
+
+        # Collect customer IDs from batch
+        customer_ids = set()
+        csv_evals = CSVEvaluationRecord.query.filter_by(batch_id=batch_id).all()
+        for eval in csv_evals:
+            if eval.customer_id:
+                customer_ids.add(eval.customer_id)
+
+        cust_evals = CustomerEvaluation.query.filter_by(batch_id=batch_id).all()
+        for eval in cust_evals:
+            customer_ids.add(eval.customer_id)
+
+        success_count = 0
+        errors = []
+
+        for update in updates:
+            customer_id = update.get('customer_id')
+            store_type_id = update.get('store_type_id')
+
+            if not customer_id or store_type_id is None:
+                errors.append(f'داده‌های نامعتبر برای مشتری: {customer_id}')
+                continue
+
+            # Verify customer belongs to batch
+            if customer_id not in customer_ids:
+                errors.append(f'مشتری {customer_id} به این دسته ارزیابی تعلق ندارد')
+                continue
+
+            # Update store type
+            customer = CustomerReport.query.get(customer_id)
+            if not customer:
+                errors.append(f'مشتری با شناسه {customer_id} یافت نشد')
+                continue
+
+            # If store_type_id is 0, set to None
+            if store_type_id == 0 or store_type_id == '':
+                customer.store_type_id = None
+            else:
+                # Verify store type exists
+                store_type = StoreType.query.get(store_type_id)
+                if not store_type:
+                    errors.append(f'نوع فروشگاه {store_type_id} برای مشتری {customer_id} یافت نشد')
+                    continue
+
+                customer.store_type_id = store_type_id
+
+            success_count += 1
+
+        # Commit all changes
+        try:
+            db.session.commit()
+            return jsonify({
+                'success': True,
+                'message': f'{success_count} مشتری با موفقیت به‌روزرسانی شد',
+                'errors': errors if errors else None
+            })
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'success': False, 'message': f'خطا در به‌روزرسانی: {str(e)}'}), 500
+
+    @app.route('/api/batch/<batch_id>/store-type-summary')
+    @login_required
+    def get_batch_store_type_summary(batch_id):
+        """Get summary of customer store types in a batch"""
+        if current_user.role != 'admin':
+            return jsonify({'error': 'Unauthorized'}), 403
+
+        # Get province for this batch
+        province = None
+        csv_eval = CSVEvaluationRecord.query.filter_by(batch_id=batch_id).first()
+        if csv_eval and csv_eval.province:
+            province_name = csv_eval.province
+            province = Province.query.filter_by(name=province_name).first()
+
+        if not province:
+            cust_eval = CustomerEvaluation.query.filter_by(batch_id=batch_id).first()
+            if cust_eval and cust_eval.province:
+                province_name = cust_eval.province
+                province = Province.query.filter_by(name=province_name).first()
+
+        if not province:
+            return jsonify({'success': False, 'message': 'استان برای این دسته ارزیابی یافت نشد'}), 404
+
+        # Get all store types
+        store_types = StoreType.query.all()
+
+        # Get customer evaluations for this batch
+        customer_ids = set()
+        csv_evals = CSVEvaluationRecord.query.filter_by(batch_id=batch_id).all()
+        for eval in csv_evals:
+            if eval.customer_id:
+                customer_ids.add(eval.customer_id)
+
+        cust_evals = CustomerEvaluation.query.filter_by(batch_id=batch_id).all()
+        for eval in cust_evals:
+            customer_ids.add(eval.customer_id)
+
+        # Get customers by grade and store type
+        customers_by_grade_and_store_type = {}
+        total_by_store_type = {}
+        total_by_grade = {}
+        unassigned_count = 0
+
+        customers = CustomerReport.query.filter(
+            CustomerReport.id.in_(customer_ids),
+            CustomerReport.province == province.name
+        ).all()
+
+        for customer in customers:
+            grade = customer.grade or 'بدون درجه'
+
+            # Count by grade
+            if grade not in total_by_grade:
+                total_by_grade[grade] = 0
+            total_by_grade[grade] += 1
+
+            if customer.store_type_id:
+                # Count by store type
+                if customer.store_type_id not in total_by_store_type:
+                    total_by_store_type[customer.store_type_id] = 0
+                total_by_store_type[customer.store_type_id] += 1
+
+                # Count by grade and store type
+                if grade not in customers_by_grade_and_store_type:
+                    customers_by_grade_and_store_type[grade] = {}
+
+                if customer.store_type_id not in customers_by_grade_and_store_type[grade]:
+                    customers_by_grade_and_store_type[grade][customer.store_type_id] = 0
+
+                customers_by_grade_and_store_type[grade][customer.store_type_id] += 1
+            else:
+                unassigned_count += 1
+
+        # Prepare store type data
+        store_type_data = []
+        for store_type in store_types:
+            count = total_by_store_type.get(store_type.id, 0)
+            percentage = (count / len(customers)) * 100 if customers else 0
+
+            # Get grade distribution for this store type
+            grade_distribution = []
+            for grade in sorted(total_by_grade.keys()):
+                grade_count = customers_by_grade_and_store_type.get(grade, {}).get(store_type.id, 0)
+                grade_percentage = (grade_count / count) * 100 if count > 0 else 0
+
+                grade_distribution.append({
+                    'grade': grade,
+                    'count': grade_count,
+                    'percentage': round(grade_percentage, 1)
+                })
+
+            store_type_data.append({
+                'id': store_type.id,
+                'name': store_type.name,
+                'count': count,
+                'percentage': round(percentage, 1),
+                'grade_distribution': grade_distribution
+            })
+
+        # Add unassigned customers
+        unassigned_percentage = (unassigned_count / len(customers)) * 100 if customers else 0
+
+        return jsonify({
+            'success': True,
+            'total_customers': len(customers),
+            'grades': [{'grade': g, 'count': c} for g, c in total_by_grade.items()],
+            'store_types': store_type_data,
+            'unassigned': {
+                'count': unassigned_count,
+                'percentage': round(unassigned_percentage, 1)
+            }
+        })
+
     @app.route('/api/evaluations/<int:eval_id>')
     @login_required
     def get_evaluation_details(eval_id):
@@ -5508,108 +6256,6 @@ def create_app():
 
         return jsonify({'error': 'Evaluation not found'}), 404
 
-    # Add to app.py
-
-    @app.route('/admin/customer-types', methods=['GET', 'POST'])
-    @login_required
-    def admin_customer_types():
-        if current_user.role != 'admin':
-            flash('دسترسی غیرمجاز!', 'danger')
-            return redirect(url_for('dashboard'))
-
-        form = CustomerTypeForm()
-        if form.validate_on_submit():
-            customer_type = CustomerType(
-                name=form.name.data,
-                description=form.description.data
-            )
-            try:
-                db.session.add(customer_type)
-                db.session.commit()
-                flash(f'نوع مشتری {customer_type.name} با موفقیت اضافه شد.', 'success')
-                return redirect(url_for('admin_customer_types'))
-            except IntegrityError:
-                db.session.rollback()
-                flash('خطا در ذخیره نوع مشتری. ممکن است این نام تکراری باشد.', 'danger')
-
-        customer_types = CustomerType.query.all()
-        return render_template('admin/customer_types.html', form=form, customer_types=customer_types)
-
-
-    @app.route('/admin/customer-types/<int:type_id>/delete', methods=['POST'])
-    @login_required
-    def delete_customer_type(type_id):
-        if current_user.role != 'admin':
-            flash('دسترسی غیرمجاز!', 'danger')
-            return redirect(url_for('dashboard'))
-
-        customer_type = CustomerType.query.get_or_404(type_id)
-
-        # Check if there are customers using this type
-        customers_count = CustomerReport.query.filter_by(customer_type_id=type_id).count()
-        if customers_count > 0:
-            flash(f'این نوع مشتری به {customers_count} مشتری متصل است و قابل حذف نیست.', 'danger')
-            return redirect(url_for('admin_customer_types'))
-
-        try:
-            # Delete any exclusions related to this type
-            ProductCustomerTypeExclusion.query.filter_by(customer_type_id=type_id).delete()
-            db.session.delete(customer_type)
-            db.session.commit()
-            flash('نوع مشتری با موفقیت حذف شد.', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'خطا در حذف نوع مشتری: {str(e)}', 'danger')
-
-        return redirect(url_for('admin_customer_types'))
-
-    @app.route('/admin/product-exclusions', methods=['GET', 'POST'])
-    @login_required
-    def admin_product_exclusions():
-        if current_user.role != 'admin':
-            flash('دسترسی غیرمجاز!', 'danger')
-            return redirect(url_for('dashboard'))
-
-        if request.method == 'POST':
-            product_id = request.form.get('product_id')
-            customer_type_ids = request.form.getlist('customer_type_ids')
-
-            if not product_id or not customer_type_ids:
-                flash('لطفاً محصول و حداقل یک نوع مشتری را انتخاب کنید.', 'danger')
-                return redirect(url_for('admin_product_exclusions'))
-
-            # First delete all existing exclusions for this product
-            ProductCustomerTypeExclusion.query.filter_by(product_id=product_id).delete()
-
-            # Then add new ones
-            for type_id in customer_type_ids:
-                exclusion = ProductCustomerTypeExclusion(
-                    product_id=product_id,
-                    customer_type_id=type_id
-                )
-                db.session.add(exclusion)
-
-            try:
-                db.session.commit()
-                flash('تنظیمات عدم تخصیص با موفقیت ذخیره شد.', 'success')
-            except Exception as e:
-                db.session.rollback()
-                flash(f'خطا در ذخیره تنظیمات: {str(e)}', 'danger')
-
-        products = Product.query.all()
-        customer_types = CustomerType.query.all()
-
-        # Get existing exclusions
-        exclusions = {}
-        for product in products:
-            product_exclusions = ProductCustomerTypeExclusion.query.filter_by(product_id=product.id).all()
-            exclusions[product.id] = [pe.customer_type_id for pe in product_exclusions]
-
-        return render_template('admin/product_exclusions.html',
-                               products=products,
-                               customer_types=customer_types,
-                               exclusions=exclusions)
-
     @app.route('/api/customer/<int:customer_id>/details')
     @login_required
     def get_customer_details(customer_id):
@@ -5617,11 +6263,6 @@ def create_app():
             return jsonify({'error': 'Unauthorized'}), 403
 
         customer = CustomerReport.query.get_or_404(customer_id)
-
-        # Get customer type if available
-        customer_type = None
-        if customer.customer_type_id:
-            customer_type = CustomerType.query.get(customer.customer_type_id)
 
         # Get the latest evaluation
         latest_eval = CustomerEvaluation.query.filter_by(customer_id=customer.id).order_by(
@@ -5637,10 +6278,6 @@ def create_app():
             'number': customer.number or 'بدون شماره',
             'grade': customer.grade or 'بدون درجه',
             'province': customer.province or 'نامشخص',
-            'customer_type': {
-                'id': customer_type.id,
-                'name': customer_type.name
-            } if customer_type else None,
             'location': {
                 'latitude': customer.latitude,
                 'longitude': customer.longitude
@@ -5676,378 +6313,70 @@ def create_app():
 
         return jsonify(result)
 
-    # Add these routes to app.py
+    # Add this to your app.py file
 
-    @app.route('/admin/customer-type-quotas', methods=['GET', 'POST'])
+    @app.route('/api/batch/<batch_id>/customers')
     @login_required
-    def admin_customer_type_quotas():
+    def get_batch_customers(batch_id):
+        """Get all customers in a batch evaluation"""
         if current_user.role != 'admin':
-            flash('دسترسی غیرمجاز!', 'danger')
-            return redirect(url_for('dashboard'))
-
-        form = CustomerTypeQuotaForm()
-
-        # Populate form dropdown choices
-        form.customer_type_id.choices = [(0, '-- انتخاب نوع فروشگاه --')] + [
-            (ct.id, ct.name) for ct in CustomerType.query.order_by(CustomerType.name).all()
-        ]
-
-        form.product_id.choices = [(0, '-- همه محصولات --')] + [
-            (p.id, p.name) for p in Product.query.order_by(Product.name).all()
-        ]
-
-        form.province_id.choices = [(0, '-- همه استان‌ها --')] + [
-            (p.id, p.name) for p in Province.query.order_by(Province.name).all()
-        ]
-
-        # Get the edit_id if any
-        edit_id = request.args.get('edit_id', type=int)
-        edit_mode = False
-        quota_to_edit = None
-
-        if edit_id:
-            quota_to_edit = CustomerTypeQuota.query.get(edit_id)
-            if quota_to_edit:
-                form.customer_type_id.data = quota_to_edit.customer_type_id
-                form.product_id.data = quota_to_edit.product_id or 0
-                form.province_id.data = quota_to_edit.province_id or 0
-                form.percentage.data = quota_to_edit.percentage
-                form.is_active.data = quota_to_edit.is_active
-                edit_mode = True
-
-        if form.validate_on_submit():
-            customer_type_id = form.customer_type_id.data
-            product_id = form.product_id.data if form.product_id.data else None
-            province_id = form.province_id.data if form.province_id.data else None
-            percentage = form.percentage.data
-            is_active = form.is_active.data
-
-            # Check if the combination already exists
-            existing_quota = CustomerTypeQuota.query.filter_by(
-                customer_type_id=customer_type_id,
-                product_id=product_id,
-                province_id=province_id
-            ).first()
-
-            # Validate total percentage doesn't exceed 100%
-            total_percentage = percentage
-
-            # Get other quotas with the same product_id and province_id
-            similar_quotas = CustomerTypeQuota.query.filter(
-                CustomerTypeQuota.product_id == product_id,
-                CustomerTypeQuota.province_id == province_id,
-                CustomerTypeQuota.is_active == True
-            )
-
-            if edit_mode and quota_to_edit:
-                similar_quotas = similar_quotas.filter(CustomerTypeQuota.id != quota_to_edit.id)
-
-            for q in similar_quotas:
-                total_percentage += q.percentage
-
-            if total_percentage > 100:
-                flash('مجموع درصدهای تخصیص داده شده نمی‌تواند از 100% بیشتر باشد.', 'danger')
-                return redirect(url_for('admin_customer_type_quotas'))
-
-            try:
-                if edit_mode and quota_to_edit:
-                    # Update existing quota
-                    quota_to_edit.customer_type_id = customer_type_id
-                    quota_to_edit.product_id = product_id
-                    quota_to_edit.province_id = province_id
-                    quota_to_edit.percentage = percentage
-                    quota_to_edit.is_active = is_active
-                    quota_to_edit.updated_at = datetime.now(timezone.utc)
-                    flash('تخصیص درصد با موفقیت به‌روزرسانی شد.', 'success')
-                elif existing_quota:
-                    # Update existing quota that matches the unique constraint
-                    existing_quota.percentage = percentage
-                    existing_quota.is_active = is_active
-                    existing_quota.updated_at = datetime.now(timezone.utc)
-                    flash('تخصیص درصد با موفقیت به‌روزرسانی شد.', 'success')
-                else:
-                    # Create new quota
-                    new_quota = CustomerTypeQuota(
-                        customer_type_id=customer_type_id,
-                        product_id=product_id,
-                        province_id=province_id,
-                        percentage=percentage,
-                        is_active=is_active
-                    )
-                    db.session.add(new_quota)
-                    flash('تخصیص درصد با موفقیت ایجاد شد.', 'success')
-
-                db.session.commit()
-                return redirect(url_for('admin_customer_type_quotas'))
-            except Exception as e:
-                db.session.rollback()
-                flash(f'خطا در ذخیره تخصیص درصد: {str(e)}', 'danger')
-
-        # Get all existing quotas for display
-        quotas = CustomerTypeQuota.query.order_by(
-            CustomerTypeQuota.is_active.desc(),
-            CustomerTypeQuota.province_id.asc(),
-            CustomerTypeQuota.product_id.asc(),
-            CustomerTypeQuota.percentage.desc()
-        ).all()
-
-        return render_template('admin/customer_type_quotas.html',
-                               form=form,
-                               quotas=quotas,
-                               edit_mode=edit_mode,
-                               customer_types=CustomerType.query.all(),
-                               products=Product.query.all(),
-                               provinces=Province.query.all())
-
-    @app.route('/admin/customer-type-quotas/delete/<int:quota_id>', methods=['POST'])
-    @login_required
-    def delete_customer_type_quota(quota_id):
-        if current_user.role != 'admin':
-            flash('دسترسی غیرمجاز!', 'danger')
-            return redirect(url_for('dashboard'))
-
-        quota = CustomerTypeQuota.query.get_or_404(quota_id)
-        try:
-            db.session.delete(quota)
-            db.session.commit()
-            flash('تخصیص درصد با موفقیت حذف شد.', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'خطا در حذف تخصیص درصد: {str(e)}', 'danger')
-
-        return redirect(url_for('admin_customer_type_quotas'))
-
-    # Add this function to app.py to calculate customer quota allocations considering customer type percentages
-
-    def calculate_customer_quota(customer, product, province, grade_weights, customers_by_grade, total_weighted_count):
-        """
-        Calculate product quotas for a specific customer, taking into account:
-        1. Their grade
-        2. Any fixed percentage allocations for their customer type
-        3. Remaining distribution among other customer types
-
-        Args:
-            customer: The CustomerReport instance
-            product: The Product instance
-            province: The Province instance
-            grade_weights: Dictionary of grade weights (e.g. {'A+': 2.0, 'A': 1.75, etc.})
-            customers_by_grade: Dictionary with count of customers by grade
-            total_weighted_count: Total weighted count of all customers
-
-        Returns:
-            tuple: (liter_quota, shrink_quota, source)
-        """
-        # Skip if customer doesn't have a grade or province
-        if not customer.grade or not province:
-            return None, None, "no_allocation"
-
-        # Get customer type
-        customer_type_id = customer.customer_type_id
-
-        # Get the product's province target
-        target = ProductProvinceTarget.query.filter_by(
-            product_id=product.id,
-            province_id=province.id
-        ).first()
-
-        if not target:
-            return None, None, "no_target"
-
-        liter_quota = None
-        shrink_quota = None
-
-        # First check if there's a batch-specific target for this grade
-        batch_target = None
-
-        # Get the latest evaluation for this customer to check if it belongs to a batch
-        customer_eval = CustomerEvaluation.query.filter_by(customer_id=customer.id).order_by(
-            CustomerEvaluation.evaluated_at.desc()).first()
-
-        if customer_eval and customer_eval.batch_id:
-            batch_target = BatchGradeTarget.query.filter_by(
-                batch_id=customer_eval.batch_id,
-                province_id=province.id,
-                product_id=product.id,
-                grade=customer.grade
-            ).first()
-
-        if batch_target:
-            # Use batch target directly if available
-            return batch_target.liter_capacity, batch_target.shrink_capacity, "batch_target"
-
-        # Check if there are any customer type quotas that apply
-        # Order of specificity: product+province > product only > province only > global
-        type_quota = None
-
-        # 1. Check for specific product and province
-        if customer_type_id:
-            type_quota = CustomerTypeQuota.query.filter_by(
-                customer_type_id=customer_type_id,
-                product_id=product.id,
-                province_id=province.id,
-                is_active=True
-            ).first()
-
-            # 2. Check for specific product, all provinces
-            if not type_quota:
-                type_quota = CustomerTypeQuota.query.filter_by(
-                    customer_type_id=customer_type_id,
-                    product_id=product.id,
-                    province_id=None,
-                    is_active=True
-                ).first()
-
-            # 3. Check for all products, specific province
-            if not type_quota:
-                type_quota = CustomerTypeQuota.query.filter_by(
-                    customer_type_id=customer_type_id,
-                    product_id=None,
-                    province_id=province.id,
-                    is_active=True
-                ).first()
-
-            # 4. Check for all products, all provinces
-            if not type_quota:
-                type_quota = CustomerTypeQuota.query.filter_by(
-                    customer_type_id=customer_type_id,
-                    product_id=None,
-                    province_id=None,
-                    is_active=True
-                ).first()
-
-        # If we have a fixed percentage allocation for this store type
-        if type_quota:
-            # Get all customers of this type in this province with this grade
-            type_grade_count = 0
-
-            # Count how many customers have this type + grade combination
-            for c in CustomerReport.query.filter_by(
-                    province=province.name,
-                    grade=customer.grade,
-                    customer_type_id=customer_type_id
-            ).all():
-                type_grade_count += 1
-
-            if type_grade_count > 0:
-                fixed_percentage = type_quota.percentage / 100.0
-
-                # Calculate allocation amount based on fixed percentage
-                if target.liter_capacity is not None:
-                    # The total allocation for this type is a fixed percentage of the total capacity
-                    type_total_liter = target.liter_capacity * fixed_percentage
-                    # Divide among customers of this type with this grade
-                    liter_quota = type_total_liter / type_grade_count
-
-                if target.shrink_capacity is not None:
-                    # The total allocation for this type is a fixed percentage of the total capacity
-                    type_total_shrink = target.shrink_capacity * fixed_percentage
-                    # Divide among customers of this type with this grade
-                    shrink_quota = type_total_shrink / type_grade_count
-
-                return liter_quota, shrink_quota, "type_fixed_percentage"
-
-        # If we get here, we need to calculate based on the remaining capacity after fixed allocations
-        # Get all the fixed percentage allocations for this product/province combination
-        fixed_allocations = CustomerTypeQuota.query.filter(
-            CustomerTypeQuota.is_active == True,
-            CustomerTypeQuota.province_id.in_([province.id, None]),
-            CustomerTypeQuota.product_id.in_([product.id, None])
-        ).all()
-
-        # Calculate the total fixed percentage already allocated
-        total_fixed_percentage = 0
-        for alloc in fixed_allocations:
-            # Apply more specific allocations first (both product and province specified)
-            if alloc.product_id == product.id and alloc.province_id == province.id:
-                total_fixed_percentage += alloc.percentage
-            # Then apply product-specific, all provinces
-            elif alloc.product_id == product.id and alloc.province_id is None:
-                # Only add if we don't already have a more specific allocation for this customer type
-                if not any(fa for fa in fixed_allocations
-                           if fa.customer_type_id == alloc.customer_type_id
-                              and fa.product_id == product.id
-                              and fa.province_id == province.id):
-                    total_fixed_percentage += alloc.percentage
-            # Then apply province-specific, all products
-            elif alloc.product_id is None and alloc.province_id == province.id:
-                # Only add if we don't already have a more specific allocation for this customer type
-                if not any(fa for fa in fixed_allocations
-                           if fa.customer_type_id == alloc.customer_type_id
-                              and (fa.product_id == product.id or
-                                   (fa.product_id is None and fa.province_id == province.id))):
-                    total_fixed_percentage += alloc.percentage
-            # Finally apply global allocations (all products, all provinces)
-            elif alloc.product_id is None and alloc.province_id is None:
-                # Only add if we don't already have a more specific allocation for this customer type
-                if not any(fa for fa in fixed_allocations
-                           if fa.customer_type_id == alloc.customer_type_id
-                              and (fa.product_id == product.id or fa.province_id == province.id)):
-                    total_fixed_percentage += alloc.percentage
-
-        # Cap at 100% to handle any calculation errors
-        total_fixed_percentage = min(total_fixed_percentage, 100)
-
-        # Calculate remaining percentage
-        remaining_percentage = 100 - total_fixed_percentage
-
-        # Get all customer types with fixed allocations
-        fixed_customer_type_ids = [a.customer_type_id for a in fixed_allocations]
-
-        # Skip if this customer has a type with fixed allocation but we didn't match it earlier
-        if customer_type_id and customer_type_id in fixed_customer_type_ids:
-            return None, None, "excluded_by_type"
-
-        # Count customers that should share the remaining capacity (excluding those with fixed allocations)
-        remaining_customers_by_grade = {}
-
-        # Count customers by grade, excluding those with fixed allocations
-        for c in CustomerReport.query.filter_by(province=province.name).all():
-            # Skip if customer type has a fixed allocation
-            if c.customer_type_id and c.customer_type_id in fixed_customer_type_ids:
-                continue
-
-            grade = c.grade or 'بدون درجه'
-            if grade not in remaining_customers_by_grade:
-                remaining_customers_by_grade[grade] = 0
-
-            remaining_customers_by_grade[grade] += 1
-
-        # Calculate total weighted count for remaining customers
-        remaining_weighted_count = 0
-        for grade, count in remaining_customers_by_grade.items():
-            weight = grade_weights.get(grade, 0.5)
-            remaining_weighted_count += count * weight
-
-        # If no remaining customers or weighted count, return none
-        if not remaining_customers_by_grade or remaining_weighted_count == 0:
-            return None, None, "no_remaining_allocation"
-
-        # Get the count for THIS SPECIFIC grade among remaining customers
-        remaining_grade_count = remaining_customers_by_grade.get(customer.grade, 0)
-
-        # If no customers of this grade remaining, return none
-        if remaining_grade_count == 0:
-            return None, None, "no_grade_allocation"
-
-        # Calculate allocation based on remaining capacity, grade weight, and customer count
-        customer_grade = customer.grade
-        customer_weight = grade_weights.get(customer_grade, 0.5)
-
-        # Calculate quotas based on remaining capacity
-        if target.liter_capacity is not None:
-            remaining_liter = target.liter_capacity * (remaining_percentage / 100.0)
-            grade_liter = remaining_liter * customer_weight * remaining_grade_count / remaining_weighted_count
-            liter_quota = grade_liter / remaining_grade_count
-
-        if target.shrink_capacity is not None:
-            remaining_shrink = target.shrink_capacity * (remaining_percentage / 100.0)
-            grade_shrink = remaining_shrink * customer_weight * remaining_grade_count / remaining_weighted_count
-            shrink_quota = grade_shrink / remaining_grade_count
-
-        return liter_quota, shrink_quota, "calculated_remaining"
-
-
-
+            return jsonify({'error': 'Unauthorized'}), 403
+
+        # Get province for this batch
+        province_name = None
+        csv_eval = CSVEvaluationRecord.query.filter_by(batch_id=batch_id).first()
+        if csv_eval and csv_eval.province:
+            province_name = csv_eval.province
+
+        if not province_name:
+            cust_eval = CustomerEvaluation.query.filter_by(batch_id=batch_id).first()
+            if cust_eval and cust_eval.province:
+                province_name = cust_eval.province
+
+        if not province_name:
+            return jsonify([])
+
+        # First get customer IDs from evaluations
+        customer_ids = set()
+
+        # Get IDs from CSV evaluations
+        csv_evals = CSVEvaluationRecord.query.filter_by(batch_id=batch_id).all()
+        for eval in csv_evals:
+            if eval.customer_id:
+                customer_ids.add(eval.customer_id)
+
+        # Get IDs from customer evaluations
+        cust_evals = CustomerEvaluation.query.filter_by(batch_id=batch_id).all()
+        for eval in cust_evals:
+            customer_ids.add(eval.customer_id)
+
+        # Get all customers in this province matching those IDs
+        customers = []
+        if customer_ids:
+            customers = CustomerReport.query.filter(
+                CustomerReport.id.in_(customer_ids),
+                CustomerReport.province == province_name
+            ).all()
+
+        # Get store types for all customers
+        store_types = {st.id: st.name for st in StoreType.query.all()}
+
+        # Format customer data
+        result = []
+        for customer in customers:
+            store_type_name = store_types.get(customer.store_type_id, None) if customer.store_type_id else None
+
+            result.append({
+                'id': customer.id,
+                'number': customer.number,
+                'name': customer.name,
+                'grade': customer.grade,
+                'province': customer.province,
+                'store_type_id': customer.store_type_id,
+                'store_type_name': store_type_name
+            })
+
+        return jsonify(result)
     # Add API endpoint for marketer to update location
     @app.route('/api/marketer/update-location', methods=['POST'])
     @login_required
@@ -6070,7 +6399,7 @@ def create_app():
             return jsonify({'error': str(e)}), 500
 
     return app
-    
+
 if __name__ == '__main__':
    application = create_app()
-   application.run(debug=True, host='0.0.0.0', port=8000)
+   application.run(debug=True, port=5000)
