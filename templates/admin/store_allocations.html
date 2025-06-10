@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>مدیریت تخصیص سهمیه به انواع فروشگاه | پنل مدیریت</title>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <style>
+    /* Global Styles */
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Vazirmatn', sans-serif;
+      padding: 2rem;
+      color: #1e293b;
+      direction: rtl;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.75rem;
+      color: #334155;
+    }
+    /* Section styling */
+    .section {
+      background: #fff;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .section h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section h2 i {
+      color: #4f46e5;
+    }
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #475569;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 0.875rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.375rem;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    input[type="number"]:focus {
+      border-color: #4f46e5;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+    }
+    .submit-btn {
+      background-color: #4f46e5;
+      color: #fff;
+      padding: 0.75rem 1.25rem;
+      border: none;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .submit-btn:hover {
+      background-color: #4338ca;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.375rem 0.75rem;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background-color: #4f46e5;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background-color: #4338ca;
+    }
+    .btn-outline {
+      background-color: transparent;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+    .btn-outline:hover {
+      background-color: #f8fafc;
+    }
+    /* Flash messages */
+    .flash {
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+    }
+    .success {
+      background-color: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      color: #166534;
+    }
+    .danger {
+      background-color: #fef2f2;
+      border-left: 4px solid #ef4444;
+      color: #b91c1c;
+    }
+    .warning {
+      background-color: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #92400e;
+    }
+    .info {
+      background-color: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      color: #1e40af;
+    }
+
+    /* Allocation Form */
+    .allocation-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .allocation-item {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      padding: 1rem;
+    }
+    .allocation-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .store-type-name {
+      font-weight: 600;
+      color: #334155;
+    }
+    .percentage-input {
+      max-width: 120px;
+      display: flex;
+      align-items: center;
+    }
+    .percentage-input input {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    .percentage-input::after {
+      content: "%";
+      background-color: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-right: none;
+      border-top-left-radius: 0.375rem;
+      border-bottom-left-radius: 0.375rem;
+      padding: 0.75rem 0.5rem;
+      color: #64748b;
+    }
+
+    /* Chart Section */
+    .chart-container {
+      height: 300px;
+      max-width: 800px;
+      margin: 1.5rem auto;
+    }
+
+    /* Total Allocation Indicator */
+    .allocation-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .summary-label {
+      font-weight: 500;
+      color: #334155;
+    }
+    .allocation-bar {
+      flex: 1;
+      height: 1rem;
+      background-color: #e2e8f0;
+      border-radius: 0.5rem;
+      margin: 0 1rem;
+      overflow: hidden;
+      position: relative;
+    }
+    .allocation-progress {
+      height: 100%;
+      background-color: #4f46e5;
+      border-radius: 0.5rem;
+      transition: width 0.3s;
+    }
+    .allocation-warning {
+      background-color: #f97316;
+    }
+    .allocation-error {
+      background-color: #ef4444;
+    }
+    .summary-value {
+      font-weight: 600;
+      color: #334155;
+    }
+    .summary-value.warning {
+      color: #f97316;
+    }
+    .summary-value.error {
+      color: #ef4444;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h1>مدیریت تخصیص سهمیه به انواع فروشگاه - دسته ارزیابی {{ batch_id }}</h1>
+    <div>
+      <a href="{{ url_for('view_batch_evaluations', batch_id=batch_id) }}" class="btn btn-outline">
+        <i class="fas fa-arrow-right"></i>
+        بازگشت به جزئیات دسته ارزیابی
+      </a>
+    </div>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="section">
+    <h2>
+      <i class="fas fa-info-circle"></i>
+      راهنمای تخصیص سهمیه کل
+    </h2>
+    <p>
+      در این بخش می‌توانید درصدی از سهمیه کل را به انواع فروشگاه‌های مختلف تخصیص دهید.
+      این تخصیص باعث می‌شود که فروشگاه‌های هر نوع، سهمیه مشخصی از کل سهمیه استان دریافت کنند.
+    </p>
+    <div class="flash info">
+      <i class="fas fa-lightbulb"></i>
+      توجه: مجموع درصدهای تخصیص نباید از 100% بیشتر باشد. سهمیه باقیمانده بین سایر مشتریان توزیع می‌شود.
+    </div>
+
+    {% if province %}
+      <div class="flash info">
+        <i class="fas fa-map-marker-alt"></i>
+        استان فعلی: <strong>{{ province.name }}</strong>
+      </div>
+    {% else %}
+      <div class="flash warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        لطفاً ابتدا یک استان را به این دسته ارزیابی تخصیص دهید.
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="allocation-summary">
+    <div class="summary-label">کل تخصیص:</div>
+    <div class="allocation-bar">
+<div class="allocation-progress {% if total_allocated > 90 %}allocation-warning{% endif %} {% if total_allocated > 100 %}allocation-error{% endif %}" style="width: {{ total_allocated if total_allocated <= 100 else 100 }}%;"></div>
+    </div>
+    <div class="summary-value {% if total_allocated > 90 %}warning{% endif %} {% if total_allocated > 100 %}error{% endif %}">
+      {{ "{:.1f}".format(total_allocated) }}%
+    </div>
+  </div>
+
+  {% if store_types %}
+    <div class="section">
+      <h2>
+        <i class="fas fa-percentage"></i>
+        تخصیص درصد از سهمیه کل
+      </h2>
+
+      <form method="POST" action="{{ url_for('manage_store_allocations', batch_id=batch_id) }}">
+        <div class="allocation-form">
+          {% for store_type in store_types %}
+            <div class="allocation-item">
+              <div class="allocation-header">
+                <div class="store-type-name">{{ store_type.name }}</div>
+                <div class="percentage-input">
+                  <input type="number" name="percentage_{{ store_type.id }}" id="percentage_{{ store_type.id }}"
+                         min="0" max="100" step="0.1"
+                         value="{{ allocations.get(store_type.id, 0) }}"
+                         onchange="updateAllocationChart()"
+                         onkeyup="updateAllocationChart()">
+                </div>
+              </div>
+              <div style="color: #64748b; font-size: 0.875rem;">
+                <div>مشتریان این نوع فروشگاه درصد مشخصی از سهمیه کل را دریافت می‌کنند.</div>
+                <div style="margin-top: 0.5rem;">حداکثر: 100%</div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="allocation-item" style="background-color: #f0fdf4; border-color: #bbf7d0; margin-top: 1rem;">
+          <div class="allocation-header">
+            <div class="store-type-name">باقیمانده برای سایر مشتریان</div>
+            <div class="percentage-input">
+              <input type="number" id="remaining_percentage"
+                     value="{{ "{:.1f}".format(remaining_percentage) }}"
+                     readonly style="background-color: #dcfce7;">
+            </div>
+          </div>
+          <div style="color: #166534; font-size: 0.875rem;">
+            این درصد بین سایر مشتریان (فروشگاه‌های بدون نوع مشخص) توزیع می‌شود.
+          </div>
+        </div>
+
+        <div class="chart-container">
+          <canvas id="allocationChart"></canvas>
+        </div>
+
+        <button type="submit" class="submit-btn" id="saveBtn">
+          <i class="fas fa-save"></i>
+          ذخیره تخصیص‌ها
+        </button>
+      </form>
+    </div>
+  {% else %}
+    <div class="section">
+      <div style="text-align: center; padding: 2rem; color: #64748b;">
+        <p>هیچ نوع فروشگاهی تعریف نشده است. لطفاً ابتدا انواع فروشگاه را تعریف کنید.</p>
+        <a href="{{ url_for('admin_store_types') }}" class="btn btn-primary" style="margin-top: 1rem;">
+          <i class="fas fa-plus"></i>
+          تعریف انواع فروشگاه
+        </a>
+      </div>
+    </div>
+  {% endif %}
+
+  <script>
+    // Initialize data for chart
+    const storeTypes = [
+      {% for store_type in store_types %}
+        {
+          id: {{ store_type.id }},
+          name: "{{ store_type.name }}",
+          percentage: {{ allocations.get(store_type.id, 0) }}
+        },
+      {% endfor %}
+    ];
+
+    // Chart configuration
+    let allocationChart;
+
+    function initializeChart() {
+      const ctx = document.getElementById('allocationChart').getContext('2d');
+
+      // Prepare data for chart
+      const labels = storeTypes.map(type => type.name);
+      labels.push('باقیمانده');
+
+      const percentages = storeTypes.map(type => type.percentage);
+      const remaining = Math.max(0, 100 - percentages.reduce((a, b) => a + b, 0));
+      percentages.push(remaining);
+
+      // Define colors
+      const backgroundColors = [
+        '#4f46e5',
+        '#22c55e',
+        '#f97316',
+        '#3b82f6',
+        '#ec4899',
+        '#8b5cf6',
+        '#64748b',
+        '#dcfce7' // Light green for remaining
+      ];
+
+      // Create chart
+      allocationChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: percentages,
+            backgroundColor: backgroundColors.slice(0, labels.length),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                font: {
+                  family: 'Vazirmatn'
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.label}: ${context.raw}%`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Update chart and calculations when percentages change
+    function updateAllocationChart() {
+      // Calculate total allocated percentage
+      let totalAllocated = 0;
+
+      storeTypes.forEach(type => {
+        const inputField = document.getElementById(`percentage_${type.id}`);
+        const percentage = parseFloat(inputField.value) || 0;
+        type.percentage = percentage;
+        totalAllocated += percentage;
+      });
+
+      // Update remaining percentage
+      const remaining = Math.max(0, 100 - totalAllocated);
+      document.getElementById('remaining_percentage').value = remaining.toFixed(1);
+
+      // Update save button state
+      const saveBtn = document.getElementById('saveBtn');
+      if (totalAllocated > 100) {
+        saveBtn.disabled = true;
+        saveBtn.style.backgroundColor = '#64748b';
+        saveBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> مجموع درصدها بیش از 100% است';
+      } else {
+        saveBtn.disabled = false;
+        saveBtn.style.backgroundColor = '';
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> ذخیره تخصیص‌ها';
+      }
+
+      // Update chart
+      if (allocationChart) {
+        // Update data
+        const percentages = storeTypes.map(type => type.percentage);
+        percentages.push(remaining);
+
+        allocationChart.data.datasets[0].data = percentages;
+        allocationChart.update();
+      }
+
+      // Update progress bar
+      const progressBar = document.querySelector('.allocation-progress');
+      progressBar.style.width = `${Math.min(totalAllocated, 100)}%`;
+
+      if (totalAllocated > 100) {
+        progressBar.classList.add('allocation-error');
+        document.querySelector('.summary-value').classList.add('error');
+      } else {
+        progressBar.classList.remove('allocation-error');
+        document.querySelector('.summary-value').classList.remove('error');
+      }
+
+      if (totalAllocated > 90 && totalAllocated <= 100) {
+        progressBar.classList.add('allocation-warning');
+        document.querySelector('.summary-value').classList.add('warning');
+      } else {
+        progressBar.classList.remove('allocation-warning');
+        document.querySelector('.summary-value').classList.remove('warning');
+      }
+
+      // Update summary value
+      document.querySelector('.summary-value').textContent = `${totalAllocated.toFixed(1)}%`;
+    }
+
+    // Initialize the chart when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeChart();
+    });
+  </script>
+</body> // Added closing body tag
+</html> // Added closing html tag
